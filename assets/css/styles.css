@@ -568,6 +568,13 @@ img {
     margin-top: var(--spacing-md);
 }
 
+.website-frame-container-fullwidth {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: var(--spacing-md);
+}
+
 .iframe-protector {
     position: relative;
     width: 100%;
@@ -580,6 +587,16 @@ img {
     min-width: 320px; /* Minimum width */
     max-width: 100%; /* Maximum width */
     overflow: auto; /* Show scrollbars when needed */
+    isolation: isolate; /* Create a new stacking context to block effects */
+}
+
+.iframe-protector-fullwidth {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--color-background);
+    height: 80vh; /* Use viewport height for better scaling */
+    min-height: 600px;
     isolation: isolate; /* Create a new stacking context to block effects */
 }
 
@@ -639,6 +656,11 @@ img {
         height: 450px;
     }
     
+    .iframe-protector-fullwidth {
+        height: 70vh;
+        min-height: 450px;
+    }
+    
     .card-image {
         height: 180px;
     }
@@ -683,6 +705,11 @@ img {
     
     .iframe-protector {
         height: 350px;
+    }
+    
+    .iframe-protector-fullwidth {
+        height: 60vh;
+        min-height: 350px;
     }
 }
 .contact-section {
