@@ -679,6 +679,19 @@ img {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .header .container {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .nav {
+        gap: var(--spacing-xs);
+    }
+    
+    .offer-button {
+        font-size: var(--font-size-xs);
+        padding: 6px 10px;
+    }
+    
     .gallery {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: var(--spacing-sm);
@@ -713,22 +726,32 @@ img {
 
 @media (max-width: 576px) {
     .header .container {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-sm);
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left;
+    }
+    
+    .logo h1 {
+        display: none; /* Hide title on mobile for space */
     }
     
     .nav {
         display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-xs);
-        justify-content: center;
+        gap: 8px;
+        align-items: center;
     }
     
     .offer-button, .back-button {
         margin-left: 0;
-        font-size: var(--font-size-xs);
-        padding: 6px 12px;
+        font-size: 12px;
+        padding: 4px 8px;
+        white-space: nowrap;
+    }
+    
+    .offer-button {
+        background: #FF6B6B;
+        border-radius: 4px;
     }
     
     .gallery {
