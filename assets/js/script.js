@@ -189,6 +189,37 @@
         if (iframe) {
             iframe.src = website.url;
             iframe.title = website.title;
+            
+            // Auto-resize iframe to content height
+            iframe.onload = function() {
+                try {
+                    // Try to access iframe content height
+                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                    const height = Math.max(
+                        iframeDocument.body.scrollHeight,
+                        iframeDocument.body.offsetHeight,
+                        iframeDocument.documentElement.clientHeight,
+                        iframeDocument.documentElement.scrollHeight,
+                        iframeDocument.documentElement.offsetHeight
+                    );
+                    
+                    // Set iframe height to content height
+                    iframe.style.height = height + 'px';
+                    
+                    // Update container height
+                    const container = iframe.parentElement;
+                    if (container) {
+                        container.style.height = height + 'px';
+                    }
+                } catch (e) {
+                    // Cross-origin restrictions prevent access, use fallback
+                    iframe.style.height = '100vh';
+                    const container = iframe.parentElement;
+                    if (container) {
+                        container.style.height = '100vh';
+                    }
+                }
+            };
         }
     }
 
