@@ -217,6 +217,43 @@ img {
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
+.neon-button {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    background: linear-gradient(135deg, #00D4FF, #0099CC);
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    margin-left: var(--spacing-md);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    animation: neon-glow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon-glow {
+    0% {
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.4), 0 0 20px rgba(0, 212, 255, 0.2);
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.6), 0 0 30px rgba(0, 212, 255, 0.3);
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+    }
+}
+
+.neon-button:hover {
+    background: linear-gradient(135deg, #00B8E6, #0088B3);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.7), 0 4px 12px rgba(0, 212, 255, 0.4);
+}
+
 .footer-offer-link {
     color: var(--color-accent);
     font-weight: 600;
@@ -721,7 +758,7 @@ img {
         gap: var(--spacing-xs);
     }
     
-    .offer-button {
+    .offer-button, .neon-button {
         font-size: var(--font-size-xs);
         padding: 6px 10px;
     }
@@ -778,7 +815,7 @@ img {
         margin-left: var(--spacing-md);
     }
     
-    .offer-button, .back-button {
+    .offer-button, .back-button, .neon-button {
         margin-left: 0;
         font-size: 12px;
         padding: 6px 10px;
@@ -787,6 +824,12 @@ img {
     
     .offer-button {
         background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        border-radius: 4px;
+        margin-left: var(--spacing-xs);
+    }
+    
+    .neon-button {
+        background: linear-gradient(135deg, #00D4FF, #0099CC);
         border-radius: 4px;
         margin-left: var(--spacing-xs);
     }
