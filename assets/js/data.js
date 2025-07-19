@@ -88,7 +88,7 @@ const SHOWCASE_WEBSITES = [
         "title": "Luxe Hair Studio",
         "description": "Premium Hair Salon Website Template with Luxury Theme",
         "url": "https://luxehairstudio.artivicolab.com/",
-        "thumbnail": "assets/images/luxehairstudio.svg",
+        "thumbnail": "assets/images/luxehairstudio.png",
         "metadata": {
             "created": "July 19, 2025",
             "technologies": ["HTML", "CSS", "JavaScript"],
