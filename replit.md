@@ -100,6 +100,7 @@ Changelog:
 - June 17, 2025. Initial setup
 - June 20, 2025. Added Neon Fluencer navigation button with neon glow effects
 - July 19, 2025. Integrated Google Analytics tracking (G-WMW68GE9TM) across all pages
+- July 19, 2025. Added Luxe Hair Studio showcase with pink/purple gradient theme and custom SVG thumbnail
 ```
 
 ## User Preferences
