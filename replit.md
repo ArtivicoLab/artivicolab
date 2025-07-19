@@ -62,6 +62,7 @@ ArtivicoLab is a static website showcase platform built by Gradi Kayamba that di
 ### Third-Party Services
 - **FormSubmit.co**: Contact form processing and email forwarding
 - **Google Fonts**: Typography (Inter, Pacifico font families)
+- **Google Analytics**: Website traffic tracking and analytics (G-WMW68GE9TM)
 - **External Websites**: Showcase websites hosted on GitHub Pages
 
 ### CDN Resources
@@ -97,6 +98,8 @@ ArtivicoLab is a static website showcase platform built by Gradi Kayamba that di
 ```
 Changelog:
 - June 17, 2025. Initial setup
+- June 20, 2025. Added Neon Fluencer navigation button with neon glow effects
+- July 19, 2025. Integrated Google Analytics tracking (G-WMW68GE9TM) across all pages
 ```
 
 ## User Preferences
