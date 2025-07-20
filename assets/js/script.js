@@ -59,8 +59,12 @@
             const galleryItem = document.createElement('div');
             galleryItem.className = 'gallery-item';
             
+            // For Luxe Styles by Jasmine (ID 8), link directly to external URL
+            const linkHref = website.id === 8 ? website.url : `showcase.html?id=${website.id}`;
+            const linkTarget = website.id === 8 ? ' target="_blank"' : '';
+            
             galleryItem.innerHTML = `
-                <a href="showcase.html?id=${website.id}" class="card">
+                <a href="${linkHref}" class="card"${linkTarget}>
                     <div class="card-image">
                         <img src="${website.thumbnail}" alt="${website.title}">
                     </div>
