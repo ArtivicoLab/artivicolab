@@ -95,5 +95,18 @@ const SHOWCASE_WEBSITES = [
             "organization": "ArtivicoLab",
             "type": "Hair Salon"
         }
+    },
+    {
+        "id": 8,
+        "title": "Luxe Styles by Jasmine",
+        "description": "Professional Hair Styling Website with Pink Theme",
+        "url": "https://luxestylesbyjasmine.artivicolab.com/",
+        "thumbnail": "assets/images/luxestylesbyjasmine.png",
+        "metadata": {
+            "created": "July 20, 2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Hair Salon"
+        }
     }
 ];
