@@ -556,9 +556,90 @@ img {
 }
 
 .card-image {
+    position: relative;
     height: 200px;
     overflow: hidden;
     background-color: var(--color-accent);
+}
+
+.card-badge {
+    position: absolute;
+    top: var(--spacing-xs);
+    left: var(--spacing-xs);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    backdrop-filter: blur(6px);
+    z-index: 1;
+}
+
+.card-badge--app {
+    background-color: rgba(9, 132, 227, 0.92);
+}
+
+.card-badge--template {
+    background-color: rgba(45, 52, 54, 0.78);
+}
+
+@media (prefers-color-scheme: dark) {
+    .card-badge--template {
+        background-color: rgba(247, 250, 252, 0.18);
+    }
+}
+
+/* Section headings (Services + gallery sections) */
+.section-heading {
+    font-size: var(--font-size-xxl);
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-xs);
+}
+
+.section-sub {
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-md);
+}
+
+.gallery-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Services */
+.services {
+    margin-bottom: var(--spacing-xl);
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+}
+
+.service-card {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+}
+
+.service-card h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.service-card p {
+    color: var(--color-secondary);
+    font-size: var(--font-size-md);
+    line-height: 1.5;
 }
 
 .card-image img {

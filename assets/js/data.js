@@ -1,12 +1,129 @@
 /**
- * Website Showcase Platform - Data
- * Contains all website information and metadata
+ * ArtivicoLab — Data
+ * Real-world static applications + reusable website templates
  */
 
-// Sample showcase websites with detailed metadata
+const MSHOTS = (url) => `https://s.wp.com/mshots/v1/${encodeURIComponent(url)}?w=1200&h=900`;
+
 const SHOWCASE_WEBSITES = [
+    // ───────────────────────── Applications ─────────────────────────
+    {
+        "id": 101,
+        "category": "application",
+        "title": "AdCalc",
+        "description": "Free, private ad profit & unit-economics calculator for DTC and dropshipping store owners.",
+        "url": "https://adcalc.artivicolab.com/",
+        "thumbnail": MSHOTS("https://adcalc.artivicolab.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Marketing analytics tool"
+        }
+    },
+    {
+        "id": 102,
+        "category": "application",
+        "title": "Btwinus",
+        "description": "Real-world static application by ArtivicoLab.",
+        "url": "https://btwinus.com/",
+        "thumbnail": MSHOTS("https://btwinus.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Web application"
+        }
+    },
+    {
+        "id": 103,
+        "category": "application",
+        "title": "Foolscap",
+        "description": "Generate, fill, and live-sign contracts in your browser — verified PDF with signing certificate.",
+        "url": "https://foolscap.artivicolab.com/",
+        "thumbnail": MSHOTS("https://foolscap.artivicolab.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Contracts & e-signing"
+        }
+    },
+    {
+        "id": 104,
+        "category": "application",
+        "title": "Hookline",
+        "description": "Script short-form video in blocks, timed to your speaking pace.",
+        "url": "https://hookline.artivicolab.com/",
+        "thumbnail": MSHOTS("https://hookline.artivicolab.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Content creation"
+        }
+    },
+    {
+        "id": 105,
+        "category": "application",
+        "title": "Pressdown",
+        "description": "Write Markdown, see the real email render live, copy the HTML and send anywhere.",
+        "url": "https://pressdown.artivicolab.com/",
+        "thumbnail": MSHOTS("https://pressdown.artivicolab.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Email & newsletters"
+        }
+    },
+    {
+        "id": 106,
+        "category": "application",
+        "title": "InvoiceMaster",
+        "description": "Private, free invoice generator — 12 templates, no signup required.",
+        "url": "https://invoicemaster.artivicolab.com/",
+        "thumbnail": MSHOTS("https://invoicemaster.artivicolab.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Business tool"
+        }
+    },
+    {
+        "id": 107,
+        "category": "application",
+        "title": "QuizBuffet",
+        "description": "Real-world static application by ArtivicoLab.",
+        "url": "https://quizbuffet.com/",
+        "thumbnail": MSHOTS("https://quizbuffet.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Web application"
+        }
+    },
+    {
+        "id": 108,
+        "category": "application",
+        "title": "ProxForm",
+        "description": "GDPR-proof medical intake forms — 100% browser-only, peer-to-peer, no server.",
+        "url": "https://proxform.artivicolab.com/",
+        "thumbnail": MSHOTS("https://proxform.artivicolab.com/"),
+        "metadata": {
+            "created": "2025",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Healthcare forms"
+        }
+    },
+
+    // ───────────────────────── Templates ─────────────────────────
     {
         "id": 1,
+        "category": "template",
         "title": "Island Vibes Kitchen",
         "description": "Complete Restaurant Website Template with Jamaican/Caribbean Theme",
         "url": "https://gradikay.github.io/IslandVibesKitchen/",
@@ -20,6 +137,7 @@ const SHOWCASE_WEBSITES = [
     },
     {
         "id": 2,
+        "category": "template",
         "title": "Nail Nova",
         "description": "Complete Nail Salon Website Template with orange and pink Theme",
         "url": "https://gradikay.github.io/NailNova/",
@@ -33,6 +151,7 @@ const SHOWCASE_WEBSITES = [
     },
     {
         "id": 3,
+        "category": "template",
         "title": "Island Flavors",
         "description": "Complete Restaurant Website Template with Jamaican/Caribbean Theme",
         "url": "https://gradikay.github.io/JamaicanCuisine/",
@@ -46,19 +165,21 @@ const SHOWCASE_WEBSITES = [
     },
     {
         "id": 4,
+        "category": "template",
         "title": "Sparkle Nails",
         "description": "Complete Nail Salon Website Template with red and pink Theme",
         "url": "https://gradikay.github.io/SparkleNails/",
-            "thumbnail": "assets/images/sparklenailshome.webp",
+        "thumbnail": "assets/images/sparklenailshome.webp",
         "metadata": {
             "created": "May 19, 2025",
-                "technologies": ["HTML", "CSS", "JavaScript"],
-                "organization": "ArtivicoLab",
-                "type": "Nail Salon"
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Nail Salon"
         }
     },
     {
         "id": 5,
+        "category": "template",
         "title": "Elegant Hair Studio",
         "description": "Complete Hair Salon Landing Page Template with Yellow and Orange Theme",
         "url": "https://gradikay.github.io/ElegantHairStudio/",
@@ -72,6 +193,7 @@ const SHOWCASE_WEBSITES = [
     },
     {
         "id": 6,
+        "category": "template",
         "title": "Neon Fluencer",
         "description": "Complete Influencer Landing Page Template with Black Theme",
         "url": "https://gradikay.github.io/NeonFluencer/",
@@ -85,6 +207,7 @@ const SHOWCASE_WEBSITES = [
     },
     {
         "id": 7,
+        "category": "template",
         "title": "Luxe Hair Studio",
         "description": "Premium Hair Salon Website Template with Luxury Theme",
         "url": "https://luxehairstudio.artivicolab.com/",
@@ -98,6 +221,7 @@ const SHOWCASE_WEBSITES = [
     },
     {
         "id": 8,
+        "category": "template",
         "title": "Luxe Styles by Jasmine",
         "description": "Professional Hair Styling Website with Pink Theme",
         "url": "https://luxestylesbyjasmine.artivicolab.com/",

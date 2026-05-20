@@ -19,54 +19,62 @@
         console.log('Website Showcase Platform initialized');
 
         // Check if we're on the index page
-        if (document.getElementById('gallery-container')) {
-            // Populate gallery with website items
-            populateGallery();
-            
-            // Add animation to gallery items
+        if (document.getElementById('applications-container') || document.getElementById('templates-container')) {
+            populateGallery('applications-container', 'application');
+            populateGallery('templates-container', 'template');
+            animateGalleryItems();
+        } else if (document.getElementById('gallery-container')) {
+            populateGallery('gallery-container');
             animateGalleryItems();
         }
         
         // Check if we're on the showcase page
         if (document.getElementById('showcase-details')) {
-            // Get the website ID from the URL
             const urlParams = new URLSearchParams(window.location.search);
             const websiteId = parseInt(urlParams.get('id'));
-            
-            if (websiteId) {
-                // Load and display the website details
+            const website = websiteId && SHOWCASE_WEBSITES.find(s => s.id === websiteId);
+
+            // Showcase page is for templates only. Applications open directly in a new tab from index.
+            if (website && website.category !== 'application') {
                 displayWebsiteDetails(websiteId);
+            } else if (website && website.category === 'application') {
+                window.location.href = website.url;
             } else {
-                // Redirect to home page if no ID provided
                 window.location.href = 'index.html';
             }
         }
     }
 
     /**
-     * Populate the gallery with website items
+     * Populate a gallery container with website items, optionally filtered by category.
      */
-    function populateGallery() {
-        const galleryContainer = document.getElementById('gallery-container');
-        
+    function populateGallery(containerId, category) {
+        const galleryContainer = document.getElementById(containerId);
         if (!galleryContainer) return;
-        
-        // Clear any existing content
+
         galleryContainer.innerHTML = '';
-        
-        // Add each website to the gallery
-        SHOWCASE_WEBSITES.forEach(website => {
+
+        const items = category
+            ? SHOWCASE_WEBSITES.filter(w => w.category === category)
+            : SHOWCASE_WEBSITES;
+
+        items.forEach(website => {
             const galleryItem = document.createElement('div');
             galleryItem.className = 'gallery-item';
-            
-            // For Luxe Styles by Jasmine (ID 8), link directly to external URL
-            const linkHref = website.id === 8 ? website.url : `showcase.html?id=${website.id}`;
-            const linkTarget = website.id === 8 ? ' target="_blank"' : '';
-            
+
+            // Applications and Luxe Styles by Jasmine (id 8) link directly to the live site.
+            const linksOut = website.category === 'application' || website.id === 8;
+            const linkHref = linksOut ? website.url : `showcase.html?id=${website.id}`;
+            const linkTarget = linksOut ? ' target="_blank" rel="noopener"' : '';
+            const badge = website.category === 'application'
+                ? '<span class="card-badge card-badge--app">Live App</span>'
+                : '<span class="card-badge card-badge--template">Template</span>';
+
             galleryItem.innerHTML = `
                 <a href="${linkHref}" class="card"${linkTarget}>
                     <div class="card-image">
-                        <img src="${website.thumbnail}" alt="${website.title}">
+                        <img src="${website.thumbnail}" alt="${website.title}" loading="lazy">
+                        ${badge}
                     </div>
                     <div class="card-content">
                         <div class="card-header">
@@ -75,17 +83,17 @@
                         </div>
                         <p>${website.description}</p>
                         <div class="card-tech-preview">
-                            ${website.metadata.technologies.slice(0, 3).map(tech => 
+                            ${website.metadata.technologies.slice(0, 3).map(tech =>
                                 `<span class="tech-badge">${tech}</span>`
                             ).join('')}
-                            ${website.metadata.technologies.length > 3 ? 
-                                `<span class="tech-badge more">+${website.metadata.technologies.length - 3}</span>` : 
+                            ${website.metadata.technologies.length > 3 ?
+                                `<span class="tech-badge more">+${website.metadata.technologies.length - 3}</span>` :
                                 ''}
                         </div>
                     </div>
                 </a>
             `;
-            
+
             galleryContainer.appendChild(galleryItem);
         });
     }
