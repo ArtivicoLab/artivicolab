@@ -10,38 +10,52 @@
 
       gtag('config', 'G-WMW68GE9TM');
     </script>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ArtivicoLab — a studio building real-world static web apps and reusable website templates. Founded by Gradi Kayamba.">
-    <meta name="keywords" content="static web apps, web applications, website templates, web design studio, Gradi Kayamba, ArtivicoLab, portfolio">
+    <meta name="description" content="ArtivicoLab — a lab shipping real-world static web applications and reusable website templates. By Gradi Kayamba.">
+    <meta name="keywords" content="static web apps, web applications, website templates, design lab, Gradi Kayamba, ArtivicoLab, portfolio">
     <meta name="author" content="Gradi Kayamba">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="ArtivicoLab — Studio building real-world static web apps & templates">
-    <meta property="og:description" content="We design and ship real-world static web applications and reusable website templates.">
+    <meta property="og:title" content="ArtivicoLab — A lab for static web applications">
+    <meta property="og:description" content="We research, prototype, and ship private-by-default static web applications and reusable templates.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://artivicolab.com/">
     <meta property="og:image" content="assets/images/logo.svg">
-    <title>ArtivicoLab — Static Web Apps & Templates by Gradi Kayamba</title>
+    <title>ArtivicoLab — A lab for static web applications</title>
     <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/images/logo.svg">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/rain.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Hand-drawn SVG filters used across the page -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="ink-jitter" x="-2%" y="-10%" width="104%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="noise">
+                    <animate attributeName="baseFrequency" dur="2.4s" values="0.02;0.06;0.02" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4"/>
+            </filter>
+            <filter id="paper-grain" x="0" y="0" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+                <feColorMatrix values="0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0.06 0"/>
+            </filter>
+        </defs>
+    </svg>
+
     <header class="header">
         <div class="container">
             <div class="logo">
                 <a href="index.html">
-                    <img src="assets/images/logo.svg" alt="Website Showcase Platform">
+                    <img src="assets/images/logo.svg" alt="ArtivicoLab">
                 </a>
+                <span class="logo-mark">ArtivicoLab</span>
             </div>
-            <h1>ArtivicoLab</h1>
             <nav class="nav">
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -49,68 +63,74 @@
                     <span></span>
                 </div>
                 <div class="nav-menu" id="nav-menu">
-                    <a href="https://neonfluencer.artivicolab.com/" class="neon-button" target="_blank">Neon Fluencer</a>
-                    <a href="https://offer.artivicolab.com" class="offer-button" target="_blank">Special Offer</a>
+                    <a href="https://neonfluencer.artivicolab.com/" class="ink-link" target="_blank">Neon Fluencer</a>
+                    <a href="https://offer.artivicolab.com" class="ink-link ink-link--warm" target="_blank">Special Offer</a>
                 </div>
             </nav>
         </div>
     </header>
-    
-    <main class="container">
+
+    <main class="container canvas">
         <section class="intro">
-            <h2>Studio building real-world static web apps &amp; templates</h2>
-            <p>ArtivicoLab designs and ships private-by-default static applications — no servers, no signups, no data leaving the browser — and a growing library of polished website templates.</p>
+            <div class="intro-text">
+                <p class="eyebrow">est. 2025 · static web research</p>
+                <h2 class="display">A lab<br>for real-world<br>static&nbsp;web<br>applications.</h2>
+                <p class="lede">ArtivicoLab researches, prototypes, and ships private-by-default browser-only software — no servers, no sign-ups, no data leaving the device — alongside an open archive of reusable web templates.</p>
+                <p class="signature">— Gradi Kayamba</p>
+            </div>
+            <figure class="intro-mascot" aria-label="ArtivicoLab mascot — ink portrait of Gradi Kayamba">
+                <img src="assets/images/mascot.jpg" alt="Ink portrait of Gradi Kayamba, ArtivicoLab mascot">
+                <figcaption class="mascot-caption">3&times; black belt in Web 2.0 &amp; Web 3.0</figcaption>
+            </figure>
         </section>
 
         <section class="services" aria-labelledby="services-heading">
-            <h2 id="services-heading" class="section-heading">What we build</h2>
+            <h2 id="services-heading" class="section-heading"><span class="section-tag">§ 01</span><span class="section-title">Areas of work</span></h2>
             <div class="services-grid">
-                <article class="service-card">
-                    <h3>Static web applications</h3>
-                    <p>Fast, private, browser-only tools for real businesses — calculators, generators, editors, forms. No backend required.</p>
+                <article class="sketch-card">
+                    <span class="card-corner">A</span>
+                    <h3 class="ink-title">Static applications</h3>
+                    <p>Browser-only tools for real businesses — calculators, generators, editors, intake forms. Built to run without a backend.</p>
                 </article>
-                <article class="service-card">
-                    <h3>Landing &amp; marketing pages</h3>
-                    <p>Conversion-focused single-page sites for products, services, and creators — built lean and shipped quickly.</p>
+                <article class="sketch-card">
+                    <span class="card-corner">B</span>
+                    <h3 class="ink-title">Landing pages</h3>
+                    <p>Conversion-focused single-page sites for products, services, and creators. Lean stack, fast ship.</p>
                 </article>
-                <article class="service-card">
-                    <h3>Reusable website templates</h3>
-                    <p>Polished HTML/CSS/JS templates for restaurants, salons, influencers, and more — ready to fork and customize.</p>
+                <article class="sketch-card">
+                    <span class="card-corner">C</span>
+                    <h3 class="ink-title">Template archive</h3>
+                    <p>Polished HTML/CSS/JS website templates published openly for restaurants, salons, influencers, and more.</p>
                 </article>
             </div>
         </section>
 
         <section class="gallery-section" aria-labelledby="apps-heading">
-            <h2 id="apps-heading" class="section-heading">Live applications</h2>
-            <p class="section-sub">Real-world static apps shipped under the ArtivicoLab umbrella.</p>
+            <h2 id="apps-heading" class="section-heading"><span class="section-tag">§ 02</span><span class="section-title">Experiments — shipped</span></h2>
+            <p class="section-sub">Static applications currently in the field, under the ArtivicoLab name.</p>
             <div class="gallery" id="applications-container"></div>
         </section>
 
         <section class="gallery-section" aria-labelledby="templates-heading">
-            <h2 id="templates-heading" class="section-heading">Website templates</h2>
-            <p class="section-sub">A curated collection of beautiful website templates you can preview and reuse.</p>
+            <h2 id="templates-heading" class="section-heading"><span class="section-tag">§ 03</span><span class="section-title">Template archive</span></h2>
+            <p class="section-sub">Open-published website templates — preview in-page, then fork and reuse.</p>
             <div class="gallery" id="templates-container"></div>
         </section>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 ArtivicoLab. All rights reserved.</p>
-            <div class="credit-container">
-                <span class="credit">Created with ❤️ by Gradi Kayamba ✨</span>
-                <div class="sparkles"></div>
-            </div>
-            <p>
-                <a href="https://offer.artivicolab.com" target="_blank" class="footer-offer-link">🎉 Special Offer</a> |
-                <a href="contact.html">Contact Us</a>
+            <p class="footer-meta">&copy; 2025 ArtivicoLab · Maintained by Gradi Kayamba</p>
+            <p class="footer-links">
+                <a href="https://offer.artivicolab.com" target="_blank" class="ink-link ink-link--warm">Special Offer</a>
+                <span class="sep">·</span>
+                <a href="contact.html" class="ink-link">Contact</a>
             </p>
         </div>
     </footer>
 
     <script src="assets/js/data.js"></script>
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/luxury-effects.js"></script>
-    <script src="assets/js/rain-direct.js"></script>
     <script src="assets/js/hamburger.js"></script>
 </body>
 </html>

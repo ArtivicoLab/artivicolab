@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,25 +10,38 @@
 
       gtag('config', 'G-WMW68GE9TM');
     </script>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Contact ArtivicoLab — get in touch about static web apps, landing pages, or website templates.">
     <meta name="author" content="Gradi Kayamba">
     <title>Contact — ArtivicoLab</title>
     <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/rain.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="ink-jitter" x="-2%" y="-10%" width="104%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="noise">
+                    <animate attributeName="baseFrequency" dur="2.4s" values="0.02;0.06;0.02" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4"/>
+            </filter>
+        </defs>
+    </svg>
+
     <header class="header">
         <div class="container">
             <div class="logo">
                 <a href="index.html">
                     <img src="assets/images/logo.svg" alt="ArtivicoLab">
                 </a>
+                <span class="logo-mark">ArtivicoLab<span class="logo-slash"> // correspondence</span></span>
             </div>
             <nav class="nav">
                 <div class="hamburger" id="hamburger">
@@ -38,9 +50,9 @@
                     <span></span>
                 </div>
                 <div class="nav-menu" id="nav-menu">
-                    <a href="index.html">Home</a>
-                    <a href="https://neonfluencer.artivicolab.com/" class="neon-button" target="_blank">Neon Fluencer</a>
-                    <a href="https://offer.artivicolab.com" class="offer-button" target="_blank">Special Offer</a>
+                    <a href="index.html" class="ink-link">Home</a>
+                    <a href="https://neonfluencer.artivicolab.com/" class="ink-link" target="_blank">Neon Fluencer</a>
+                    <a href="https://offer.artivicolab.com" class="ink-link ink-link--warm" target="_blank">Special Offer</a>
                 </div>
             </nav>
         </div>
@@ -48,11 +60,11 @@
 
     <main class="container">
         <section class="contact-section">
-            <h1>Contact Us</h1>
-            <p class="contact-intro">Have questions or inquiries? We'd love to hear from you!</p>
-            
+            <p class="eyebrow">// § correspondence</p>
+            <h1>Reach the lab.</h1>
+            <p class="contact-intro">Project inquiry, collaboration, or a question about a published experiment — send it through. Replies come from the maintainer.</p>
+
             <form id="contact-form" class="contact-form" action="https://formsubmit.co/artivicolab@gmail.com" method="POST">
-                <!-- FormSubmit configuration -->
                 <input type="hidden" name="_next" value="https://artivicolab.com/contact.html">
                 <input type="hidden" name="_subject" value="New Contact Form Submission">
                 <input type="hidden" name="_template" value="table">
@@ -61,41 +73,34 @@
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="subject">Subject</label>
                     <input type="text" id="subject" name="subject" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="message">Message</label>
                     <textarea id="message" name="message" rows="5" required></textarea>
                 </div>
-                
-                <button type="submit" class="submit-button">Send Message</button>
-            </form>
 
+                <button type="submit" class="submit-button">Submit</button>
+            </form>
         </section>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 ArtivicoLab. All rights reserved. | An ArtivicoLab Company</p>
-            <div class="credit-container">
-                <span class="credit">Created with ❤️ by Gradi Kayamba ✨</span>
-                <div class="sparkles"></div>
-            </div>
+            <p class="footer-meta">&copy; 2025 ArtivicoLab · Maintained by Gradi Kayamba</p>
         </div>
     </footer>
 
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/luxury-effects.js"></script>
-    <script src="assets/js/rain-direct.js"></script>
     <script src="assets/js/hamburger.js"></script>
 </body>
 </html>
