@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 109,
+        "category": "application",
+        "title": "PricePrint",
+        "description": "Your personal grocery price memory — detect fake sales, shrinkflation, and track personal inflation.",
+        "url": "https://priceprint.artivicolab.com/",
+        "thumbnail": MSHOTS("https://priceprint.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Price tracking & shopping analytics"
+        }
+    },
+    {
         "id": 108,
         "category": "application",
         "title": "ProxForm",
