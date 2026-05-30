@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 110,
+        "category": "application",
+        "title": "Lingala",
+        "description": "A daily phrase from home for Congolese everywhere, wrapped in a beautifully designed culture card.",
+        "url": "https://lingala.artivicolab.com/",
+        "thumbnail": MSHOTS("https://lingala.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Language & cultural identity"
+        }
+    },
+    {
         "id": 109,
         "category": "application",
         "title": "PricePrint",
