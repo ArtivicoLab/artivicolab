@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 111,
+        "category": "application",
+        "title": "GA Spas",
+        "description": "Georgia's spa & wellness directory — discover vetted day spas, med spas, and massage studios.",
+        "url": "https://ga.spas.artivicolab.com/",
+        "thumbnail": MSHOTS("https://ga.spas.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Spa & wellness directory"
+        }
+    },
+    {
         "id": 110,
         "category": "application",
         "title": "Lingala",
