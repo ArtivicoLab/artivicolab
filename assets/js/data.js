@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 112,
+        "category": "application",
+        "title": "GA Contractors",
+        "description": "Find licensed Georgia builders by trade, city, county, or ZIP.",
+        "url": "https://gac.artivicolab.com/",
+        "thumbnail": MSHOTS("https://gac.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Business directory"
+        }
+    },
+    {
         "id": 111,
         "category": "application",
         "title": "GA Spas",
