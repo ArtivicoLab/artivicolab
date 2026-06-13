@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 113,
+        "category": "application",
+        "title": "GA Lawyers",
+        "description": "Browse 5,178 law firms and attorneys across Georgia by city, county, ZIP, or practice area.",
+        "url": "https://lawyers.artivicolab.com/",
+        "thumbnail": MSHOTS("https://lawyers.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Legal services directory"
+        }
+    },
+    {
         "id": 112,
         "category": "application",
         "title": "GA Contractors",
