@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 114,
+        "category": "application",
+        "title": "GA Pawns",
+        "description": "Compare licensed Georgia pawn shops, title pawns, and gold buyers by rating, reviews, and specialty.",
+        "url": "https://pawns.artivicolab.com/",
+        "thumbnail": MSHOTS("https://pawns.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Marketplace directory"
+        }
+    },
+    {
         "id": 113,
         "category": "application",
         "title": "GA Lawyers",
