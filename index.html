@@ -19,6 +19,7 @@
     <meta name="geo.region" content="US-GA">
     <meta name="geo.placename" content="Atlanta, Georgia">
     <meta name="robots" content="index, follow">
+    <meta property="og:site_name" content="ArtivicoLab">
     <meta property="og:title" content="ArtivicoLab — Static-Web Research Lab · Atlanta, GA">
     <meta property="og:description" content="A research lab building real-world static web applications, landing pages, and reusable templates.">
     <meta property="og:type" content="website">
@@ -32,6 +33,23 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://artivicolab.com/#website",
+          "name": "ArtivicoLab",
+          "url": "https://artivicolab.com/",
+          "publisher": { "@id": "https://artivicolab.com/#business" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://artivicolab.com/#org",
+          "name": "ArtivicoLab",
+          "url": "https://artivicolab.com/",
+          "logo": "https://artivicolab.com/assets/images/logo.svg",
+          "sameAs": []
+        },
+        {
       "@type": "ProfessionalService",
       "@id": "https://artivicolab.com/#business",
       "name": "ArtivicoLab",
@@ -62,6 +80,8 @@
         "Static web applications",
         "Landing pages",
         "Website templates"
+      ]
+        }
       ]
     }
     </script>
