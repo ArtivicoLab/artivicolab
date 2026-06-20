@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 115,
+        "category": "application",
+        "title": "Number Lab",
+        "description": "Georgia Lottery number generator (Mega Millions) with 15 model predictions.",
+        "url": "https://lottery.artivicolab.com/",
+        "thumbnail": MSHOTS("https://lottery.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript"],
+            "organization": "ArtivicoLab",
+            "type": "Lottery number generator"
+        }
+    },
+    {
         "id": 114,
         "category": "application",
         "title": "GA Pawns",
