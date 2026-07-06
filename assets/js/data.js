@@ -106,6 +106,20 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 116,
+        "category": "application",
+        "title": "Life Planner",
+        "description": "Organize personal goals and life activities. Zero tracking — your own Google Sheet is the backend.",
+        "url": "https://lifeplanner.artivicolab.com/",
+        "thumbnail": MSHOTS("https://lifeplanner.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
+            "organization": "ArtivicoLab",
+            "type": "Personal organization · bring-your-own-sheet"
+        }
+    },
+    {
         "id": 115,
         "category": "application",
         "title": "Number Lab",

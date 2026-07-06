@@ -845,6 +845,66 @@ img { max-width: 100%; height: auto; display: block; }
     background-image: var(--sketch-underline-warm);
 }
 
+/* ─── Legal pages (privacy, terms) ───────────────────────── */
+.legal { padding-bottom: var(--sp-xl); }
+
+.legal-section {
+    padding: var(--sp-xl) 0 var(--sp-lg);
+    max-width: 68ch;
+}
+
+.legal-heading {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--fs-3xl);
+    color: var(--ink);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--sp-xs);
+}
+
+.legal-heading:hover { filter: url(#ink-jitter); }
+
+.legal-updated {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    margin-bottom: var(--sp-lg);
+}
+
+.legal-section h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--ink);
+    margin-top: var(--sp-lg);
+    margin-bottom: var(--sp-xs);
+    letter-spacing: -0.01em;
+}
+
+.legal-section p {
+    color: var(--ink-soft);
+    font-size: var(--fs-md);
+    line-height: 1.65;
+    margin-bottom: var(--sp-sm);
+}
+
+.legal-section p strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.legal-section code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 1px 6px;
+    background-color: rgba(26, 24, 22, 0.06);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+}
+
 /* ─── Footer ─────────────────────────────────────────────── */
 .footer {
     /* Sticky to viewport bottom — always visible while scrolling */
