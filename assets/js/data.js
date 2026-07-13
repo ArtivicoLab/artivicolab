@@ -120,6 +120,34 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 118,
+        "category": "application",
+        "title": "Budget Planner",
+        "description": "Plan your money — income, bills, expenses, transactions, savings, debt payoff, and net worth. Your own Google Sheet is the backend.",
+        "url": "https://budget.artivicolab.com/",
+        "thumbnail": MSHOTS("https://budget.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
+            "organization": "ArtivicoLab",
+            "type": "Personal finance · bring-your-own-sheet"
+        }
+    },
+    {
+        "id": 117,
+        "category": "application",
+        "title": "Social Planner",
+        "description": "Plan your social media content — ideas, a monthly calendar, and a posting schedule. Your own Google Sheet is the backend.",
+        "url": "https://socialplanner.artivicolab.com/",
+        "thumbnail": MSHOTS("https://socialplanner.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
+            "organization": "ArtivicoLab",
+            "type": "Content planning · bring-your-own-sheet"
+        }
+    },
+    {
         "id": 115,
         "category": "application",
         "title": "Number Lab",

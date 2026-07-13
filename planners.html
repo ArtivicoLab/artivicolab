@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WMW68GE9TM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WMW68GE9TM');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ArtivicoLab planner apps — phone-first planners that sync to a spreadsheet in your own Google Drive. Life Planner, Budget Planner, Social Planner, and more.">
+    <meta name="keywords" content="planner apps, budget planner, life planner, social planner, google sheet planner, offline planner, ArtivicoLab">
+    <meta name="author" content="Gradi Kayamba">
+    <meta name="robots" content="index, follow">
+    <meta property="og:site_name" content="ArtivicoLab">
+    <meta property="og:title" content="Planner Apps — ArtivicoLab">
+    <meta property="og:description" content="Phone-first planners that live in your own Google Sheet. Offline-first, no server, your data stays yours.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://artivicolab.com/planners.html">
+    <meta property="og:image" content="https://artivicolab.com/assets/images/mascot.jpg">
+    <meta property="og:locale" content="en_US">
+    <title>Planner Apps — ArtivicoLab</title>
+    <link rel="canonical" href="https://artivicolab.com/planners.html">
+    <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/css/normalize.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        .planner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin: 28px 0 8px; }
+        .planner-card { display: block; border: 1px solid rgba(0,0,0,0.12); border-radius: 14px; padding: 20px 22px; text-decoration: none; color: inherit; transition: border-color .15s ease, transform .15s ease; background: rgba(255,255,255,0.35); }
+        .planner-card:hover { border-color: rgba(0,0,0,0.35); transform: translateY(-2px); }
+        .planner-card h3 { margin: 0 0 6px; font-size: 20px; }
+        .planner-card p { margin: 0 0 10px; font-size: 15px; line-height: 1.5; }
+        .planner-card .go { font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: .02em; }
+        .planner-legal { font-size: 13px; margin-top: 6px; }
+        .planner-legal a { margin-right: 10px; }
+        .how-box { border: 1px solid rgba(0,0,0,0.12); border-radius: 14px; padding: 18px 22px; margin: 22px 0; background: rgba(255,255,255,0.35); }
+        @media (prefers-color-scheme: dark) {
+            .planner-card, .how-box { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.14); }
+            .planner-card:hover { border-color: rgba(255,255,255,0.4); }
+        }
+    </style>
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="ink-jitter" x="-2%" y="-10%" width="104%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="noise">
+                    <animate attributeName="baseFrequency" dur="2.4s" values="0.02;0.06;0.02" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="assets/images/logo.svg" alt="ArtivicoLab">
+                </a>
+                <span class="logo-mark">ArtivicoLab</span>
+            </div>
+            <nav class="nav">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="nav-menu" id="nav-menu">
+                    <a href="index.html" class="ink-link">Home</a>
+                    <a href="planners.html" class="ink-link">Planners</a>
+                    <a href="contact.html" class="ink-link">Contact</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container legal">
+        <section class="legal-section">
+            <p class="eyebrow">§ 03 · planner apps</p>
+            <h1 class="legal-heading">Planners.</h1>
+
+            <p class="lede">Phone-first planners that live in <strong>your own Google Sheet</strong>. Each one opens in any browser, works offline on your device, and can sync to a spreadsheet in your own Google Drive so you always own a backup. No server of ours, no subscription, no tracking.</p>
+
+            <div class="planner-grid">
+                <a class="planner-card" href="https://lifeplanner.artivicolab.com" target="_blank" rel="noopener">
+                    <h3>Life Planner</h3>
+                    <p>Organize your whole life: tasks, habits, goals, budget, meals, and fitness, all in one place.</p>
+                    <span class="go">lifeplanner.artivicolab.com &rarr;</span>
+                </a>
+                <a class="planner-card" href="https://budget.artivicolab.com" target="_blank" rel="noopener">
+                    <h3>Budget Planner</h3>
+                    <p>Plan your money: income, bills, expenses, transactions, savings, debt payoff, and net worth.</p>
+                    <span class="go">budget.artivicolab.com &rarr;</span>
+                </a>
+                <a class="planner-card" href="https://socialplanner.artivicolab.com" target="_blank" rel="noopener">
+                    <h3>Social Planner</h3>
+                    <p>Plan your social media content: ideas, a monthly calendar, and a posting schedule.</p>
+                    <span class="go">socialplanner.artivicolab.com &rarr;</span>
+                </a>
+            </div>
+
+            <div class="how-box">
+                <h2 style="margin-top:0;">How the planners use your Google account</h2>
+                <p>Connecting Google is optional. When you choose to connect, a planner requests only the <strong>Google Drive &ldquo;drive.file&rdquo;</strong> permission &mdash; access limited to the <strong>single spreadsheet the app creates for you</strong>, and nothing else in your Drive. Your sign-in stays in your browser and talks to Google directly from your device. ArtivicoLab operates no server and never receives, stores, or sells your data.</p>
+                <p class="planner-legal">
+                    <a href="planners-privacy.html" class="ink-link">Planner Apps Privacy</a>
+                    <a href="planners-terms.html" class="ink-link">Planner Apps Terms</a>
+                </p>
+            </div>
+
+            <p>Each planner also links its own privacy and terms from its Settings, with the same terms scoped to that app.</p>
+
+            <p class="signature">— ArtivicoLab</p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-meta">&copy; 2026 ArtivicoLab · Static-web research lab</p>
+            <p class="footer-links">
+                <a href="planners.html" class="ink-link">Planners</a>
+                <span class="sep">·</span>
+                <a href="contact.html" class="ink-link">Contact</a>
+                <span class="sep">·</span>
+                <a href="privacy.html" class="ink-link">Privacy</a>
+                <span class="sep">·</span>
+                <a href="terms.html" class="ink-link">Terms</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/hamburger.js"></script>
+</body>
+</html>
