@@ -18,8 +18,13 @@
         // Add any general functionality here
         console.log('Website Showcase Platform initialized');
 
-        // Check if we're on the index page
-        if (document.getElementById('applications-container') || document.getElementById('templates-container')) {
+        // Planners page — filter by subcategory
+        if (document.getElementById('planners-container')) {
+            populateGallery('planners-container', 'application', 'planner');
+            animateGalleryItems();
+        }
+        // Index page — split by top-level category
+        else if (document.getElementById('applications-container') || document.getElementById('templates-container')) {
             populateGallery('applications-container', 'application');
             populateGallery('templates-container', 'template');
             animateGalleryItems();
@@ -48,15 +53,16 @@
     /**
      * Populate a gallery container with website items, optionally filtered by category.
      */
-    function populateGallery(containerId, category) {
+    function populateGallery(containerId, category, subcategory) {
         const galleryContainer = document.getElementById(containerId);
         if (!galleryContainer) return;
 
         galleryContainer.innerHTML = '';
 
-        const items = category
-            ? SHOWCASE_WEBSITES.filter(w => w.category === category)
-            : SHOWCASE_WEBSITES;
+        const items = SHOWCASE_WEBSITES.filter(w =>
+            (!category || w.category === category) &&
+            (!subcategory || w.subcategory === subcategory)
+        );
 
         items.forEach(website => {
             const galleryItem = document.createElement('div');

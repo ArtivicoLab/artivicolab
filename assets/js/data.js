@@ -1,5 +1,5 @@
 /**
- * ArtivicoLab — Data
+ * ArtivicoLab, Data
  * Real-world static applications + reusable website templates
  */
 
@@ -39,7 +39,7 @@ const SHOWCASE_WEBSITES = [
         "id": 103,
         "category": "application",
         "title": "Foolscap",
-        "description": "Generate, fill, and live-sign contracts in your browser — verified PDF with signing certificate.",
+        "description": "Generate, fill, and live-sign contracts in your browser, verified PDF with signing certificate.",
         "url": "https://foolscap.artivicolab.com/",
         "thumbnail": MSHOTS("https://foolscap.artivicolab.com/"),
         "metadata": {
@@ -81,7 +81,7 @@ const SHOWCASE_WEBSITES = [
         "id": 106,
         "category": "application",
         "title": "InvoiceMaster",
-        "description": "Private, free invoice generator — 12 templates, no signup required.",
+        "description": "Private, free invoice generator, 12 templates, no signup required.",
         "url": "https://invoicemaster.artivicolab.com/",
         "thumbnail": MSHOTS("https://invoicemaster.artivicolab.com/"),
         "metadata": {
@@ -106,10 +106,26 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 117,
+        "category": "application",
+        "subcategory": "planner",
+        "title": "Task Tracker",
+        "description": "Manage and organize tasks and daily activities. Zero tracking. Your own Google Sheet is the backend.",
+        "url": "https://tasktracker.artivicolab.com/",
+        "thumbnail": MSHOTS("https://tasktracker.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
+            "organization": "ArtivicoLab",
+            "type": "Project management · bring-your-own-sheet"
+        }
+    },
+    {
         "id": 116,
         "category": "application",
+        "subcategory": "planner",
         "title": "Life Planner",
-        "description": "Organize personal goals and life activities. Zero tracking — your own Google Sheet is the backend.",
+        "description": "Organize personal goals and life activities. Zero tracking. Your own Google Sheet is the backend.",
         "url": "https://lifeplanner.artivicolab.com/",
         "thumbnail": MSHOTS("https://lifeplanner.artivicolab.com/"),
         "metadata": {
@@ -123,7 +139,7 @@ const SHOWCASE_WEBSITES = [
         "id": 118,
         "category": "application",
         "title": "Budget Planner",
-        "description": "Plan your money — income, bills, expenses, transactions, savings, debt payoff, and net worth. Your own Google Sheet is the backend.",
+        "description": "Plan your money, income, bills, expenses, transactions, savings, debt payoff, and net worth. Your own Google Sheet is the backend.",
         "url": "https://budget.artivicolab.com/",
         "thumbnail": MSHOTS("https://budget.artivicolab.com/"),
         "metadata": {
@@ -137,7 +153,7 @@ const SHOWCASE_WEBSITES = [
         "id": 117,
         "category": "application",
         "title": "Social Planner",
-        "description": "Plan your social media content — ideas, a monthly calendar, and a posting schedule. Your own Google Sheet is the backend.",
+        "description": "Plan your social media content, ideas, a monthly calendar, and a posting schedule. Your own Google Sheet is the backend.",
         "url": "https://socialplanner.artivicolab.com/",
         "thumbnail": MSHOTS("https://socialplanner.artivicolab.com/"),
         "metadata": {
@@ -207,7 +223,7 @@ const SHOWCASE_WEBSITES = [
         "id": 111,
         "category": "application",
         "title": "GA Spas",
-        "description": "Georgia's spa & wellness directory — discover vetted day spas, med spas, and massage studios.",
+        "description": "Georgia's spa & wellness directory. Discover vetted day spas, med spas, and massage studios.",
         "url": "https://ga.spas.artivicolab.com/",
         "thumbnail": MSHOTS("https://ga.spas.artivicolab.com/"),
         "metadata": {
@@ -235,7 +251,7 @@ const SHOWCASE_WEBSITES = [
         "id": 109,
         "category": "application",
         "title": "PricePrint",
-        "description": "Your personal grocery price memory — detect fake sales, shrinkflation, and track personal inflation.",
+        "description": "Your personal grocery price memory. Detect fake sales, shrinkflation, and track personal inflation.",
         "url": "https://priceprint.artivicolab.com/",
         "thumbnail": MSHOTS("https://priceprint.artivicolab.com/"),
         "metadata": {
@@ -249,7 +265,7 @@ const SHOWCASE_WEBSITES = [
         "id": 108,
         "category": "application",
         "title": "ProxForm",
-        "description": "GDPR-proof medical intake forms — 100% browser-only, peer-to-peer, no server.",
+        "description": "GDPR-proof medical intake forms, 100% browser-only, peer-to-peer, no server.",
         "url": "https://proxform.artivicolab.com/",
         "thumbnail": MSHOTS("https://proxform.artivicolab.com/"),
         "metadata": {
