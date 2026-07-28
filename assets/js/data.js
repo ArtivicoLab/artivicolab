@@ -169,8 +169,8 @@ const SHOWCASE_WEBSITES = [
         "category": "application",
         "title": "Social Planner",
         "description": "Plan your social media content, ideas, a monthly calendar, and a posting schedule. Your own Google Sheet is the backend.",
-        "url": "https://socialplanner.artivicolab.com/",
-        "thumbnail": MSHOTS("https://socialplanner.artivicolab.com/"),
+        "url": "https://social.artivicolab.com/",
+        "thumbnail": MSHOTS("https://social.artivicolab.com/"),
         "metadata": {
             "created": "2026",
             "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
