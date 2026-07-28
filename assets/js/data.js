@@ -106,6 +106,21 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 119,
+        "category": "application",
+        "subcategory": "planner",
+        "title": "Events Planner",
+        "description": "Organize event details, guests, and logistics in one place. Zero tracking. Your own Google Sheet is the backend.",
+        "url": "https://eventsplanner.artivicolab.com/",
+        "thumbnail": MSHOTS("https://eventsplanner.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
+            "organization": "ArtivicoLab",
+            "type": "Event management · bring-your-own-sheet"
+        }
+    },
+    {
         "id": 117,
         "category": "application",
         "subcategory": "planner",
