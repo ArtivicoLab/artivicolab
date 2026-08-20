@@ -106,6 +106,21 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
+        "id": 120,
+        "category": "application",
+        "subcategory": "planner",
+        "title": "Wedding Planner",
+        "description": "Organize wedding events, vendors, guests, and planning details in one place. Your own Google Sheet is the backend.",
+        "url": "https://weddingplanner.artivicolab.com/",
+        "thumbnail": MSHOTS("https://weddingplanner.artivicolab.com/"),
+        "metadata": {
+            "created": "2026",
+            "technologies": ["HTML", "CSS", "JavaScript", "Google Sheets"],
+            "organization": "ArtivicoLab",
+            "type": "Wedding planning · bring-your-own-sheet"
+        }
+    },
+    {
         "id": 119,
         "category": "application",
         "subcategory": "planner",
