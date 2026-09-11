@@ -48,6 +48,9 @@
     --sketch-underline:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'><path d='M2,5 C30,2 60,8 100,4 C140,1 170,7 198,4' fill='none' stroke='%231A1816' stroke-width='1.5' stroke-linecap='round'/></svg>");
 
+    --sketch-bar:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 20' preserveAspectRatio='none'><path d='M3,4 C80,2 200,6 317,3 C318,10 316,14 318,17 C200,19 90,16 2,18 C3,12 1,8 3,4 Z' fill='none' stroke='%231A1816' stroke-width='1.5' stroke-linejoin='round'/></svg>");
+
     --sketch-underline-warm:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'><path d='M2,5 C30,2 60,8 100,4 C140,1 170,7 198,4' fill='none' stroke='%23B5392B' stroke-width='2' stroke-linecap='round'/></svg>");
 }
@@ -71,6 +74,8 @@
             url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220' preserveAspectRatio='none'><path d='M5,9 C95,3 205,11 315,5 C317,82 312,150 317,215 C218,219 108,212 3,217 C8,148 2,82 5,9 Z' fill='none' stroke='%23E76F5C' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/></svg>");
         --sketch-underline:
             url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'><path d='M2,5 C30,2 60,8 100,4 C140,1 170,7 198,4' fill='none' stroke='%23ECE3CC' stroke-width='1.5' stroke-linecap='round'/></svg>");
+        --sketch-bar:
+            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 20' preserveAspectRatio='none'><path d='M3,4 C80,2 200,6 317,3 C318,10 316,14 318,17 C200,19 90,16 2,18 C3,12 1,8 3,4 Z' fill='none' stroke='%23ECE3CC' stroke-width='1.5' stroke-linejoin='round'/></svg>");
         --sketch-underline-warm:
             url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'><path d='M2,5 C30,2 60,8 100,4 C140,1 170,7 198,4' fill='none' stroke='%23E76F5C' stroke-width='2' stroke-linecap='round'/></svg>");
     }
@@ -937,6 +942,224 @@ img { max-width: 100%; height: auto; display: block; }
 
 .footer .sep { margin: 0 var(--sp-xs); color: var(--ink-faint); }
 
+
+/* ─── Gamification: character sheet ──────────────────────── */
+.charsheet { margin-bottom: var(--sp-lg); }
+
+.charsheet-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.05fr) minmax(0, 2fr);
+    gap: var(--sp-md);
+    margin-top: var(--sp-md);
+    align-items: stretch;
+}
+
+.charsheet-level,
+.stat-card {
+    position: relative;
+    padding: var(--sp-md);
+    background-image: var(--sketch-border);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: transform 0.3s var(--ease), background-image 0.2s var(--ease);
+}
+
+.charsheet-level { justify-content: center; }
+
+.charsheet-level:hover,
+.stat-card:hover {
+    background-image: var(--sketch-border-hover);
+    transform: translateY(-3px);
+}
+
+.stat-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-faint);
+}
+
+.stat-big {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 84px;
+    line-height: 0.95;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+}
+
+.charsheet-level:hover .stat-big { filter: url(#ink-jitter); }
+
+.stat-num {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+}
+
+.stat-card:hover .stat-num { filter: url(#ink-jitter); }
+
+.stat-note {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+}
+
+.charsheet-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--sp-sm);
+}
+
+.xp-bar {
+    position: relative;
+    height: 16px;
+    margin: 10px 0 6px;
+    background-image: var(--sketch-bar);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.xp-bar-fill {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: 0%;
+    background-color: var(--accent);
+    transition: width 1.4s var(--ease);
+}
+
+/* ─── Gamification: rarity tier on cards ─────────────────── */
+.card-rarity {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background-color: var(--paper-card);
+    border: 1px solid var(--rule-strong);
+    color: var(--ink);
+}
+
+.card-rarity--legendary { border-color: var(--accent); color: var(--accent); }
+.card-rarity--rare      { border-color: var(--accent-cool); color: var(--accent-cool); }
+.card-rarity--uncommon  { }
+.card-rarity--common    { border-style: dashed; color: var(--ink-faint); }
+
+/* ─── Gamification: trophy case ──────────────────────────── */
+.trophies { margin-bottom: var(--sp-lg); }
+
+.trophy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--sp-sm);
+    margin-top: var(--sp-md);
+}
+
+.trophy {
+    position: relative;
+    padding: var(--sp-sm) var(--sp-xs);
+    text-align: center;
+    background-image: var(--sketch-border);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.3s var(--ease), background-image 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+.trophy:hover {
+    transform: translateY(-3px) rotate(-0.5deg);
+    background-image: var(--sketch-border-hover);
+}
+
+.trophy-icon {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--paper);
+    background-color: var(--ink);
+    border-radius: 50%;
+}
+
+.trophy-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.2;
+}
+
+.trophy-desc {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.trophy--locked { opacity: 0.55; }
+.trophy--locked .trophy-icon {
+    background-color: transparent;
+    color: var(--ink-faint);
+    border: 1.5px dashed var(--rule-strong);
+}
+.trophy--locked .trophy-name { color: var(--ink-soft); }
+.trophy--locked:hover { opacity: 0.85; }
+
+/* ─── Gamification: toast + easter egg ───────────────────── */
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 76px;
+    z-index: 200;
+    padding: 12px 18px;
+    max-width: 320px;
+    background-color: var(--paper-card);
+    background-image: var(--sketch-border);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+    pointer-events: none;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast strong { color: var(--accent); font-weight: 600; }
+
+.intro-mascot.poked { animation: poke 0.9s var(--ease); }
+
+@keyframes poke {
+    0%   { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(-3deg) scale(1.02); }
+    50%  { transform: rotate(3deg) scale(1.02); }
+    75%  { transform: rotate(-1.5deg) scale(1.01); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {
     .intro {
@@ -976,4 +1199,8 @@ img { max-width: 100%; height: auto; display: block; }
     .nav-menu.active { display: flex; }
 
     .gallery { grid-template-columns: 1fr; }
+
+    .charsheet-grid { grid-template-columns: 1fr; }
+    .stat-big { font-size: 64px; }
+    .toast { right: 12px; left: 12px; max-width: none; }
 }

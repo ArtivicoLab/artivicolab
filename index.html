@@ -89,7 +89,8 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/arcade.css">
 </head>
 <body>
     <!-- Hand-drawn SVG filters used across the page -->
@@ -107,6 +108,8 @@
             </filter>
         </defs>
     </svg>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <header class="header">
         <div class="container">
@@ -134,10 +137,11 @@
     <main class="container canvas">
         <section class="intro">
             <div class="intro-text">
-                <p class="eyebrow">est. 2025 · static web research</p>
+                <p class="eyebrow">PLAYER 1 &middot; EST. 2025 &middot; STATIC WEB RESEARCH</p>
                 <h2 class="display">A lab<br>for real-world<br>static&nbsp;web<br>applications.</h2>
                 <p class="lede">ArtivicoLab is a static-web research lab shipping real-world browser-only software, calculators, generators, editors, intake forms, and a growing archive of reusable website templates. Private by default. No servers, no sign-ups.</p>
-                <p class="signature">Gradi Kayamba, founder</p>
+                <p class="signature">GRADI KAYAMBA, FOUNDER</p>
+                <a href="#apps-heading" class="press-start">&#9654; PRESS START</a>
             </div>
             <figure class="intro-mascot" aria-label="ArtivicoLab mascot, ink portrait of Gradi Kayamba">
                 <span class="smoke smoke--t1" aria-hidden="true"></span>
@@ -151,14 +155,36 @@
                 <span class="smoke smoke--l2" aria-hidden="true"></span>
                 <img src="assets/images/mascot.jpg" alt="Ink portrait of Gradi Kayamba, ArtivicoLab mascot">
                 <figcaption class="mascot-caption">
-                    <span class="mascot-caption-tag">Specimen N&deg; 001 , <em>Homo&nbsp;staticus</em></span>
-                    <span class="mascot-caption-line">Ships flat files for sport.</span>
+                    <span class="mascot-caption-tag">PLAYER 1 &middot; <em>HOMO STATICUS</em></span>
+                    <span class="mascot-caption-line">SHIPS FLAT FILES FOR SPORT</span>
                 </figcaption>
             </figure>
         </section>
 
+        <section class="charsheet" aria-labelledby="charsheet-heading">
+            <h2 id="charsheet-heading" class="section-heading"><span class="section-tag">&sect; 00</span><span class="section-title">Character sheet</span></h2>
+            <p class="section-sub">Player stats. Computed live from the archive below.</p>
+            <div class="charsheet-grid">
+                <div class="charsheet-level">
+                    <span class="stat-label">Level</span>
+                    <span class="stat-big" data-count="level">0</span>
+                    <div class="xp-bar" role="progressbar" aria-label="Experience toward next level">
+                        <div class="xp-bar-fill" data-xp-fill></div>
+                    </div>
+                    <span class="stat-note"><span data-count="xp">0</span> XP &middot; <span data-count="toNext">0</span> to next level</span>
+                </div>
+                <div class="charsheet-stats">
+                    <div class="stat-card"><span class="stat-num" data-count="apps">0</span><span class="stat-label">Apps shipped</span></div>
+                    <div class="stat-card"><span class="stat-num" data-count="planners">0</span><span class="stat-label">Planners</span></div>
+                    <div class="stat-card"><span class="stat-num" data-count="directories">0</span><span class="stat-label">Directories</span></div>
+                    <div class="stat-card"><span class="stat-num" data-count="templates">0</span><span class="stat-label">Templates</span></div>
+                </div>
+            </div>
+        </section>
+
         <section class="services" aria-labelledby="services-heading">
-            <h2 id="services-heading" class="section-heading"><span class="section-tag">§ 01</span><span class="section-title">Areas of work</span></h2>
+            <h2 id="services-heading" class="section-heading"><span class="section-tag">&sect; 01</span><span class="section-title">Skill tree</span></h2>
+            <p class="section-sub">Areas of work. Three branches unlocked, all static.</p>
             <div class="services-grid">
                 <article class="sketch-card">
                     <span class="card-corner">A</span>
@@ -179,21 +205,27 @@
         </section>
 
         <section class="gallery-section" aria-labelledby="apps-heading">
-            <h2 id="apps-heading" class="section-heading"><span class="section-tag">§ 02</span><span class="section-title">Experiments, shipped</span></h2>
-            <p class="section-sub">Static applications currently in the field, under the ArtivicoLab name.</p>
+            <h2 id="apps-heading" class="section-heading"><span class="section-tag">§ 02</span><span class="section-title">Stage select</span></h2>
+            <p class="section-sub">Cleared stages. Static applications currently in the field, under the ArtivicoLab name.</p>
             <div class="gallery" id="applications-container"></div>
         </section>
 
         <section class="gallery-section" aria-labelledby="templates-heading">
-            <h2 id="templates-heading" class="section-heading"><span class="section-tag">§ 03</span><span class="section-title">Template archive</span></h2>
-            <p class="section-sub">Open-published website templates, preview in-page, then fork and reuse.</p>
+            <h2 id="templates-heading" class="section-heading"><span class="section-tag">&sect; 03</span><span class="section-title">Inventory</span></h2>
+            <p class="section-sub">Loot drops. Open-published website templates, preview in-page, then fork and reuse.</p>
             <div class="gallery" id="templates-container"></div>
+        </section>
+
+        <section class="trophies" aria-labelledby="trophies-heading">
+            <h2 id="trophies-heading" class="section-heading"><span class="section-tag">&sect; 04</span><span class="section-title">Trophy case</span></h2>
+            <p class="section-sub">Achievements unlocked so far. One still locked. Ship one more app to get it.</p>
+            <div class="trophy-grid" id="trophy-grid"></div>
         </section>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p class="footer-meta">&copy; 2026 ArtivicoLab · Static-web research lab</p>
+            <p class="footer-meta">&copy; 2026 ARTIVICOLAB &middot; STATIC-WEB RESEARCH LAB &middot; INSERT COIN</p>
             <p class="footer-links">
                 <a href="https://offer.artivicolab.com" target="_blank" class="ink-link ink-link--warm">Special Offer</a>
                 <span class="sep">·</span>
@@ -207,6 +239,7 @@
     </footer>
 
     <script src="assets/js/data.js"></script>
+    <script src="assets/js/gamify.js"></script>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/hamburger.js"></script>
 </body>

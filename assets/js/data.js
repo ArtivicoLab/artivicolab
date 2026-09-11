@@ -168,6 +168,7 @@ const SHOWCASE_WEBSITES = [
     {
         "id": 118,
         "category": "application",
+        "subcategory": "planner",
         "title": "Budget Planner",
         "description": "Plan your money, income, bills, expenses, transactions, savings, debt payoff, and net worth. Your own Google Sheet is the backend.",
         "url": "https://budget.artivicolab.com/",
@@ -180,8 +181,9 @@ const SHOWCASE_WEBSITES = [
         }
     },
     {
-        "id": 117,
+        "id": 121,
         "category": "application",
+        "subcategory": "planner",
         "title": "Social Planner",
         "description": "Plan your social media content, ideas, a monthly calendar, and a posting schedule. Your own Google Sheet is the backend.",
         "url": "https://social.artivicolab.com/",
