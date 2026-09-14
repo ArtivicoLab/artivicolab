@@ -29,7 +29,7 @@
     <link rel="canonical" href="https://artivicolab.com/contact.html">
     <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/css/normalize.css">
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260914-0754">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20260914-0831">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -74,20 +74,17 @@
             <p class="eyebrow">// § correspondence</p>
             <h1>Reach the lab.</h1>
             <p class="contact-intro">Project inquiry, collaboration, or a question about a published experiment. Send it through. Replies come from the maintainer.</p>
+            <p class="contact-sent" id="contact-sent" hidden>Your mail app should be open with the message drafted. Hit send there and the lab has it.</p>
 
-            <form id="contact-form" class="contact-form" action="https://formsubmit.co/artivicolab@gmail.com" method="POST">
-                <input type="hidden" name="_next" value="https://artivicolab.com/contact.html">
-                <input type="hidden" name="_subject" value="New Contact Form Submission">
-                <input type="hidden" name="_template" value="table">
-                <input type="hidden" name="_captcha" value="true">
+            <form id="contact-form" class="contact-form" action="#" method="post" novalidate>
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
+                    <input type="text" id="name" name="name" required autocomplete="name">
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" required autocomplete="email">
                 </div>
 
                 <div class="form-group">
@@ -101,6 +98,7 @@
                 </div>
 
                 <button type="submit" class="submit-button">Submit</button>
+                <p class="contact-hint">Submit opens your mail app with the message ready to send to the lab.</p>
             </form>
         </section>
     </main>
@@ -120,8 +118,28 @@
         </div>
     </footer>
 
-    <script src="assets/js/script.js?v=20260914-0754"></script>
-    <script src="assets/js/hamburger.js?v=20260914-0754"></script>
-    <script src="assets/js/gate.js?v=20260914-0754"></script>
+    <script src="assets/js/script.js?v=20260914-0831"></script>
+    <script src="assets/js/hamburger.js?v=20260914-0831"></script>
+    <script>
+      // Submit builds a mailto: link so the visitor's own mail app sends the message.
+      (function () {
+        var form = document.getElementById('contact-form');
+        if (!form) return;
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (!form.reportValidity()) return;
+          var v = function (id) { return (document.getElementById(id).value || '').trim(); };
+          var subject = v('subject') || 'Message from artivicolab.com';
+          var body = 'Name: ' + v('name') + '\nEmail: ' + v('email') + '\n\n' + v('message');
+          var href = 'mailto:artivicolab@gmail.com'
+            + '?subject=' + encodeURIComponent(subject)
+            + '&body=' + encodeURIComponent(body);
+          window.location.href = href;
+          var note = document.getElementById('contact-sent');
+          if (note) { note.hidden = false; }
+        });
+      })();
+    </script>
+    <script src="assets/js/gate.js?v=20260914-0831"></script>
 </body>
 </html>

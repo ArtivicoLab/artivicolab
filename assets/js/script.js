@@ -21,6 +21,10 @@
         // Footer watermark: "Homo staticus" drifting across and waving
         buildFooterWave();
 
+        // Keep page content clear of the fixed footer, whatever its height
+        fitFooterPadding();
+        window.addEventListener('resize', fitFooterPadding);
+
         // Planners page — filter by subcategory
         if (document.getElementById('planners-container')) {
             populateGallery('planners-container', 'application', 'planner');
@@ -51,6 +55,12 @@
                 window.location.href = 'index.html';
             }
         }
+    }
+
+    function fitFooterPadding() {
+        const footer = document.querySelector('.footer');
+        if (!footer) return;
+        document.body.style.paddingBottom = (footer.offsetHeight + 16) + 'px';
     }
 
     /**
