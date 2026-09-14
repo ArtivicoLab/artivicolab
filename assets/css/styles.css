@@ -842,6 +842,22 @@ body.frame-full-open .footer { display: none; }
     color: var(--ink-faint);
 }
 
+.contact-fallback {
+    margin: calc(-1 * var(--sp-sm)) 0 var(--sp-lg);
+    padding: 12px 16px;
+    max-width: 560px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    background-image: var(--sketch-border-hover);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+.contact-fallback p { margin-bottom: 8px; }
+.contact-fallback .sep { margin: 0 8px; color: var(--ink-faint); }
+.contact-copy { background: transparent; border: 0; cursor: pointer; font-size: 15px; }
+
 .contact-sent {
     margin: calc(-1 * var(--sp-md)) 0 var(--sp-lg);
     padding: 12px 16px;
