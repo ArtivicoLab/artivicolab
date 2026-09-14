@@ -45,8 +45,8 @@
                     '</svg>' +
                     '<span class="gate-hint">click here</span>' +
                 '</div>' +
-                '<p class="gate-fine">Shown once. Clicking means you read it.</p>' +
-                '<p class="gate-fine gate-stamp">Site updated &middot; September 14, 2026 · 12:29 PM MDT</p>' +
+                '<p class="gate-fine">Shown once. Clicking means you read it. This site uses Google Analytics for visit counts, see <a href="privacy.html?peek=1" class="gate-link" target="_blank" rel="noopener">Privacy</a>.</p>' +
+                '<p class="gate-fine gate-stamp">Site updated &middot; September 14, 2026 · 12:39 PM MDT</p>' +
             '</div>';
         return overlay;
     }
@@ -168,6 +168,13 @@
         if (!document.querySelector('.gate')) open();
     });
     window.ArtivicoGate = { open: open };
+
+    // ?peek=1 lets the Privacy link from inside the notice open without the notice
+    // (the visitor hasn't acknowledged yet). Nothing is remembered.
+    if (/[?&]peek=1\b/.test(location.search)) {
+        document.documentElement.classList.remove('gate-pending');
+        return;
+    }
 
     if (acked()) return;
     if (document.readyState === 'loading') {

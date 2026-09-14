@@ -84,6 +84,32 @@
         track.innerHTML = html;
         wave.appendChild(track);
         footer.insertBefore(wave, footer.firstChild);
+
+        // Equalizer bars pulsing to a 120 bpm beat, plus a flowing soundwave line.
+        const beat = document.createElement('div');
+        beat.className = 'footer-beat';
+        beat.setAttribute('aria-hidden', 'true');
+        let bars = '';
+        const count = 96;
+        for (let i = 0; i < count; i++) {
+            // Deterministic pseudo-random heights so the pattern is stable across loads.
+            const seed = Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1;
+            const h = (0.25 + seed * 0.75).toFixed(2);
+            const d = (0.45 + ((i * 7) % 5) * 0.09).toFixed(2);
+            const delay = (-(seed * 1.2)).toFixed(2);
+            bars += `<span style="--h:${h};--d:${d}s;--delay:${delay}s"></span>`;
+        }
+        beat.innerHTML = bars;
+        footer.insertBefore(beat, footer.firstChild);
+
+        const line = document.createElement('div');
+        line.className = 'footer-soundwave';
+        line.setAttribute('aria-hidden', 'true');
+        line.innerHTML =
+            '<svg viewBox="0 0 1200 60" preserveAspectRatio="none">' +
+                '<path d="M0,30 C25,5 50,5 75,30 S125,55 150,30 S200,5 225,30 S275,55 300,30 S350,5 375,30 S425,55 450,30 S500,5 525,30 S575,55 600,30 S650,5 675,30 S725,55 750,30 S800,5 825,30 S875,55 900,30 S950,5 975,30 S1025,55 1050,30 S1100,5 1125,30 S1175,55 1200,30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+            '</svg>';
+        footer.insertBefore(line, footer.firstChild);
     }
 
     /**
