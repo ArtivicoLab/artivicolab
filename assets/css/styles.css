@@ -1029,9 +1029,36 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 
 .gate-stamp { margin-top: 4px; color: var(--accent); }
 
-/* Big watermark lock behind the notice text; pops open on acknowledge */
+.gate-btn { display: inline-flex; align-items: center; gap: 10px; }
+.gate-btn:disabled { cursor: default; color: var(--accent); }
+.gate-btn:disabled:hover { filter: none; }
+
+.gate-lock { width: 22px; height: 28px; flex-shrink: 0; overflow: visible; }
+.gate-lock-shackle { transform-origin: 23px 18px; transition: transform 0.45s var(--ease); }
+
+.gate-cta { position: relative; display: inline-flex; align-items: center; gap: 14px; }
+.gate-arrow {
+    width: 96px; height: 48px; color: var(--accent); flex-shrink: 0;
+    animation: gate-nudge 1.1s var(--ease) infinite alternate;
+    transform-origin: left center;
+}
+.gate-hint {
+    position: absolute; left: calc(100% - 78px); top: -22px;
+    font-family: var(--font-display); font-style: italic; font-size: 16px;
+    color: var(--accent); transform: rotate(-6deg); white-space: nowrap;
+}
+@keyframes gate-nudge { from { transform: translateX(0); } to { transform: translateX(-8px); } }
+.gate-unlocking .gate-arrow, .gate-unlocking .gate-hint { opacity: 0; }
+
+/* Big watermark lock behind the notice. On acknowledge it comes forward,
+   the text falls back, a caption + countdown appear under it, the lock
+   shakes, then pops open. */
 .gate-card { overflow: hidden; }
-.gate-card > :not(.gate-watermark) { position: relative; z-index: 1; }
+.gate-card > :not(.gate-watermark):not(.gate-stage):not(.gate-burst):not(.gate-grant):not(.gate-xp) {
+    position: relative;
+    z-index: 1;
+    transition: opacity 0.5s var(--ease), filter 0.5s var(--ease);
+}
 
 .gate-watermark {
     position: absolute;
@@ -1045,62 +1072,85 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
     pointer-events: none;
     overflow: visible;
     z-index: 0;
-    transition: opacity 0.5s var(--ease);
+    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), top 0.55s var(--ease), width 0.55s var(--ease);
 }
 .gate-wm-shackle {
     transform-origin: 23px 18px;
-    transition: transform 0.55s var(--ease);
+    transition: transform 0.5s var(--ease);
 }
-.gate-unlocking .gate-wm-shackle { transform: rotate(-42deg) translate(-2px, -3px); }
+
+/* Stage: caption + countdown under the lock (hidden until unlocking) */
+.gate-stage {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 9%;
+    z-index: 3;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.45s var(--ease) 0.25s, transform 0.45s var(--ease) 0.25s;
+    pointer-events: none;
+}
+.gate-stage-name {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    line-height: 1.1;
+}
+.gate-stage-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin-top: 4px;
+}
+.gate-stage-count {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--accent);
+    margin-top: 8px;
+    min-height: 40px;
+}
+
+/* Phase 1: unlocking */
+.gate-unlocking > :not(.gate-watermark):not(.gate-stage):not(.gate-burst):not(.gate-grant):not(.gate-xp) { opacity: 0.06; filter: blur(1px); }
 .gate-unlocking .gate-watermark {
-    opacity: 0.16;
-    animation: gate-wm-pop 0.7s var(--ease);
+    z-index: 2;
+    opacity: 1;
+    top: 38%;
+    width: 46%;
+    animation: gate-shake 0.5s var(--ease) 0.55s infinite;
 }
+.gate-unlocking .gate-stage { opacity: 1; transform: translateY(0); }
+
+@keyframes gate-shake {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-6deg); }
+    20%      { transform: translate(-52%, -50%) rotate(-10deg); }
+    40%      { transform: translate(-48%, -50%) rotate(-2deg); }
+    60%      { transform: translate(-51%, -50%) rotate(-9deg); }
+    80%      { transform: translate(-49%, -50%) rotate(-3deg); }
+}
+
+/* Phase 2: popped */
+.gate-popped .gate-watermark { animation: gate-wm-pop 0.6s var(--ease) forwards; }
+.gate-popped .gate-wm-shackle { transform: rotate(-46deg) translate(-2px, -4px); }
+.gate-popped .gate-lock-shackle { transform: rotate(-38deg) translate(-2px, -3px); }
 @keyframes gate-wm-pop {
     0%   { transform: translate(-50%, -50%) rotate(-6deg) scale(1); }
-    45%  { transform: translate(-50%, -50%) rotate(-2deg) scale(1.14); }
-    100% { transform: translate(-50%, -50%) rotate(-6deg) scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-    .gate-wm-shackle { transition: none; }
-    .gate-unlocking .gate-watermark { animation: none; }
+    45%  { transform: translate(-50%, -54%) rotate(2deg) scale(1.18); }
+    100% { transform: translate(-50%, -50%) rotate(-6deg) scale(1.06); }
 }
 
-.gate-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-.gate-btn:disabled { cursor: default; color: var(--accent); }
-.gate-btn:disabled:hover { filter: none; }
+/* Small button lock only opens at the pop */
+.gate-unlocking .gate-lock-shackle { transform: none; }
+.gate-popped .gate-lock-shackle { transform: rotate(-38deg) translate(-2px, -3px); }
 
-.gate-lock {
-    width: 22px;
-    height: 28px;
-    flex-shrink: 0;
-    overflow: visible;
-}
-.gate-lock-shackle {
-    transform-origin: 23px 18px;
-    transition: transform 0.45s var(--ease);
-}
-.gate-unlocking .gate-lock-shackle { transform: rotate(-38deg) translate(-2px, -3px); }
-.gate-unlocking .gate-lock { animation: gate-lock-pop 0.45s var(--ease); }
-.gate-unlocking .gate-arrow, .gate-unlocking .gate-hint { opacity: 0; transition: opacity 0.25s var(--ease); }
-
-@keyframes gate-lock-pop {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.18) rotate(-4deg); }
-    100% { transform: scale(1); }
-}
-
-.gate-count {
-    display: inline-block;
-    min-width: 1.2em;
-    text-align: center;
-    color: var(--accent);
-    font-weight: 600;
-}
 .gate-count-pop { animation: gate-count-pop 0.35s var(--ease); }
 @keyframes gate-count-pop {
     0%   { transform: scale(1.5); opacity: 0.3; }
@@ -1108,55 +1158,88 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .gate-lock-shackle { transition: none; }
-    .gate-unlocking .gate-lock, .gate-count-pop { animation: none; }
+    .gate-wm-shackle, .gate-lock-shackle { transition: none; }
+    .gate-unlocking .gate-watermark, .gate-popped .gate-watermark, .gate-count-pop { animation: none; }
 }
 
-.gate-cta {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
+.gate-stage-tag {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    margin-bottom: 2px;
 }
 
-.gate-arrow {
-    width: 96px;
-    height: 48px;
+/* Card jolt on pop */
+.gate-popped { animation: gate-jolt 0.35s var(--ease); }
+@keyframes gate-jolt {
+    0%   { transform: translateY(0) rotate(-0.4deg); }
+    30%  { transform: translate(-3px, 2px) rotate(-1.2deg); }
+    60%  { transform: translate(3px, -2px) rotate(0.4deg); }
+    100% { transform: translateY(0) rotate(-0.4deg); }
+}
+
+/* Ink dot burst from the lock */
+.gate-burst {
+    position: absolute; left: 50%; top: 38%; width: 0; height: 0; z-index: 4; pointer-events: none;
+}
+.gate-burst span {
+    position: absolute; left: -4px; top: -4px; width: 8px; height: 8px;
+    border-radius: 50%; background-color: var(--ink);
+    transform: rotate(var(--a)) translateX(0) scale(1);
+    opacity: 1;
+    animation: gate-dot 0.75s var(--ease) forwards;
+}
+.gate-burst span:nth-child(3n) { background-color: var(--accent); }
+@keyframes gate-dot {
+    to { transform: rotate(var(--a)) translateX(var(--d)) scale(0.2); opacity: 0; }
+}
+
+/* ACCESS GRANTED stamp slams in */
+.gate-grant {
+    position: absolute; left: 50%; top: 46%; z-index: 5;
+    padding: 8px 16px;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     color: var(--accent);
-    flex-shrink: 0;
-    animation: gate-nudge 1.1s var(--ease) infinite alternate;
-    transform-origin: left center;
-}
-
-.gate-hint {
-    position: absolute;
-    left: calc(100% - 78px);
-    top: -22px;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 16px;
-    color: var(--accent);
-    transform: rotate(-6deg);
+    border: 3px solid var(--accent);
+    background-color: var(--paper);
+    background-image: var(--sketch-border-hover);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     white-space: nowrap;
+    transform: translate(-50%, -50%) rotate(-8deg) scale(1.8);
+    opacity: 0;
+    animation: gate-stamp-in 0.4s var(--ease) 0.15s forwards;
+}
+@keyframes gate-stamp-in {
+    to { transform: translate(-50%, -50%) rotate(-8deg) scale(1); opacity: 1; }
 }
 
-@keyframes gate-nudge {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-8px); }
+/* +100 XP floats up */
+.gate-xp {
+    position: absolute; left: 50%; top: 30%; z-index: 5;
+    font-family: var(--font-display); font-weight: 900; font-size: 28px;
+    color: var(--accent-cool);
+    transform: translate(-50%, 0);
+    opacity: 0;
+    animation: gate-xp 1.1s var(--ease) 0.35s forwards;
+    pointer-events: none;
+}
+@keyframes gate-xp {
+    0%   { transform: translate(-50%, 0);     opacity: 0; }
+    20%  { opacity: 1; }
+    100% { transform: translate(-50%, -70px); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .gate-arrow { animation: none; }
-}
-
-@media (max-width: 768px) {
-    .gate-arrow { width: 72px; height: 36px; }
-    .gate-hint { left: calc(100% - 60px); font-size: 14px; }
-}
-
-@media (max-width: 768px) {
-    .gate-card { padding: var(--sp-md); }
-    .gate-title { font-size: 36px; }
+    .gate-arrow, .gate-popped, .gate-burst span, .gate-xp { animation: none; }
+    .gate-grant { animation: none; opacity: 1; transform: translate(-50%, -50%) rotate(-8deg); }
+    .gate-burst { display: none; }
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */

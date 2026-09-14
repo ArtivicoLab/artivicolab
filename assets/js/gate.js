@@ -101,16 +101,50 @@
             remember();
 
             var card = overlay.querySelector('.gate-card');
+
+            // Stage under the lock: name, title, countdown.
+            var stage = document.createElement('div');
+            stage.className = 'gate-stage';
+            stage.innerHTML =
+                '<p class="gate-stage-tag">Player 1</p>' +
+                '<p class="gate-stage-name">Gradi Kayamba</p>' +
+                '<p class="gate-stage-title">Master web developer &middot; Lvl 99</p>' +
+                '<p class="gate-stage-count">3</p>';
+            card.appendChild(stage);
+            var count = stage.querySelector('.gate-stage-count');
+
+            // 1) Lock comes forward, text falls back.
             card.classList.add('gate-unlocking');
 
-            // Swap the fine print for a countdown, then let them in.
-            var fine = overlay.querySelector('.gate-fine:not(.gate-stamp)');
+            // 2) Countdown while the lock shakes.
             var n = 3;
-            fine.innerHTML = 'Unlocked. Entering the lab in <strong class="gate-count">' + n + '</strong>';
-            var count = fine.querySelector('.gate-count');
             var tick = setInterval(function () {
                 n -= 1;
-                if (n <= 0) { clearInterval(tick); dismiss(); return; }
+                if (n <= 0) {
+                    clearInterval(tick);
+                    count.textContent = '';
+                    // 3) Pop open: ink burst, ACCESS GRANTED stamp, XP float. Then voila.
+                    card.classList.add('gate-popped');
+                    var burst = document.createElement('div');
+                    burst.className = 'gate-burst';
+                    for (var i = 0; i < 14; i++) {
+                        var dot = document.createElement('span');
+                        dot.style.setProperty('--a', (i * (360 / 14)) + 'deg');
+                        dot.style.setProperty('--d', (60 + (i % 3) * 22) + 'px');
+                        burst.appendChild(dot);
+                    }
+                    card.appendChild(burst);
+                    var grant = document.createElement('div');
+                    grant.className = 'gate-grant';
+                    grant.textContent = 'Access granted';
+                    card.appendChild(grant);
+                    var xp = document.createElement('div');
+                    xp.className = 'gate-xp';
+                    xp.textContent = '+100 XP';
+                    card.appendChild(xp);
+                    setTimeout(dismiss, 1500);
+                    return;
+                }
                 count.textContent = n;
                 count.classList.remove('gate-count-pop');
                 void count.offsetWidth;
@@ -125,6 +159,15 @@
             btn.focus();
         });
     }
+
+    // Footer "All rights reserved" link re-opens the notice on demand.
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest && e.target.closest('[data-gate-open]');
+        if (!trigger) return;
+        e.preventDefault();
+        if (!document.querySelector('.gate')) open();
+    });
+    window.ArtivicoGate = { open: open };
 
     if (acked()) return;
     if (document.readyState === 'loading') {
