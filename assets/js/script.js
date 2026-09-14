@@ -102,6 +102,12 @@
         beat.innerHTML = bars;
         footer.insertBefore(beat, footer.firstChild);
 
+        // Wavy top edge in place of the straight border
+        const edge = document.createElement('div');
+        edge.className = 'footer-edge';
+        edge.setAttribute('aria-hidden', 'true');
+        footer.insertBefore(edge, footer.firstChild);
+
         const line = document.createElement('div');
         line.className = 'footer-soundwave';
         line.setAttribute('aria-hidden', 'true');
