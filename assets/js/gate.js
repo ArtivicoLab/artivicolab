@@ -20,11 +20,25 @@
         overlay.className = 'gate';
         overlay.innerHTML =
             '<div class="gate-card" role="dialog" aria-modal="true" aria-labelledby="gate-title" aria-describedby="gate-body">' +
+                '<svg class="gate-watermark" viewBox="0 0 32 40" aria-hidden="true" focusable="false">' +
+                    '<path class="gate-wm-shackle" d="M9,18 C8,7 11,3 16,3 C21,3 24,7 23,18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
+                    '<path d="M5,18 C12,17 20,17 27,18 C28,25 27,31 27,36 C20,37 12,37 5,36 C5,31 4,25 5,18 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' +
+                    '<circle cx="16" cy="26" r="2.2" fill="currentColor"/>' +
+                    '<path d="M16,28 L16,32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+                '</svg>' +
                 '<p class="eyebrow">Notice &middot; before you enter</p>' +
                 '<h2 id="gate-title" class="gate-title">All rights reserved.</h2>' +
-                '<p id="gate-body" class="gate-body">Everything on this site is the work of <strong>Gradi Kayamba</strong>, published under <strong>ArtivicoLab</strong> supervision. Look around, use the apps, fork the templates that say you can. Just don\'t pass any of it off as your own.</p>' +
+                '<p id="gate-body" class="gate-body">Everything on this site is the original work of <strong>Gradi Kayamba</strong>, published under <strong>ArtivicoLab</strong> supervision. Gradi\'s imagination, brought to life. Look around, use the apps, fork the templates that say you can. Just don\'t pass any of it off as your own.</p>' +
                 '<div class="gate-cta">' +
-                    '<button type="button" class="gate-btn" id="gate-btn">Understood, chef Gradi.</button>' +
+                    '<button type="button" class="gate-btn" id="gate-btn">' +
+                        '<svg class="gate-lock" viewBox="0 0 32 40" aria-hidden="true" focusable="false">' +
+                            '<path class="gate-lock-shackle" d="M9,18 C8,7 11,3 16,3 C21,3 24,7 23,18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>' +
+                            '<path class="gate-lock-body" d="M5,18 C12,17 20,17 27,18 C28,25 27,31 27,36 C20,37 12,37 5,36 C5,31 4,25 5,18 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>' +
+                            '<circle class="gate-lock-key" cx="16" cy="26" r="2.2" fill="currentColor"/>' +
+                            '<path class="gate-lock-key" d="M16,28 L16,32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
+                        '</svg>' +
+                        '<span class="gate-btn-text">Understood, chef Gradi.</span>' +
+                    '</button>' +
                     '<svg class="gate-arrow" viewBox="0 0 120 60" aria-hidden="true" focusable="false">' +
                         '<path d="M112,10 C95,8 70,14 48,30 C36,39 26,44 12,46" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
                         '<path d="M26,36 C20,41 16,44 11,46 C16,47 21,50 25,54" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
@@ -32,15 +46,33 @@
                     '<span class="gate-hint">click here</span>' +
                 '</div>' +
                 '<p class="gate-fine">Shown once. Clicking means you read it.</p>' +
-                '<p class="gate-fine gate-stamp">Site updated &middot; September 14, 2026 · 8:58 AM EDT</p>' +
+                '<p class="gate-fine gate-stamp">Site updated &middot; September 14, 2026 · 6:58 AM MDT</p>' +
             '</div>';
         return overlay;
     }
 
     function open() {
         var overlay = build();
-        document.body.appendChild(overlay);
-        document.body.classList.add('gate-open');
+        var html = document.documentElement;
+        var body = document.body;
+        var scrollY = window.scrollY || 0;
+
+        body.appendChild(overlay);
+
+        // Hard scroll lock: works in Safari and with trackpads, unlike overflow alone.
+        body.style.top = (-scrollY) + 'px';
+        html.classList.add('gate-open');
+        body.classList.add('gate-open');
+
+        // Block wheel and touch scrolling on the backdrop; allow it inside the card.
+        function stopScroll(e) {
+            var card = overlay.querySelector('.gate-card');
+            if (card && card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
+            e.preventDefault();
+        }
+        overlay.addEventListener('wheel', stopScroll, { passive: false });
+        overlay.addEventListener('touchmove', stopScroll, { passive: false });
+
         var btn = overlay.querySelector('#gate-btn');
 
         // Keep focus inside the dialog. Escape does not dismiss; the button does.
@@ -53,16 +85,43 @@
             overlay._trap = trap;
         });
 
-        btn.addEventListener('click', function () {
-            remember();
+        function dismiss() {
             overlay.classList.add('gate-out');
-            document.body.classList.remove('gate-open');
+            html.classList.remove('gate-open');
+            body.classList.remove('gate-open');
+            body.style.top = '';
+            window.scrollTo(0, scrollY);
             if (overlay._trap) document.removeEventListener('focusin', overlay._trap);
             setTimeout(function () { overlay.remove(); }, 350);
+        }
+
+        btn.addEventListener('click', function () {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            remember();
+
+            var card = overlay.querySelector('.gate-card');
+            card.classList.add('gate-unlocking');
+
+            // Swap the fine print for a countdown, then let them in.
+            var fine = overlay.querySelector('.gate-fine:not(.gate-stamp)');
+            var n = 3;
+            fine.innerHTML = 'Unlocked. Entering the lab in <strong class="gate-count">' + n + '</strong>';
+            var count = fine.querySelector('.gate-count');
+            var tick = setInterval(function () {
+                n -= 1;
+                if (n <= 0) { clearInterval(tick); dismiss(); return; }
+                count.textContent = n;
+                count.classList.remove('gate-count-pop');
+                void count.offsetWidth;
+                count.classList.add('gate-count-pop');
+            }, 1000);
         });
 
         requestAnimationFrame(function () {
             overlay.classList.add('gate-in');
+            // The overlay is painted now, so the pre-paint paper cover can go.
+            html.classList.remove('gate-pending');
             btn.focus();
         });
     }

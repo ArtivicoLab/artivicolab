@@ -939,7 +939,18 @@ img { max-width: 100%; height: auto; display: block; }
 
 
 /* ─── Entry notice (first visit) ─────────────────────────── */
-body.gate-open { overflow: hidden; }
+/* Pre-paint cover: set by an inline head script before the page renders,
+   removed by gate.js once the overlay is on screen. Prevents any flash of site. */
+html.gate-pending::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background-color: var(--paper);
+}
+
+html.gate-open, body.gate-open { overflow: hidden; height: 100%; }
+body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 
 .gate {
     position: fixed;
@@ -1017,6 +1028,89 @@ body.gate-open { overflow: hidden; }
 }
 
 .gate-stamp { margin-top: 4px; color: var(--accent); }
+
+/* Big watermark lock behind the notice text; pops open on acknowledge */
+.gate-card { overflow: hidden; }
+.gate-card > :not(.gate-watermark) { position: relative; z-index: 1; }
+
+.gate-watermark {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    width: 62%;
+    height: auto;
+    transform: translate(-50%, -50%) rotate(-6deg);
+    color: var(--ink);
+    opacity: 0.07;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 0;
+    transition: opacity 0.5s var(--ease);
+}
+.gate-wm-shackle {
+    transform-origin: 23px 18px;
+    transition: transform 0.55s var(--ease);
+}
+.gate-unlocking .gate-wm-shackle { transform: rotate(-42deg) translate(-2px, -3px); }
+.gate-unlocking .gate-watermark {
+    opacity: 0.16;
+    animation: gate-wm-pop 0.7s var(--ease);
+}
+@keyframes gate-wm-pop {
+    0%   { transform: translate(-50%, -50%) rotate(-6deg) scale(1); }
+    45%  { transform: translate(-50%, -50%) rotate(-2deg) scale(1.14); }
+    100% { transform: translate(-50%, -50%) rotate(-6deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .gate-wm-shackle { transition: none; }
+    .gate-unlocking .gate-watermark { animation: none; }
+}
+
+.gate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.gate-btn:disabled { cursor: default; color: var(--accent); }
+.gate-btn:disabled:hover { filter: none; }
+
+.gate-lock {
+    width: 22px;
+    height: 28px;
+    flex-shrink: 0;
+    overflow: visible;
+}
+.gate-lock-shackle {
+    transform-origin: 23px 18px;
+    transition: transform 0.45s var(--ease);
+}
+.gate-unlocking .gate-lock-shackle { transform: rotate(-38deg) translate(-2px, -3px); }
+.gate-unlocking .gate-lock { animation: gate-lock-pop 0.45s var(--ease); }
+.gate-unlocking .gate-arrow, .gate-unlocking .gate-hint { opacity: 0; transition: opacity 0.25s var(--ease); }
+
+@keyframes gate-lock-pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.18) rotate(-4deg); }
+    100% { transform: scale(1); }
+}
+
+.gate-count {
+    display: inline-block;
+    min-width: 1.2em;
+    text-align: center;
+    color: var(--accent);
+    font-weight: 600;
+}
+.gate-count-pop { animation: gate-count-pop 0.35s var(--ease); }
+@keyframes gate-count-pop {
+    0%   { transform: scale(1.5); opacity: 0.3; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gate-lock-shackle { transition: none; }
+    .gate-unlocking .gate-lock, .gate-count-pop { animation: none; }
+}
 
 .gate-cta {
     position: relative;
