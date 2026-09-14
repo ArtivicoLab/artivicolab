@@ -76,26 +76,16 @@
                 ? '<span class="card-badge card-badge--app">Live App</span>'
                 : '<span class="card-badge card-badge--template">Template</span>';
 
-            // Gamification: rarity tier + XP, provided by gamify.js when loaded.
-            const game = window.ArtivicoGame;
-            const rarity = game ? game.rarityOf(website) : null;
-            const xp = game ? game.xpOf(website) : null;
-            const rarityTag = rarity
-                ? `<span class="card-rarity card-rarity--${rarity}">${rarity}</span>`
-                : '';
-            const xpText = xp ? `+${xp} XP &middot; ` : '';
-
             galleryItem.innerHTML = `
                 <a href="${linkHref}" class="card"${linkTarget}>
                     <div class="card-image">
                         <img src="${website.thumbnail}" alt="${website.title}" loading="lazy">
                         ${badge}
-                        ${rarityTag}
                     </div>
                     <div class="card-content">
                         <div class="card-header">
                             <h3>${website.title}</h3>
-                            <span class="card-date">${xpText}${website.metadata.created.split(' ')[0]}</span>
+                            <span class="card-date">${website.metadata.created.split(' ')[0]}</span>
                         </div>
                         <p>${website.description}</p>
                         <div class="card-tech-preview">
