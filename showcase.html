@@ -30,7 +30,7 @@
     <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/images/logo.svg">
     <link rel="stylesheet" href="assets/css/normalize.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=20260914-0754">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
                 <a href="index.html">
                     <img src="assets/images/logo.svg" alt="ArtivicoLab">
                 </a>
-                <span class="logo-mark">ArtivicoLab<span class="logo-slash"> // template preview</span></span>
+                <span class="logo-mark">ArtivicoLab</span>
             </div>
             <nav class="nav">
                 <div class="hamburger" id="hamburger">
@@ -76,19 +76,26 @@
         </section>
     </main>
 
-    <section class="website-frame-container-fullwidth">
-        <div class="iframe-protector-fullwidth" id="iframe-wrapper">
-            <iframe 
+    <section class="frame-section" id="frame-section">
+        <div class="frame-bar">
+            <div class="frame-bar-left">
+                <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
+                <span class="frame-name" id="frame-name">Template preview</span>
+            </div>
+            <div class="frame-bar-right">
+                <a id="frame-open" class="ink-link" href="#" target="_blank" rel="noopener">Open live site</a>
+                <button type="button" class="frame-btn" id="frame-expand" aria-pressed="false">Expand</button>
+            </div>
+        </div>
+        <div class="frame-viewport" id="iframe-wrapper">
+            <iframe
                 id="website-frame"
                 title="Website Showcase"
-                class="website-frame" 
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-top-navigation" 
+                class="website-frame"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-top-navigation"
                 referrerpolicy="no-referrer"
                 loading="lazy">
             </iframe>
-        </div>
-        <div class="iframe-notice">
-            <p>This content is protected. Right-click, copying, and inspector tools have been disabled to preserve creator's rights.</p>
         </div>
     </section>
 
@@ -105,14 +112,16 @@
                 <a href="terms.html" class="ink-link">Terms</a>
                 <span class="sep">&middot;</span>
                 <a href="#" class="ink-link" data-gate-open>All rights reserved</a>
+                <span class="sep">&middot;</span>
+                <span class="site-stamp">Updated September 14, 2026</span>
             </p>
         </div>
     </footer>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/protection.js"></script>
-    <script src="assets/js/script.js"></script>
-    <script src="assets/js/hamburger.js"></script>
-    <script src="assets/js/gate.js"></script>
+    <script src="assets/js/data.js?v=20260914-0754"></script>
+    <script src="assets/js/protection.js?v=20260914-0754"></script>
+    <script src="assets/js/script.js?v=20260914-0754"></script>
+    <script src="assets/js/hamburger.js?v=20260914-0754"></script>
+    <script src="assets/js/gate.js?v=20260914-0754"></script>
 </body>
 </html>

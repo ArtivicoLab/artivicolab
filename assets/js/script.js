@@ -18,6 +18,9 @@
         // Add any general functionality here
         console.log('Website Showcase Platform initialized');
 
+        // Footer watermark: "Homo staticus" drifting across and waving
+        buildFooterWave();
+
         // Planners page — filter by subcategory
         if (document.getElementById('planners-container')) {
             populateGallery('planners-container', 'application', 'planner');
@@ -48,6 +51,29 @@
                 window.location.href = 'index.html';
             }
         }
+    }
+
+    /**
+     * Big faint "Homo staticus" text scrolling across the footer, each word bobbing
+     * on a staggered wave. Two identical tracks make the loop seamless.
+     */
+    function buildFooterWave() {
+        const footer = document.querySelector('.footer');
+        if (!footer || footer.querySelector('.footer-wave')) return;
+        const wave = document.createElement('div');
+        wave.className = 'footer-wave';
+        wave.setAttribute('aria-hidden', 'true');
+        const track = document.createElement('div');
+        track.className = 'footer-wave-track';
+        let html = '';
+        for (let set = 0; set < 2; set++) {
+            for (let i = 0; i < 10; i++) {
+                html += `<span class="fw-word" style="--i:${i}">Homo staticus</span>`;
+            }
+        }
+        track.innerHTML = html;
+        wave.appendChild(track);
+        footer.insertBefore(wave, footer.firstChild);
     }
 
     /**
@@ -202,43 +228,42 @@
             </div>
         `;
         
-        // Set the iframe source
+        // Set the iframe source and wire the preview toolbar
         const iframe = document.getElementById('website-frame');
         if (iframe) {
             iframe.src = website.url;
             iframe.title = website.title;
-            
-            // Auto-resize iframe to content height
-            iframe.onload = function() {
-                try {
-                    // Try to access iframe content height
-                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                    const height = Math.max(
-                        iframeDocument.body.scrollHeight,
-                        iframeDocument.body.offsetHeight,
-                        iframeDocument.documentElement.clientHeight,
-                        iframeDocument.documentElement.scrollHeight,
-                        iframeDocument.documentElement.offsetHeight
-                    );
-                    
-                    // Set iframe height to content height
-                    iframe.style.height = height + 'px';
-                    
-                    // Update container height
-                    const container = iframe.parentElement;
-                    if (container) {
-                        container.style.height = height + 'px';
-                    }
-                } catch (e) {
-                    // Cross-origin restrictions prevent access, use fallback
-                    iframe.style.height = '100vh';
-                    const container = iframe.parentElement;
-                    if (container) {
-                        container.style.height = '100vh';
-                    }
-                }
-            };
+            const name = document.getElementById('frame-name');
+            if (name) name.textContent = website.title;
+            const open = document.getElementById('frame-open');
+            if (open) open.href = website.url;
+            setupFrameExpand(website.title);
         }
+    }
+
+    /**
+     * Expand / collapse the template preview to fill the viewport.
+     * Esc or the button exits. The gate overlay (z 1000) still sits above it.
+     */
+    function setupFrameExpand(title) {
+        const section = document.getElementById('frame-section');
+        const btn = document.getElementById('frame-expand');
+        if (!section || !btn) return;
+
+        function setFull(on) {
+            section.classList.toggle('is-full', on);
+            document.body.classList.toggle('frame-full-open', on);
+            btn.textContent = on ? 'Exit full view' : 'Expand';
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            if (on) btn.focus();
+        }
+
+        btn.addEventListener('click', function () {
+            setFull(!section.classList.contains('is-full'));
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && section.classList.contains('is-full')) setFull(false);
+        });
     }
 
     /**

@@ -46,7 +46,7 @@
                     '<span class="gate-hint">click here</span>' +
                 '</div>' +
                 '<p class="gate-fine">Shown once. Clicking means you read it.</p>' +
-                '<p class="gate-fine gate-stamp">Site updated &middot; September 14, 2026 · 6:58 AM MDT</p>' +
+                '<p class="gate-fine gate-stamp">Site updated &middot; September 14, 2026 · 7:54 AM MDT</p>' +
             '</div>';
         return overlay;
     }
