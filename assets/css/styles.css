@@ -44,6 +44,14 @@
     --sketch-border-hover:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220' preserveAspectRatio='none'><path d='M5,9 C95,3 205,11 315,5 C317,82 312,150 317,215 C218,219 108,212 3,217 C8,148 2,82 5,9 Z' fill='none' stroke='%23B5392B' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/></svg>");
 
+    /* Same hand-drawn frame, recolored, for the mascot's beat-synced color cycle */
+    --sketch-border-green:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220' preserveAspectRatio='none'><path d='M6,8 C90,4 200,9 314,6 C316,80 313,150 316,214 C220,217 110,213 4,216 C7,150 3,80 6,8 Z' fill='none' stroke='%232E5944' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/></svg>");
+    --sketch-border-gold:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220' preserveAspectRatio='none'><path d='M6,8 C90,4 200,9 314,6 C316,80 313,150 316,214 C220,217 110,213 4,216 C7,150 3,80 6,8 Z' fill='none' stroke='%23C99A2E' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/></svg>");
+    --sketch-border-violet:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220' preserveAspectRatio='none'><path d='M6,8 C90,4 200,9 314,6 C316,80 313,150 316,214 C220,217 110,213 4,216 C7,150 3,80 6,8 Z' fill='none' stroke='%236B4FA0' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/></svg>");
+
     /* Hand-drawn underline (wobbly horizontal stroke) */
     --sketch-underline:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'><path d='M2,5 C30,2 60,8 100,4 C140,1 170,7 198,4' fill='none' stroke='%231A1816' stroke-width='1.5' stroke-linecap='round'/></svg>");
@@ -266,32 +274,40 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .intro-mascot:hover img { filter: url(#ink-jitter); }
 
-/* While the beats player is running, the frame bops on the beat and its
-   glow cycles through the site's accent palette. box-shadow (not the baked
-   SVG border) carries the color animation since it's the one part of the
-   frame CSS can actually animate. */
+/* While the beats player is running, the frame bops on the beat and the
+   SAME hand-drawn border cycles through the site's accent colors, no extra
+   ring added around it. background-image can't be smoothly interpolated,
+   so mascot-recolor jumps between four recolored copies of the existing
+   --sketch-border SVG at each quarter-beat, using steps(1) to hold each
+   color instead of trying (and failing) to fade between images.
+   transition is switched off here because a transition and a keyframe
+   animation fighting over the same `transform` property is what made the
+   motion stutter instead of read as a wave. */
 html.sound-playing .intro-mascot {
-    animation: mascot-wave 1.43s ease-in-out infinite, mascot-glow 4.29s linear infinite;
+    transition: none;
+    transform-origin: 50% 50%;
+    animation:
+        mascot-wave 1.43s ease-in-out infinite,
+        mascot-recolor 4.29s steps(1) infinite;
 }
-html.sound-playing .intro-mascot:hover { animation-play-state: running, running; }
 
 @keyframes mascot-wave {
-    0%, 100% { transform: rotate(-0.6deg) translateY(0) scale(1); }
+    0%, 100% { transform: rotate(-0.6deg) translateY(0)    scale(1); }
     25%      { transform: rotate(0.9deg)  translateY(-3px) scale(1.012); }
     50%      { transform: rotate(-0.3deg) translateY(1px)  scale(0.996); }
     75%      { transform: rotate(0.7deg)  translateY(-2px) scale(1.008); }
 }
 
-@keyframes mascot-glow {
-    0%   { box-shadow: 0 0 0 3px var(--accent),      0 0 26px 4px rgba(181, 57, 43, 0.45); }
-    25%  { box-shadow: 0 0 0 3px var(--accent-cool),  0 0 26px 4px rgba(46, 89, 68, 0.45); }
-    50%  { box-shadow: 0 0 0 3px #C99A2E,             0 0 26px 4px rgba(201, 154, 46, 0.45); }
-    75%  { box-shadow: 0 0 0 3px #6B4FA0,             0 0 26px 4px rgba(107, 79, 160, 0.45); }
-    100% { box-shadow: 0 0 0 3px var(--accent),      0 0 26px 4px rgba(181, 57, 43, 0.45); }
+@keyframes mascot-recolor {
+    0%   { background-image: var(--sketch-border-hover); }
+    25%  { background-image: var(--sketch-border-green); }
+    50%  { background-image: var(--sketch-border-gold); }
+    75%  { background-image: var(--sketch-border-violet); }
+    100% { background-image: var(--sketch-border-hover); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    html.sound-playing .intro-mascot { animation: none; }
+    html.sound-playing .intro-mascot { animation: none; transition: transform 0.6s var(--ease), background-image 0.2s var(--ease); }
 }
 
 .mascot-caption {
