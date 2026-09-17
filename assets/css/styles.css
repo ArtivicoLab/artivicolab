@@ -266,6 +266,34 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .intro-mascot:hover img { filter: url(#ink-jitter); }
 
+/* While the beats player is running, the frame bops on the beat and its
+   glow cycles through the site's accent palette. box-shadow (not the baked
+   SVG border) carries the color animation since it's the one part of the
+   frame CSS can actually animate. */
+html.sound-playing .intro-mascot {
+    animation: mascot-wave 1.43s ease-in-out infinite, mascot-glow 4.29s linear infinite;
+}
+html.sound-playing .intro-mascot:hover { animation-play-state: running, running; }
+
+@keyframes mascot-wave {
+    0%, 100% { transform: rotate(-0.6deg) translateY(0) scale(1); }
+    25%      { transform: rotate(0.9deg)  translateY(-3px) scale(1.012); }
+    50%      { transform: rotate(-0.3deg) translateY(1px)  scale(0.996); }
+    75%      { transform: rotate(0.7deg)  translateY(-2px) scale(1.008); }
+}
+
+@keyframes mascot-glow {
+    0%   { box-shadow: 0 0 0 3px var(--accent),      0 0 26px 4px rgba(181, 57, 43, 0.45); }
+    25%  { box-shadow: 0 0 0 3px var(--accent-cool),  0 0 26px 4px rgba(46, 89, 68, 0.45); }
+    50%  { box-shadow: 0 0 0 3px #C99A2E,             0 0 26px 4px rgba(201, 154, 46, 0.45); }
+    75%  { box-shadow: 0 0 0 3px #6B4FA0,             0 0 26px 4px rgba(107, 79, 160, 0.45); }
+    100% { box-shadow: 0 0 0 3px var(--accent),      0 0 26px 4px rgba(181, 57, 43, 0.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.sound-playing .intro-mascot { animation: none; }
+}
+
 .mascot-caption {
     margin-top: var(--sp-sm);
     text-align: center;
