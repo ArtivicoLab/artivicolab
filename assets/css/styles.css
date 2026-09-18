@@ -1295,6 +1295,33 @@ html.ip-pending::before {
 
 .ipgate-title { font-size: 22px; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.02em; }
 .ipgate-sub { font-size: 15px; opacity: 0.75; }
+
+.ipgate-meta {
+    margin-top: 26px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(237, 227, 197, 0.18);
+    font-size: 13px;
+    line-height: 1.9;
+    text-align: left;
+    display: inline-block;
+}
+.ipgate-meta span {
+    display: inline-block;
+    min-width: 72px;
+    opacity: 0.45;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 11px;
+}
+
+.ipgate-ua {
+    margin-top: 16px;
+    max-width: 460px;
+    font-size: 11px;
+    line-height: 1.6;
+    opacity: 0.35;
+    word-break: break-word;
+}
 /* IP-GATE:END */
 
 html.gate-open, body.gate-open { overflow: hidden; height: 100%; }

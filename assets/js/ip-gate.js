@@ -30,7 +30,35 @@
     var html = document.documentElement;
     var done = false;
 
-    function ban() {
+    // Readable browser + OS from the user agent, for the block screen.
+    function browserInfo() {
+        var ua = navigator.userAgent;
+        var m;
+        var browser = 'Unknown browser';
+
+        if ((m = ua.match(/Edg\/([\d.]+)/)))                  browser = 'Edge ' + m[1];
+        else if ((m = ua.match(/OPR\/([\d.]+)/)))             browser = 'Opera ' + m[1];
+        else if ((m = ua.match(/Firefox\/([\d.]+)/)))         browser = 'Firefox ' + m[1];
+        else if ((m = ua.match(/Chrome\/([\d.]+)/)))          browser = 'Chrome ' + m[1];
+        else if ((m = ua.match(/Version\/([\d.]+).*Safari/))) browser = 'Safari ' + m[1];
+
+        var os = 'Unknown OS';
+        if (/Windows/.test(ua))                 os = 'Windows';
+        else if (/Mac OS X/.test(ua))           os = 'macOS';
+        else if (/Android/.test(ua))            os = 'Android';
+        else if (/iPhone|iPad|iPod/.test(ua))   os = 'iOS';
+        else if (/Linux/.test(ua))              os = 'Linux';
+
+        return browser + ' on ' + os;
+    }
+
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function ban(ip) {
         if (done) return;
         done = true;
         document.body.innerHTML =
@@ -38,6 +66,12 @@
                 '<div>' +
                     '<p class="ipgate-title">Your IP has been banned.</p>' +
                     '<p class="ipgate-sub">Please contact admin.</p>' +
+                    '<div class="ipgate-meta">' +
+                        '<p><span>IP</span> ' + esc(ip || 'unknown') + '</p>' +
+                        '<p><span>Browser</span> ' + esc(browserInfo()) + '</p>' +
+                        '<p><span>Time</span> ' + esc(new Date().toString()) + '</p>' +
+                    '</div>' +
+                    '<p class="ipgate-ua">' + esc(navigator.userAgent) + '</p>' +
                 '</div>' +
             '</div>';
         html.classList.remove('ip-pending');
@@ -52,14 +86,15 @@
     fetch('https://api64.ipify.org?format=json')
         .then(function (r) { return r.json(); })
         .then(function (data) {
-            if (data && ALLOWED_IPS.indexOf(data.ip) !== -1) {
+            var ip = data && data.ip;
+            if (ip && ALLOWED_IPS.indexOf(ip) !== -1) {
                 allow();
             } else {
-                ban();
+                ban(ip);
             }
         })
-        .catch(ban);
+        .catch(function () { ban(null); });
 
     // Never leave the page hidden forever if the lookup hangs.
-    setTimeout(function () { if (!done) ban(); }, 6000);
+    setTimeout(function () { if (!done) ban(null); }, 6000);
 })();
