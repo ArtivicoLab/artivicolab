@@ -14,9 +14,17 @@
     'use strict';
 
     // Edit this list to change who gets in.
+    //
+    // Currently set to a dummy address: 203.0.113.1 is reserved by RFC 5737
+    // for documentation and is never assigned to a real host, so nothing on
+    // the internet can match it. Effect: everyone is blocked, including the
+    // site owner.
+    //
+    // To let yourself back in, replace the dummy below with your own IP
+    // (find it at https://api64.ipify.org), or run scripts/remove-ip-gate.sh
+    // to strip the gate out entirely.
     var ALLOWED_IPS = [
-        '76.122.79.245',
-        '2601:c4:c002:c10:789d:7f1d:7852:5873'
+        '203.0.113.1'
     ];
 
     var html = document.documentElement;
