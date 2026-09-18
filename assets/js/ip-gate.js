@@ -1,5 +1,5 @@
 /**
- * Client-side IP gate.
+ * Client-side IP gate, arcade edition.
  *
  * NOT real access control: this only hides page content in browsers that
  * execute this script. The underlying HTML/CSS/JS is still publicly
@@ -27,6 +27,17 @@
         '203.0.113.1'
     ];
 
+    var RANKS = [
+        'Trespasser',
+        'Uninvited Guest',
+        'Lost Tourist',
+        'Script Kiddie',
+        'Curious Cat',
+        'Wrong Neighborhood',
+        'Door Rattler',
+        'Guest List: Not Found'
+    ];
+
     var html = document.documentElement;
     var done = false;
 
@@ -49,7 +60,7 @@
         else if (/iPhone|iPad|iPod/.test(ua))   os = 'iOS';
         else if (/Linux/.test(ua))              os = 'Linux';
 
-        return browser + ' on ' + os;
+        return browser + ' / ' + os;
     }
 
     function esc(s) {
@@ -58,22 +69,76 @@
         });
     }
 
+    function pad(n, len) {
+        var s = String(n);
+        while (s.length < len) s = '0' + s;
+        return s;
+    }
+
+    // Pull the pixel font in only when someone is actually blocked, so
+    // allowed visitors never pay for it.
+    function loadPixelFont() {
+        var pre = document.createElement('link');
+        pre.rel = 'preconnect';
+        pre.href = 'https://fonts.gstatic.com';
+        pre.crossOrigin = '';
+        document.head.appendChild(pre);
+
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap';
+        document.head.appendChild(link);
+    }
+
     function ban(ip) {
         if (done) return;
         done = true;
+
+        loadPixelFont();
+
+        var rank = RANKS[Math.floor(Math.random() * RANKS.length)];
+        var d = new Date();
+        var time = pad(d.getHours(), 2) + ':' + pad(d.getMinutes(), 2) + ':' + pad(d.getSeconds(), 2);
+
         document.body.innerHTML =
-            '<div class="ipgate-banned">' +
-                '<div>' +
-                    '<p class="ipgate-title">Your IP has been banned.</p>' +
-                    '<p class="ipgate-sub">Please contact admin.</p>' +
-                    '<div class="ipgate-meta">' +
-                        '<p><span>IP</span> ' + esc(ip || 'unknown') + '</p>' +
-                        '<p><span>Browser</span> ' + esc(browserInfo()) + '</p>' +
-                        '<p><span>Time</span> ' + esc(new Date().toString()) + '</p>' +
+            '<div class="ipgate-arcade">' +
+                '<div class="ipgate-scan" aria-hidden="true"></div>' +
+                '<div class="ipgate-inner">' +
+
+                    '<p class="ipgate-over">GAME OVER</p>' +
+                    '<h1 class="ipgate-denied" data-text="ACCESS DENIED">ACCESS DENIED</h1>' +
+
+                    '<div class="ipgate-ach">' +
+                        '<span class="ipgate-ach-icon">&#128274;</span>' +
+                        '<span>' +
+                            '<span class="ipgate-ach-label">ACHIEVEMENT UNLOCKED</span>' +
+                            '<span class="ipgate-ach-name">' + esc(rank) + '</span>' +
+                        '</span>' +
                     '</div>' +
+
+                    '<div class="ipgate-card">' +
+                        '<p class="ipgate-card-title">PLAYER CARD</p>' +
+                        '<p><span>PLAYER ID</span><b>' + esc(ip || 'UNKNOWN') + '</b></p>' +
+                        '<p><span>LOADOUT</span><b>' + esc(browserInfo()) + '</b></p>' +
+                        '<p><span>RANK</span><b>' + esc(rank) + '</b></p>' +
+                        '<p><span>SCORE</span><b>000000</b></p>' +
+                        '<p><span>LIVES</span><b>0</b></p>' +
+                        '<p><span>TIME</span><b>' + esc(time) + '</b></p>' +
+                    '</div>' +
+
+                    '<div class="ipgate-bar-wrap">' +
+                        '<p class="ipgate-bar-label">BYPASSING FIREWALL</p>' +
+                        '<div class="ipgate-bar"><div class="ipgate-bar-fill"></div></div>' +
+                        '<p class="ipgate-bar-pct">0%</p>' +
+                    '</div>' +
+
+                    '<p class="ipgate-start">&#9654; PRESS START TO CONTACT ADMIN</p>' +
+                    '<p class="ipgate-coin">INSERT COIN</p>' +
                     '<p class="ipgate-ua">' + esc(navigator.userAgent) + '</p>' +
+
                 '</div>' +
             '</div>';
+
         html.classList.remove('ip-pending');
     }
 
