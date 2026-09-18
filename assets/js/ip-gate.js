@@ -13,18 +13,17 @@
 (function () {
     'use strict';
 
-    // Edit this list to change who gets in.
+    // Edit this list to change who gets in. Everyone not listed here gets
+    // the block screen.
     //
-    // Currently set to a dummy address: 203.0.113.1 is reserved by RFC 5737
-    // for documentation and is never assigned to a real host, so nothing on
-    // the internet can match it. Effect: everyone is blocked, including the
-    // site owner.
-    //
-    // To let yourself back in, replace the dummy below with your own IP
-    // (find it at https://api64.ipify.org), or run scripts/remove-ip-gate.sh
-    // to strip the gate out entirely.
+    // Both entries below are the owner's home connection as of 2026-09-18,
+    // IPv4 and IPv6. Note the IPv6 address can rotate on its own with many
+    // ISPs, which would lock the owner out with no warning. If that happens,
+    // get the current address from https://api64.ipify.org and update it
+    // here, or run scripts/remove-ip-gate.sh to strip the gate entirely.
     var ALLOWED_IPS = [
-        '203.0.113.1'
+        '76.122.79.245',
+        '2601:c4:c002:c10:789d:7f1d:7852:5873'
     ];
 
     var RANKS = [
