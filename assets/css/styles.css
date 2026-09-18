@@ -1267,6 +1267,36 @@ html.gate-pending::before {
     background-color: var(--paper);
 }
 
+/* IP-GATE:START temporary, added 2026-09-18, remove by 2026-09-20. See CLAUDE.md */
+/* ─── Client-side IP gate ────────────────────────────────── */
+/* Pre-paint cover, set inline before first render, removed by ip-gate.js
+   once the visitor's IP has been checked. Sits above everything else,
+   including the entry notice above. See ip-gate.js for what this does
+   and does not actually protect against. */
+html.ip-pending::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background-color: #0B0B0B;
+}
+
+.ipgate-banned {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0B0B0B;
+    color: #EDE3C5;
+    text-align: center;
+    padding: 24px;
+    font-family: var(--font-mono);
+}
+
+.ipgate-title { font-size: 22px; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.02em; }
+.ipgate-sub { font-size: 15px; opacity: 0.75; }
+/* IP-GATE:END */
+
 html.gate-open, body.gate-open { overflow: hidden; height: 100%; }
 body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 
