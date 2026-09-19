@@ -131,6 +131,45 @@
         return browser + ' / ' + os;
     }
 
+    // Everything the browser will tell us about itself, no API needed.
+    function deviceInfo() {
+        var ua = navigator.userAgent;
+        var n = navigator;
+
+        var device = 'Desktop';
+        if (/iPad|Tablet/i.test(ua)) device = 'Tablet';
+        else if (/Mobi|iPhone|Android/i.test(ua)) device = 'Mobile';
+
+        var model = 'Generic';
+        if (/iPhone/i.test(ua))       model = 'iPhone';
+        else if (/iPad/i.test(ua))    model = 'iPad';
+        else if (/Macintosh/i.test(ua)) model = 'Mac';
+        else if (/Android/i.test(ua)) model = 'Android device';
+        else if (/Windows/i.test(ua)) model = 'Windows PC';
+        else if (/Linux/i.test(ua))   model = 'Linux box';
+
+        var conn = n.connection || n.mozConnection || n.webkitConnection;
+
+        var tz = 'unknown';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown'; } catch (e) { /* ignore */ }
+
+        return {
+            device:   device + ' / ' + model,
+            os:       browserInfo().split(' / ')[1] || 'unknown',
+            browser:  browserInfo().split(' / ')[0] || 'unknown',
+            screen:   screen.width + ' x ' + screen.height + ' @ ' + (window.devicePixelRatio || 1) + 'x',
+            viewport: window.innerWidth + ' x ' + window.innerHeight,
+            depth:    (screen.colorDepth || '?') + '-bit colour',
+            tz:       tz,
+            lang:     (n.languages && n.languages.join(', ')) || n.language || 'unknown',
+            cores:    (n.hardwareConcurrency || '?') + ' logical',
+            memory:   n.deviceMemory ? n.deviceMemory + ' GB' : 'undisclosed',
+            touch:    (n.maxTouchPoints || 0) + ' touch points',
+            conn:     conn && conn.effectiveType ? conn.effectiveType.toUpperCase() : 'unknown',
+            referrer: document.referrer ? document.referrer.replace(/^https?:\/\//, '').slice(0, 42) : 'direct'
+        };
+    }
+
     // Pull the pixel font in only when someone is actually blocked.
     function loadPixelFont() {
         var pre = document.createElement('link');
@@ -194,6 +233,10 @@
                 '<p class="ipscan-timer" id="ipscan-timer">T-30.0s</p>' +
                 '<p class="ipscan-iplabel">ORIGIN SIGNATURE</p>' +
                 '<p class="ipscan-ip" id="ipscan-ip"><span class="ipscan-ip-wait">SCANNING</span></p>' +
+                '<div class="ipscan-dossier" id="ipscan-dossier"></div>' +
+                '<p class="ipscan-fineprint">For entertainment only. Everything above is read ' +
+                'live from your own browser and shown back to you. Nothing is recorded, ' +
+                'stored, or shared.</p>' +
                 '<div class="ipscan-log" id="ipscan-log"></div>' +
                 '<div class="ipscan-bar"><div class="ipscan-bar-fill" id="ipscan-fill"></div></div>' +
                 '<p class="ipscan-pct" id="ipscan-pct">0%</p>' +
@@ -274,7 +317,95 @@
                 span.style.setProperty('--i', i);
                 span.textContent = ch;
                 host.appendChild(span);
+                host.appendChild(document.createElement('wbr'));
             }, i * 55);
+        });
+    }
+
+    /* ─── The dossier ────────────────────────────────────
+
+       Everything the browser volunteers about itself, read back to the
+       visitor one line at a time. None of it is stored or sent anywhere.
+       The geo rows fill in from a public lookup if it answers in time.  */
+
+    var geo = {};                  // filled by the lookup below
+    var pendingGeoRows = {};       // rows already on screen, waiting on geo
+
+    function setRowValue(row, value) {
+        var out = row.querySelector('.ipscan-row-val');
+        out.textContent = '';
+        String(value).split('').forEach(function (ch, i) {
+            var sp = document.createElement('span');
+            sp.className = 'ipscan-row-char';
+            sp.style.setProperty('--i', i);
+            sp.textContent = ch;
+            out.appendChild(sp);
+            out.appendChild(document.createElement('wbr'));
+        });
+    }
+
+    function applyGeo() {
+        Object.keys(pendingGeoRows).forEach(function (key) {
+            if (geo[key]) {
+                setRowValue(pendingGeoRows[key], geo[key]);
+                delete pendingGeoRows[key];
+            }
+        });
+    }
+
+    function startDossier() {
+        var host = loader && loader.querySelector('#ipscan-dossier');
+        if (!host) return;
+
+        var d = deviceInfo();
+        var fields = [
+            ['DEVICE',        d.device],
+            ['OPERATING SYS', d.os],
+            ['BROWSER',       d.browser],
+            ['DISPLAY',       d.screen],
+            ['VIEWPORT',      d.viewport],
+            ['COLOUR',        d.depth],
+            ['TIME ZONE',     d.tz],
+            ['LANGUAGE',      d.lang],
+            ['PROCESSOR',     d.cores],
+            ['MEMORY',        d.memory],
+            ['INPUT',         d.touch],
+            ['NETWORK',       d.conn],
+            ['ARRIVED FROM',  d.referrer],
+            ['CITY',          { geo: 'city' }],
+            ['REGION',        { geo: 'region' }],
+            ['COUNTRY',       { geo: 'country' }],
+            ['PROVIDER',      { geo: 'isp' }],
+            ['COORDINATES',   { geo: 'coords' }]
+        ];
+
+        var window_ms = MIN_SCAN_MS - 3500;
+        var step = window_ms / fields.length;
+
+        fields.forEach(function (field, i) {
+            setTimeout(function () {
+                if (!host.isConnected) return;
+
+                var row = document.createElement('div');
+                row.className = 'ipscan-row';
+                row.innerHTML = '<span class="ipscan-row-key">' + esc(field[0]) + '</span>' +
+                                '<span class="ipscan-row-val"></span>';
+                host.appendChild(row);
+
+                if (field[1] && field[1].geo) {
+                    var key = field[1].geo;
+                    if (geo[key]) {
+                        setRowValue(row, geo[key]);
+                    } else {
+                        setRowValue(row, 'RESOLVING');
+                        pendingGeoRows[key] = row;
+                    }
+                } else {
+                    setRowValue(row, field[1] || 'unknown');
+                }
+
+                host.scrollTop = host.scrollHeight;
+            }, 1200 + i * step);
         });
     }
 
@@ -284,6 +415,43 @@
         var el = loader;
         loader = null;
         setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 420);
+    }
+
+    /* ─── Rescan button ──────────────────────────────────── */
+
+    // Sits next to the footer play button. Clears the cached verdict so the
+    // scan runs again on reload, which is the only way to re-trigger it
+    // before the one hour expiry.
+    function injectResetButton() {
+        function place() {
+            if (document.getElementById('ipgate-reset')) return;
+            var beats = document.getElementById('beatsBtn');
+            var container = document.querySelector('.footer .container');
+            if (!beats && !container) return;
+
+            var btn = document.createElement('button');
+            btn.id = 'ipgate-reset';
+            btn.type = 'button';
+            btn.className = 'ipgate-reset';
+            btn.title = 'Clear the saved verification and run the IP scan again';
+            btn.innerHTML = '<span aria-hidden="true">&#8635;</span> RESCAN IP';
+            btn.addEventListener('click', function () {
+                try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
+                location.reload();
+            });
+
+            if (beats && beats.parentNode) {
+                beats.parentNode.insertBefore(btn, beats.nextSibling);
+            } else {
+                container.insertBefore(btn, container.firstChild);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', place);
+        } else {
+            place();
+        }
     }
 
     /* ─── Verdicts ───────────────────────────────────────── */
@@ -307,6 +475,7 @@
             // Cached only once the sequence has actually finished. Anyone who
             // leaves mid-scan gets a fresh check next time.
             writeCache(true, ip);
+            injectResetButton();
         }, 620);
     }
 
@@ -372,12 +541,21 @@
                         '<p class="ipgate-bar-pct">0%</p>' +
                     '</div>' +
 
+                    '<button type="button" class="ipgate-retry" id="ipgate-retry">&#8635; RETRY SCAN</button>' +
                     '<p class="ipgate-start">&#9654; PRESS START TO CONTACT ADMIN</p>' +
                     '<p class="ipgate-coin">INSERT COIN</p>' +
                     '<p class="ipgate-ua">' + esc(navigator.userAgent) + '</p>' +
 
                 '</div>' +
             '</div>';
+
+        var retry = document.getElementById('ipgate-retry');
+        if (retry) {
+            retry.addEventListener('click', function () {
+                try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
+                location.reload();
+            });
+        }
     }
 
     // Hold the verdict until the scan animation has had its moment.
@@ -396,6 +574,7 @@
         done = true;
         if (cached.allowed) {
             html.classList.remove('ip-pending');
+            injectResetButton();
         } else if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function () {
                 showBlockScreen(cached.ip);
@@ -409,6 +588,24 @@
     }
 
     buildLoader();
+    startDossier();
+
+    // Geo lookup purely for the readout. The allow/deny decision never
+    // depends on it, so a failure here just leaves those rows unresolved.
+    fetch('https://ipwho.is/')
+        .then(function (r) { return r.json(); })
+        .then(function (g) {
+            if (!g || g.success === false) return;
+            geo.city    = g.city || 'unknown';
+            geo.region  = g.region || 'unknown';
+            geo.country = g.country || 'unknown';   // no emoji: the per-char reveal splits surrogate pairs
+            geo.isp     = (g.connection && (g.connection.isp || g.connection.org)) || 'unknown';
+            geo.coords  = (g.latitude != null && g.longitude != null)
+                ? Number(g.latitude).toFixed(3) + ', ' + Number(g.longitude).toFixed(3)
+                : 'unknown';
+            applyGeo();
+        })
+        .catch(function () { /* readout only, ignore */ });
 
     fetch('https://api64.ipify.org?format=json')
         .then(function (r) { return r.json(); })

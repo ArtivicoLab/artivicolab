@@ -1322,7 +1322,7 @@ html.ip-pending::before {
     color: rgba(53,240,255,.16);
 }
 
-.ipscan-inner { position: relative; text-align: center; width: 100%; max-width: 440px; }
+.ipscan-inner { position: relative; text-align: center; width: 100%; max-width: 440px; min-width: 0; }
 
 /* Radar */
 .ipscan-radar {
@@ -1382,6 +1382,7 @@ html.ip-pending::before {
     margin-bottom: 20px;
     min-height: 22px;
     word-break: break-all;
+    line-break: anywhere;
     line-height: 1.5;
 }
 .ipscan-ip-wait { opacity: .35; letter-spacing: .3em; font-size: 11px; }
@@ -1403,9 +1404,69 @@ html.ip-pending::before {
     50%      { transform: translateY(-7px); color: #B6FF3D; }
 }
 
+/* The readout of everything the visitor's browser just told us. */
+.ipscan-dossier {
+    text-align: left;
+    height: 208px;
+    overflow: hidden;
+    max-width: 100%;
+    margin-bottom: 18px;
+    border-top: 1px solid rgba(53,240,255,.22);
+    border-bottom: 1px solid rgba(53,240,255,.22);
+    padding: 10px 0;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 100%);
+}
+
+.ipscan-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-width: 0;
+    padding: 5px 0;
+    animation: ipscan-in .26s ease-out;
+}
+
+.ipscan-row-key {
+    flex: 0 0 auto;
+    min-width: 118px;
+    font-size: 9px;
+    letter-spacing: .22em;
+    color: rgba(127,233,245,.6);
+}
+
+.ipscan-row-val {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 16px;
+    letter-spacing: .02em;
+    color: #B6FF3D;
+    text-shadow: 0 0 14px rgba(182,255,61,.45);
+    overflow-wrap: anywhere;
+    line-break: anywhere;
+    text-align: right;
+}
+
+/* Values land character by character, same trick as the IP. */
+.ipscan-row-char {
+    display: inline-block;
+    white-space: pre;
+    animation: ipscan-char-in .3s cubic-bezier(.22,.61,.36,1) backwards;
+    animation-delay: calc(var(--i) * .018s);
+}
+
+.ipscan-fineprint {
+    font-size: 9px;
+    line-height: 1.7;
+    letter-spacing: .04em;
+    color: rgba(127,233,245,.42);
+    max-width: 380px;
+    margin: -8px auto 18px;
+}
+
 .ipscan-log {
     text-align: left; font-size: 11px; line-height: 2;
-    height: 132px; overflow: hidden; margin-bottom: 18px;
+    height: 92px; overflow: hidden; margin-bottom: 18px;
     -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 100%);
     mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 100%);
 }
@@ -1457,7 +1518,7 @@ html.ip-pending::before {
 @media (prefers-reduced-motion: reduce) {
     .ipscan-grid, .ipscan-sweep, .ipscan-dots::after, .ipscan-log p,
     .ipscan-granted, .ipscan-refused, .ipscan-flash, .ipscan-reject,
-    .ipscan-ip-char { animation: none; }
+    .ipscan-ip-char, .ipscan-row, .ipscan-row-char { animation: none; }
 }
 
 /* The site's own body keeps its padding and cream background otherwise,
@@ -1603,6 +1664,52 @@ html.ipgate-locked body {
 @keyframes ipgate-stuck { 0%, 100% { width: 2%; } 50% { width: 4%; } }
 .ipgate-bar-pct { font-size: 8px; color: #B6FF3D; margin-top: 10px; letter-spacing: .1em; }
 
+/* Footer rescan button, sits beside the play button */
+.ipgate-reset {
+    flex-shrink: 0;
+    margin-left: 10px;
+    padding: 7px 13px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--accent);
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    animation: ipgate-reset-pulse 2.4s ease-out infinite;
+}
+.ipgate-reset:hover { background: var(--accent-deep); }
+.ipgate-reset:active { transform: translateY(1px); }
+@keyframes ipgate-reset-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(181,57,43,.55); }
+    70%  { box-shadow: 0 0 0 11px rgba(181,57,43,0); }
+    100% { box-shadow: 0 0 0 0 rgba(181,57,43,0); }
+}
+
+/* Retry button on the block screen */
+.ipgate-retry {
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: .1em;
+    line-height: 1.6;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    color: #0B0B16;
+    background: #B6FF3D;
+    border: 3px solid #0B0B16;
+    box-shadow: 0 0 0 3px #B6FF3D, 0 0 26px rgba(182,255,61,.45);
+    cursor: pointer;
+    transition: background-color .18s ease, box-shadow .18s ease, transform .1s ease;
+}
+.ipgate-retry:hover {
+    background: #FFD93D;
+    box-shadow: 0 0 0 3px #FFD93D, 0 0 28px rgba(255,217,61,.5);
+}
+.ipgate-retry:active { transform: translateY(2px); }
+
 .ipgate-start {
     font-size: 10px;
     color: #FFD93D;
@@ -1623,7 +1730,8 @@ html.ipgate-locked body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ipgate-over, .ipgate-denied, .ipgate-ach, .ipgate-start, .ipgate-bar-fill { animation: none; }
+    .ipgate-over, .ipgate-denied, .ipgate-ach, .ipgate-start, .ipgate-bar-fill,
+    .ipgate-reset { animation: none; }
 }
 @media (max-width: 600px) {
     .ipgate-inner { padding: 28px 16px; }
@@ -1635,6 +1743,8 @@ html.ipgate-locked body {
     .ipgate-ach { padding: 10px 12px; gap: 10px; }
     .ipgate-ach-name { font-size: 9px; }
     .ipgate-start { font-size: 8px; }
+    .ipgate-retry { font-size: 9px; padding: 12px 14px; }
+    .ipgate-reset { font-size: 9px; padding: 6px 10px; margin-left: 8px; }
     .ipgate-ua { font-size: 9px; }
     .ipscan-hex { display: none; }
     .ipscan-radar { width: 104px; height: 104px; margin-bottom: 20px; }
@@ -1644,6 +1754,10 @@ html.ipgate-locked body {
     .ipscan-ip { font-size: 12px; }
     .ipscan-log { height: 108px; font-size: 9px; }
     .ipscan-note { font-size: 11px; }
+    .ipscan-dossier { height: 176px; }
+    .ipscan-row { padding: 4px 0; gap: 8px; }
+    .ipscan-row-key { min-width: 0; flex-basis: 84px; font-size: 7px; letter-spacing: .14em; }
+    .ipscan-row-val { font-size: 12px; }
 }
 /* IP-GATE:END */
 
