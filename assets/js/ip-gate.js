@@ -214,6 +214,42 @@
 
     /* ─── Scan sequence ──────────────────────────────────── */
 
+    // The scan runs as three short steps instead of one tall wall of
+    // readouts. Only one step is on screen at a time, which is what keeps
+    // the whole thing inside a phone without scrolling.
+    var STEP_2_AT = 9000;
+    var STEP_3_AT = 22000;
+
+    var STEP_NAMES = [
+        'STEP 1 OF 3 &middot; ACQUIRING SIGNAL',
+        'STEP 2 OF 3 &middot; DEVICE SWEEP',
+        'STEP 3 OF 3 &middot; CLASSIFICATION'
+    ];
+
+    // A stable, official looking catalogue number for this visitor.
+    function accession() {
+        var seed = navigator.userAgent + '|' + screen.width + 'x' + screen.height;
+        var h = 0;
+        for (var i = 0; i < seed.length; i++) {
+            h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+        }
+        var d = new Date();
+        var stamp = d.getFullYear() +
+                    ('0' + (d.getMonth() + 1)).slice(-2) +
+                    ('0' + d.getDate()).slice(-2);
+        return 'ARTV-' + stamp + '-' + ('000' + (h >>> 16).toString(16).toUpperCase()).slice(-4);
+    }
+
+    function showStep(n) {
+        if (!loader) return;
+        var steps = loader.querySelectorAll('.ipscan-step');
+        for (var i = 0; i < steps.length; i++) {
+            steps[i].classList.toggle('is-on', i === n - 1);
+        }
+        var name = loader.querySelector('#ipscan-stepname');
+        if (name) name.innerHTML = STEP_NAMES[n - 1];
+    }
+
     function buildLoader() {
         loader = document.createElement('div');
         loader.className = 'ipscan';
@@ -222,54 +258,79 @@
             '<div class="ipscan-scan" aria-hidden="true"></div>' +
             '<div class="ipscan-hex" id="ipscan-hex" aria-hidden="true"></div>' +
             '<div class="ipscan-inner">' +
-                '<div class="ipscan-radar" aria-hidden="true">' +
-                    '<span class="ipscan-ring"></span>' +
-                    '<span class="ipscan-ring ipscan-ring2"></span>' +
-                    '<span class="ipscan-sweep"></span>' +
-                    '<span class="ipscan-cross"></span>' +
-                    '<span class="ipscan-cross ipscan-cross-v"></span>' +
+
+                '<div class="ipscan-head">' +
+                    '<span class="ipscan-stepname" id="ipscan-stepname">' + STEP_NAMES[0] + '</span>' +
+                    '<span class="ipscan-timer" id="ipscan-timer">T-30.0s</span>' +
                 '</div>' +
-                '<p class="ipscan-title">VERIFYING IP<span class="ipscan-dots"></span></p>' +
-                '<p class="ipscan-timer" id="ipscan-timer">T-30.0s</p>' +
-                '<p class="ipscan-iplabel">ORIGIN SIGNATURE</p>' +
-                '<p class="ipscan-ip" id="ipscan-ip"><span class="ipscan-ip-wait">SCANNING</span></p>' +
-                '<div class="ipscan-dossier" id="ipscan-dossier"></div>' +
-                '<div class="ipscan-specimen">' +
-                    '<p class="ipscan-specimen-kicker">SPECIMEN CLASSIFICATION</p>' +
-                    '<p class="ipscan-specimen-name" id="ipscan-species">Homo staticus</p>' +
-                    '<p class="ipscan-specimen-sub" id="ipscan-species-sub"></p>' +
-                    '<p class="ipscan-specimen-note">Collected live. Released unharmed.</p>' +
+
+                '<div class="ipscan-steps">' +
+
+                    '<section class="ipscan-step is-on">' +
+                        '<div class="ipscan-radar" aria-hidden="true">' +
+                            '<span class="ipscan-ring"></span>' +
+                            '<span class="ipscan-ring ipscan-ring2"></span>' +
+                            '<span class="ipscan-sweep"></span>' +
+                            '<span class="ipscan-cross"></span>' +
+                            '<span class="ipscan-cross ipscan-cross-v"></span>' +
+                        '</div>' +
+                        '<p class="ipscan-title">VERIFYING IP<span class="ipscan-dots"></span></p>' +
+                        '<p class="ipscan-iplabel">ORIGIN SIGNATURE</p>' +
+                        '<p class="ipscan-ip" id="ipscan-ip"><span class="ipscan-ip-wait">SCANNING</span></p>' +
+                    '</section>' +
+
+                    '<section class="ipscan-step">' +
+                        '<div class="ipscan-dossier" id="ipscan-dossier"></div>' +
+                    '</section>' +
+
+                    '<section class="ipscan-step">' +
+                        '<div class="ipscan-specimen">' +
+                            '<p class="ipscan-specimen-kicker">SPECIMEN CLASSIFICATION</p>' +
+                            '<p class="ipscan-specimen-name" id="ipscan-species">Homo staticus</p>' +
+                            '<p class="ipscan-specimen-sub" id="ipscan-species-sub"></p>' +
+                            '<p class="ipscan-specimen-rule" aria-hidden="true"></p>' +
+                            '<p class="ipscan-specimen-org">ARTIVICOLAB FIELD STATION 01 &middot; ATLANTA</p>' +
+                            '<p class="ipscan-specimen-curator">Catalogued by <b>GRADI KAYAMBA</b>, Curator</p>' +
+                            '<p class="ipscan-specimen-acc">ACCESSION ' + esc(accession()) + '</p>' +
+                        '</div>' +
+                        // Deliberately microscopic, in the finest tradition of fine print.
+                        '<p class="ipscan-fineprint">NOTICE: The foregoing readout is provided for ' +
+                        'entertainment and demonstrative purposes only and constitutes neither ' +
+                        'surveillance nor data collection. All values displayed are read live from ' +
+                        'your own browser at render time, held in volatile memory for the duration ' +
+                        'of this animation, and discarded when this overlay closes. Nothing is ' +
+                        'recorded, stored, sold, or retained by ArtivicoLab. Approximate location ' +
+                        'and network provider are resolved by a third party address lookup and are ' +
+                        'accurate to the city at best, frequently not even that. No cookies are set ' +
+                        'by this notice. Your browser volunteered every one of these details without ' +
+                        'being asked, which is in fact the entire point being made here.</p>' +
+                    '</section>' +
+
                 '</div>' +
-                // Deliberately microscopic, in the finest tradition of fine print.
-                '<p class="ipscan-fineprint">NOTICE: The foregoing readout is provided for ' +
-                'entertainment and demonstrative purposes only and constitutes neither ' +
-                'surveillance nor data collection. All values displayed are read live from ' +
-                'your own browser at render time, held in volatile memory for the duration ' +
-                'of this animation, and discarded when this overlay closes. Nothing is ' +
-                'recorded, stored, sold, or retained by ArtivicoLab. Approximate location ' +
-                'and network provider are resolved by a third party address lookup and are ' +
-                'accurate to the city at best, frequently not even that. No cookies are set ' +
-                'by this notice. Your browser volunteered every one of these details without ' +
-                'being asked, which is in fact the entire point being made here.</p>' +
-                '<div class="ipscan-log" id="ipscan-log"></div>' +
-                '<div class="ipscan-bar"><div class="ipscan-bar-fill" id="ipscan-fill"></div></div>' +
-                '<p class="ipscan-pct" id="ipscan-pct">0%</p>' +
-                '<p class="ipscan-note" id="ipscan-note">' + esc(NOTES[0]) + '</p>' +
-                '<p class="ipscan-verdict" id="ipscan-verdict"></p>' +
+
+                '<div class="ipscan-foot">' +
+                    '<p class="ipscan-logline" id="ipscan-logline"></p>' +
+                    '<div class="ipscan-bar"><div class="ipscan-bar-fill" id="ipscan-fill"></div></div>' +
+                    '<p class="ipscan-pct" id="ipscan-pct">0%</p>' +
+                    '<p class="ipscan-note" id="ipscan-note">' + esc(NOTES[0]) + '</p>' +
+                    '<p class="ipscan-verdict" id="ipscan-verdict"></p>' +
+                '</div>' +
+
             '</div>';
         html.appendChild(loader);
 
-        // Terminal lines type in one after another.
-        var log = loader.querySelector('#ipscan-log');
+        // Advance through the steps.
+        setTimeout(function () { showStep(2); }, STEP_2_AT);
+        setTimeout(function () { showStep(3); }, STEP_3_AT);
+
+        // One status line at a time, replacing the old scrolling terminal box.
+        var logline = loader.querySelector('#ipscan-logline');
         var step = (MIN_SCAN_MS - 900) / SCAN_LINES.length;
         SCAN_LINES.forEach(function (text, i) {
             setTimeout(function () {
-                if (!log.isConnected) return;
-                var row = document.createElement('p');
-                row.innerHTML = '<span class="ipscan-caret">&gt;</span> ' + esc(text) +
-                                '<span class="ipscan-ok">OK</span>';
-                log.appendChild(row);
-                log.scrollTop = log.scrollHeight;
+                if (!logline.isConnected) return;
+                logline.innerHTML = '<span class="ipscan-caret">&gt;</span> ' + esc(text) +
+                                    '<span class="ipscan-ok">OK</span>';
             }, 200 + i * step);
         });
 
@@ -415,7 +476,7 @@
             ['COORDINATES',   { geo: 'coords' }]
         ];
 
-        var window_ms = MIN_SCAN_MS - 3500;
+        var window_ms = STEP_3_AT - STEP_2_AT - 900;
         var step = window_ms / fields.length;
 
         fields.forEach(function (field, i) {
@@ -441,7 +502,7 @@
                 }
 
                 host.scrollTop = host.scrollHeight;
-            }, 1200 + i * step);
+            }, STEP_2_AT + 300 + i * step);
         });
     }
 
@@ -580,6 +641,8 @@
                     '<button type="button" class="ipgate-retry" id="ipgate-retry">&#8635; RETRY SCAN</button>' +
                     '<p class="ipgate-start">&#9654; PRESS START TO CONTACT ADMIN</p>' +
                     '<p class="ipgate-coin">INSERT COIN</p>' +
+                    '<p class="ipgate-curator">ARTIVICOLAB &middot; ATLANTA<br>' +
+                    'GAME BY <b>GRADI KAYAMBA</b></p>' +
                     '<p class="ipgate-ua">' + esc(navigator.userAgent) + '</p>' +
 
                 '</div>' +

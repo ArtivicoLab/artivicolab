@@ -1349,7 +1349,7 @@ html.ip-pending::before {
 
 .ipscan-title {
     font-size: 14px; letter-spacing: .28em; color: #35F0FF;
-    text-shadow: 0 0 14px rgba(53,240,255,.6); margin-bottom: 20px;
+    text-shadow: 0 0 14px rgba(53,240,255,.6); margin-bottom: 22px;
 }
 .ipscan-dots::after {
     content: ''; animation: ipscan-dots 1.2s steps(4) infinite;
@@ -1358,13 +1358,61 @@ html.ip-pending::before {
     0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
 }
 
+/* Header row, fixed above the steps so nothing below it jumps. */
+.ipscan-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 9px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(53,240,255,.22);
+}
+
+.ipscan-stepname {
+    font-size: 8px;
+    letter-spacing: .26em;
+    color: rgba(127,233,245,.62);
+    text-align: left;
+}
+
 .ipscan-timer {
-    font-size: 26px;
-    letter-spacing: .1em;
+    flex: 0 0 auto;
+    font-size: 17px;
+    letter-spacing: .08em;
     color: #B6FF3D;
-    text-shadow: 0 0 18px rgba(182,255,61,.55);
-    margin-bottom: 18px;
+    text-shadow: 0 0 16px rgba(182,255,61,.55);
     font-variant-numeric: tabular-nums;
+}
+
+/* One step at a time. The wrapper reserves the height so the footer
+   stays put as the steps swap. */
+.ipscan-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(300px, 46vh, 400px);
+    margin-bottom: 16px;
+}
+
+.ipscan-step { display: none; width: 100%; }
+.ipscan-step.is-on { display: block; animation: ipscan-step-in .45s ease-out; }
+
+@keyframes ipscan-step-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Status line, one entry at a time rather than a scrolling box. */
+.ipscan-logline {
+    display: flex;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: .12em;
+    min-height: 14px;
+    margin-bottom: 12px;
+    color: rgba(127,233,245,.8);
+    text-align: left;
 }
 
 .ipscan-iplabel {
@@ -1407,7 +1455,7 @@ html.ip-pending::before {
 /* The readout of everything the visitor's browser just told us. */
 .ipscan-dossier {
     text-align: left;
-    height: 208px;
+    height: clamp(280px, 44vh, 380px);
     overflow: hidden;
     max-width: 100%;
     margin-bottom: 18px;
@@ -1488,11 +1536,46 @@ html.ip-pending::before {
     color: rgba(127,233,245,.72);
 }
 
-.ipscan-specimen-note {
-    margin-top: 7px;
+.ipgate-curator {
+    margin-top: 20px;
+    font-size: 8px;
+    line-height: 2.2;
+    letter-spacing: .22em;
+    color: rgba(127,233,245,.5);
+}
+.ipgate-curator b { color: #B6FF3D; letter-spacing: .26em; font-weight: 400; }
+
+.ipscan-specimen-rule {
+    height: 1px;
+    margin: 12px auto;
+    background: rgba(182,255,61,.28);
+}
+
+.ipscan-specimen-org {
     font-size: 7px;
-    letter-spacing: .2em;
-    color: rgba(127,233,245,.4);
+    letter-spacing: .24em;
+    color: rgba(182,255,61,.6);
+    margin-bottom: 6px;
+}
+
+.ipscan-specimen-curator {
+    font-size: 11px;
+    letter-spacing: .05em;
+    color: rgba(127,233,245,.9);
+    margin-bottom: 6px;
+}
+.ipscan-specimen-curator b {
+    color: #B6FF3D;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-shadow: 0 0 14px rgba(182,255,61,.45);
+}
+
+.ipscan-specimen-acc {
+    font-size: 8px;
+    letter-spacing: .18em;
+    color: rgba(127,233,245,.45);
+    font-variant-numeric: tabular-nums;
 }
 
 /* Fine print, at the size the genre demands. Lean in and squint. */
@@ -1506,12 +1589,6 @@ html.ip-pending::before {
     margin: 0 auto 18px;
 }
 
-.ipscan-log {
-    text-align: left; font-size: 11px; line-height: 2;
-    height: 92px; overflow: hidden; margin-bottom: 18px;
-    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 100%);
-}
 .ipscan-log p { animation: ipscan-in .22s ease-out; display: flex; gap: 8px; }
 .ipscan-caret { color: #B6FF3D; }
 .ipscan-ok { margin-left: auto; color: #B6FF3D; opacity: .9; }
@@ -1791,10 +1868,11 @@ html.ipgate-locked body {
     .ipscan-hex { display: none; }
     .ipscan-radar { width: 104px; height: 104px; margin-bottom: 20px; }
     .ipscan-title { font-size: 12px; letter-spacing: .2em; }
-    .ipscan-log { font-size: 10px; min-height: 96px; }
-    .ipscan-timer { font-size: 20px; }
+    .ipscan-timer { font-size: 15px; }
+    .ipscan-stepname { font-size: 7px; letter-spacing: .18em; }
+    .ipscan-steps { min-height: clamp(280px, 48vh, 360px); }
+    .ipscan-logline { font-size: 9px; letter-spacing: .08em; }
     .ipscan-ip { font-size: 12px; }
-    .ipscan-log { height: 108px; font-size: 9px; }
     .ipscan-note { font-size: 11px; }
     .ipscan-dossier { height: 176px; }
     .ipscan-row { padding: 4px 0; gap: 8px; }
@@ -1803,6 +1881,8 @@ html.ipgate-locked body {
     .ipscan-specimen { max-width: 100%; padding: 11px 13px; }
     .ipscan-specimen-name { font-size: 21px; }
     .ipscan-specimen-sub { font-size: 8px; }
+    .ipscan-specimen-curator { font-size: 10px; }
+    .ipscan-specimen-rule { margin: 10px auto; }
     .ipscan-fineprint { font-size: 4.5px; max-width: 100%; }
 }
 /* IP-GATE:END */
