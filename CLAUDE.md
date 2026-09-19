@@ -2,6 +2,33 @@
 
 Notes for whoever (human or Claude) works on this repo next.
 
+## Runway lights
+
+Approach lighting down both page gutters, at the end of `styles.css` under
+a `RUNWAY LIGHTS` banner. Permanent site decor, unrelated to the gate and
+deliberately outside the IP-GATE markers, so removing the gate leaves it
+alone.
+
+Built from `body::before` and `body::after` only, so no page markup is
+involved. A repeating radial-gradient mask turns two flat gradients into a
+column of lamps: the steady layer is coloured by aviation convention,
+green at the threshold, amber along the edges, red at the runway end, and
+a gold strobe slides underneath the mask so the lamps stay put while the
+light runs up through them.
+
+Two things worth keeping:
+
+- The strobe is saturated gold, not white. On cream paper a near-white
+  highlight is invisible, so a lamp has to read as brighter by getting
+  richer rather than lighter.
+- One wave every six seconds. Real approach strobes fire about twice a
+  second, which on a page people are reading would be irritating and a
+  genuine photosensitivity risk. There is a reduced-motion rule that stops
+  the sequence and leaves the lamps steady. Do not speed this up.
+
+Shown only at 1180px and wider, where the gutters exist. Measured clear of
+the 1100px container at every width above that.
+
 ## ⚠️ Temporary: client-side IP gate, remove by 2026-09-20
 
 Added 2026-09-18 at the user's request, to visually hide the site from

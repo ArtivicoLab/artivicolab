@@ -2419,3 +2419,91 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 
     .gallery { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   RUNWAY LIGHTS
+   Approach lighting down both gutters. Lamps are drawn as a column of
+   soft dots, coloured by aviation convention: green at the threshold up
+   top, warm amber along the edges, red at the runway end above the
+   footer. A single bloom runs up the column every few seconds, the way
+   sequenced flashers lead an aircraft in.
+
+   Built entirely from two body pseudo-elements, so no page markup is
+   involved. The lamp grid is a repeating radial-gradient mask on the
+   element, and the bloom is a background layer sliding underneath it, so
+   the lamps stay put while the light travels through them.
+
+   Deliberately slow. Real approach strobes fire about twice a second,
+   which on a page people are reading would be both irritating and a
+   genuine photosensitivity risk, so one wave every six seconds it is.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Lamps at rest sit faint against the paper. */
+    --runway-green: rgba(53, 120, 90, .3);
+    --runway-amber: rgba(201, 154, 58, .34);
+    --runway-red:   rgba(181, 57, 43, .3);
+    /* The strobe reads as brighter by being richer, not whiter. On cream
+       paper a near-white highlight simply disappears. */
+    --runway-bloom: #C8860D;
+}
+
+@media (min-width: 1180px) {
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        bottom: 68px;            /* clear of the fixed footer */
+        width: 12px;
+        z-index: 1;
+        pointer-events: none;
+
+        background-image:
+            /* the travelling bloom */
+            linear-gradient(to top,
+                rgba(200, 134, 13, 0) 0%,
+                rgba(200, 134, 13, .55) 34%,
+                var(--runway-bloom) 47%,
+                #A8620A 50%,
+                var(--runway-bloom) 53%,
+                rgba(200, 134, 13, .55) 66%,
+                rgba(200, 134, 13, 0) 100%),
+            /* the lamps at rest, coloured by position down the runway */
+            linear-gradient(to bottom,
+                var(--runway-green) 0 13%,
+                var(--runway-amber) 26% 74%,
+                var(--runway-red) 87% 100%);
+        background-size: 100% 30vh, 100% 100%;
+        background-repeat: no-repeat, no-repeat;
+        background-position: 0 100vh, 0 0;
+
+        /* One soft lamp every 38px. This mask is what turns the two flat
+           gradients above into a row of individual lights. */
+        -webkit-mask-image: radial-gradient(circle at 50% 50%,
+            #000 0, #000 1.7px, rgba(0, 0, 0, .5) 2.8px, rgba(0, 0, 0, 0) 5.8px);
+        mask-image: radial-gradient(circle at 50% 50%,
+            #000 0, #000 1.7px, rgba(0, 0, 0, .5) 2.8px, rgba(0, 0, 0, 0) 5.8px);
+        -webkit-mask-size: 100% 38px;
+        mask-size: 100% 38px;
+        -webkit-mask-repeat: repeat-y;
+        mask-repeat: repeat-y;
+
+        animation: runway-sequence 6s linear infinite;
+    }
+
+    body::before { left: 22px; }
+    body::after  { right: 22px; }
+}
+
+@keyframes runway-sequence {
+    from { background-position: 0 100vh, 0 0; }
+    to   { background-position: 0 -30vh, 0 0; }
+}
+
+/* Lamps stay lit, the sequence stops. */
+@media (prefers-reduced-motion: reduce) {
+    body::before,
+    body::after { animation: none; background-image: none, linear-gradient(to bottom,
+        var(--runway-green) 0 13%, var(--runway-amber) 26% 74%, var(--runway-red) 87% 100%); }
+}
