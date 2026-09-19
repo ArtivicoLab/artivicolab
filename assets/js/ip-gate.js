@@ -31,6 +31,23 @@
     // once an hour, not on every page load.
     var MIN_SCAN_MS = 30000;
 
+    // Arcade loop for blocked visitors. Three denials burn the three lives,
+    // and the fourth screen asks for the magic word instead. Getting it right
+    // buys a short guest pass. None of this is security: the word is sitting
+    // right here in a file anyone can read.
+    var LIVES_KEY = 'artivicolab_ipgate_lives_v1';
+    var PASS_KEY = 'artivicolab_ipgate_pass_v1';
+    var START_LIVES = 3;
+    var PASS_MS = 5 * 60 * 1000;
+    var MAGIC_WORD = 'please';
+
+    var SNARK = [
+        'NOT THE WORD. TRY MANNERS.',
+        'STILL NO. SOMEBODY TAUGHT YOU THIS ONE.',
+        'ONE WORD. SIX LETTERS. VERY POLITE.',
+        'YOU ARE OVERTHINKING A DOOR.'
+    ];
+
     // Verdict cache. Once a scan completes, the result is stored and reused
     // for an hour, so normal browsing doesn't re-run the 10 second sequence.
     // Note: if the visitor's network changes inside that hour, they keep the
@@ -185,6 +202,38 @@
     }
 
     /* ─── Verdict cache ──────────────────────────────────── */
+
+    function readLives() {
+        try {
+            var v = parseInt(localStorage.getItem(LIVES_KEY), 10);
+            return isNaN(v) ? START_LIVES : Math.max(0, v);
+        } catch (e) { return START_LIVES; }
+    }
+    function writeLives(n) {
+        try { localStorage.setItem(LIVES_KEY, String(Math.max(0, n))); } catch (e) { /* ignore */ }
+    }
+
+    function readPass() {
+        try {
+            var raw = localStorage.getItem(PASS_KEY);
+            if (!raw) return null;
+            var pass = JSON.parse(raw);
+            if (!pass || typeof pass.until !== 'number') return null;
+            if (Date.now() >= pass.until) { localStorage.removeItem(PASS_KEY); return null; }
+            return pass;
+        } catch (e) { return null; }
+    }
+    function grantPass() {
+        try {
+            localStorage.setItem(PASS_KEY, JSON.stringify({ until: Date.now() + PASS_MS }));
+        } catch (e) { /* ignore */ }
+        writeLives(START_LIVES);   // the loop resets, so it has to be earned again
+        location.reload();
+    }
+    function endPass() {
+        try { localStorage.removeItem(PASS_KEY); } catch (e) { /* ignore */ }
+        location.reload();
+    }
 
     function readCache() {
         try {
@@ -589,7 +638,7 @@
 
         setTimeout(function () {
             removeLoader();
-            showBlockScreen(ip);
+            showBlockScreen(ip, true);
             html.classList.remove('ip-pending');
             // Cached only once the sequence has actually finished. Anyone who
             // leaves mid-scan gets a fresh check next time.
@@ -597,13 +646,20 @@
         }, 700);
     }
 
-    function showBlockScreen(ip) {
+    function showBlockScreen(ip, spendLife) {
         loadPixelFont();
 
         // Neutralise the site's own body padding/background and stop the page
         // behind the block screen from scrolling. Without this, mobile shows a
         // strip of the real site below the overlay and the page scrolls.
         html.classList.add('ipgate-locked');
+
+        var lives = readLives();
+        if (spendLife && lives > 0) {
+            lives = lives - 1;
+            writeLives(lives);
+        }
+        var outOfLives = lives <= 0;
 
         var rank = RANKS[Math.floor(Math.random() * RANKS.length)];
         var d = new Date();
@@ -631,7 +687,8 @@
                         '<p><span>LOADOUT</span><b>' + esc(browserInfo()) + '</b></p>' +
                         '<p><span>RANK</span><b>' + esc(rank) + '</b></p>' +
                         '<p><span>SCORE</span><b>000000</b></p>' +
-                        '<p><span>LIVES</span><b>0</b></p>' +
+                        '<p><span>LIVES</span><b>' + (outOfLives ? '0' :
+                            new Array(lives + 1).join('&#9829; ')) + '</b></p>' +
                         '<p><span>TIME</span><b>' + esc(time) + '</b></p>' +
                     '</div>' +
 
@@ -641,7 +698,18 @@
                         '<p class="ipgate-bar-pct">0%</p>' +
                     '</div>' +
 
-                    '<button type="button" class="ipgate-retry" id="ipgate-retry">&#8635; RETRY SCAN</button>' +
+                    (outOfLives
+                        ? '<form class="ipgate-word" id="ipgate-word">' +
+                              '<p class="ipgate-word-label">&#9733; CONTINUE? &#9733;</p>' +
+                              '<p class="ipgate-word-hint">THIS DOOR RESPONDS TO MANNERS.<br>SAY THE MAGIC WORD.</p>' +
+                              '<input class="ipgate-word-input" id="ipgate-word-input" type="text" ' +
+                                  'autocomplete="off" autocorrect="off" spellcheck="false" ' +
+                                  'maxlength="16" placeholder="TYPE IT" aria-label="The magic word">' +
+                              '<button type="submit" class="ipgate-word-go">ENTER</button>' +
+                              '<p class="ipgate-word-msg" id="ipgate-word-msg"></p>' +
+                          '</form>'
+                        : '<button type="button" class="ipgate-retry" id="ipgate-retry">&#8635; RETRY SCAN &middot; ' +
+                          lives + ' LEFT</button>') +
                     '<p class="ipgate-start">&#9654; PRESS START TO CONTACT ADMIN</p>' +
                     '<p class="ipgate-coin">INSERT COIN</p>' +
                     '<p class="ipgate-curator">ARTIVICOLAB &middot; ATLANTA<br>' +
@@ -658,6 +726,63 @@
                 location.reload();
             });
         }
+
+        var form = document.getElementById('ipgate-word');
+        if (form) {
+            var input = document.getElementById('ipgate-word-input');
+            var msg = document.getElementById('ipgate-word-msg');
+            var wrong = 0;
+
+            form.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                var said = (input.value || '').trim().toLowerCase().replace(/[.!]+$/, '');
+
+                if (said === MAGIC_WORD) {
+                    msg.textContent = 'WELL MANNERED. 5 MINUTE PASS GRANTED.';
+                    msg.className = 'ipgate-word-msg is-good';
+                    form.classList.add('is-good');
+                    setTimeout(grantPass, 900);
+                    return;
+                }
+
+                msg.textContent = SNARK[wrong % SNARK.length];
+                msg.className = 'ipgate-word-msg is-bad';
+                wrong++;
+                form.classList.remove('is-shake');
+                void form.offsetWidth;          // restart the shake
+                form.classList.add('is-shake');
+                input.select();
+            });
+
+            setTimeout(function () { try { input.focus(); } catch (e) { /* ignore */ } }, 400);
+        }
+    }
+
+    /* ─── Guest pass ─────────────────────────────────────── */
+
+    // A visible countdown while the pass is live. When it runs out the page
+    // reloads, which drops the visitor back onto the block screen.
+    function showPassTimer(until) {
+        var badge = document.createElement('div');
+        badge.className = 'ipgate-pass';
+        badge.innerHTML = '<span class="ipgate-pass-label">GUEST PASS</span>' +
+                          '<span class="ipgate-pass-clock" id="ipgate-pass-clock">5:00</span>';
+        document.body.appendChild(badge);
+
+        var clock = badge.querySelector('#ipgate-pass-clock');
+        var tick = setInterval(function () {
+            var left = until - Date.now();
+            if (left <= 0) {
+                clearInterval(tick);
+                clock.textContent = '0:00';
+                badge.classList.add('is-out');
+                setTimeout(endPass, 700);
+                return;
+            }
+            var total = Math.ceil(left / 1000);
+            clock.textContent = Math.floor(total / 60) + ':' + pad(total % 60, 2);
+            badge.classList.toggle('is-low', left <= 60000);
+        }, 250);
     }
 
     // Hold the verdict until the scan animation has had its moment.
@@ -670,6 +795,21 @@
 
     /* ─── Go ─────────────────────────────────────────────── */
 
+    function onReady(fn) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fn);
+        } else { fn(); }
+    }
+
+    var pass = readPass();
+    if (pass) {
+        // Earned by saying the magic word. Runs out on its own.
+        done = true;
+        html.classList.remove('ip-pending');
+        onReady(function () { showPassTimer(pass.until); });
+        return;
+    }
+
     var cached = readCache();
     if (cached) {
         // Verdict from the last hour: apply it instantly, no scan.
@@ -679,11 +819,11 @@
             injectResetButton();
         } else if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function () {
-                showBlockScreen(cached.ip);
+                showBlockScreen(cached.ip, false);
                 html.classList.remove('ip-pending');
             });
         } else {
-            showBlockScreen(cached.ip);
+            showBlockScreen(cached.ip, false);
             html.classList.remove('ip-pending');
         }
         return;
