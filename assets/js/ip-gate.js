@@ -257,6 +257,16 @@
             '<div class="ipscan-grid" aria-hidden="true"></div>' +
             '<div class="ipscan-scan" aria-hidden="true"></div>' +
             '<div class="ipscan-hex" id="ipscan-hex" aria-hidden="true"></div>' +
+            // Radar stays up for the whole scan, large and faint, with the
+            // steps reading on top of it.
+            '<div class="ipscan-radar ipscan-radar--bg" aria-hidden="true">' +
+                '<span class="ipscan-ring"></span>' +
+                '<span class="ipscan-ring ipscan-ring2"></span>' +
+                '<span class="ipscan-ring ipscan-ring3"></span>' +
+                '<span class="ipscan-sweep"></span>' +
+                '<span class="ipscan-cross"></span>' +
+                '<span class="ipscan-cross ipscan-cross-v"></span>' +
+            '</div>' +
             '<div class="ipscan-inner">' +
 
                 '<div class="ipscan-head">' +
@@ -267,13 +277,6 @@
                 '<div class="ipscan-steps">' +
 
                     '<section class="ipscan-step is-on">' +
-                        '<div class="ipscan-radar" aria-hidden="true">' +
-                            '<span class="ipscan-ring"></span>' +
-                            '<span class="ipscan-ring ipscan-ring2"></span>' +
-                            '<span class="ipscan-sweep"></span>' +
-                            '<span class="ipscan-cross"></span>' +
-                            '<span class="ipscan-cross ipscan-cross-v"></span>' +
-                        '</div>' +
                         '<p class="ipscan-title">VERIFYING IP<span class="ipscan-dots"></span></p>' +
                         '<p class="ipscan-iplabel">ORIGIN SIGNATURE</p>' +
                         '<p class="ipscan-ip" id="ipscan-ip"><span class="ipscan-ip-wait">SCANNING</span></p>' +

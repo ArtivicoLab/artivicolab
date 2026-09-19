@@ -1322,7 +1322,7 @@ html.ip-pending::before {
     color: rgba(53,240,255,.16);
 }
 
-.ipscan-inner { position: relative; text-align: center; width: 100%; max-width: 440px; min-width: 0; }
+.ipscan-inner { position: relative; z-index: 1; text-align: center; width: 100%; max-width: 440px; min-width: 0; }
 
 /* Radar */
 .ipscan-radar {
@@ -1335,6 +1335,26 @@ html.ip-pending::before {
     border: 1px solid rgba(53,240,255,.28);
 }
 .ipscan-ring2 { inset: 40px; }
+
+.ipscan-radar--bg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(74vmin, 540px);
+    height: min(74vmin, 540px);
+    margin: 0;
+    transform: translate(-50%, -50%);
+    opacity: .3;
+    pointer-events: none;
+    z-index: 0;
+    border-width: 1px;
+    box-shadow: 0 0 80px rgba(53,240,255,.18), inset 0 0 90px rgba(53,240,255,.07);
+}
+/* Fixed insets do not scale, so the big one uses proportional rings. */
+.ipscan-radar--bg .ipscan-ring  { inset: 13%; }
+.ipscan-radar--bg .ipscan-ring2 { inset: 27%; }
+.ipscan-radar--bg .ipscan-ring3 { inset: 40%; }
+.ipscan-radar--bg .ipscan-sweep { animation-duration: 3.6s; opacity: .8; }
 .ipscan-sweep {
     position: absolute; inset: 0; border-radius: 50%;
     background: conic-gradient(from 0deg, rgba(53,240,255,.55), rgba(53,240,255,0) 70deg);
@@ -1438,6 +1458,7 @@ html.ip-pending::before {
 /* Each character drops in, then the whole string keeps rippling. */
 .ipscan-ip-char {
     display: inline-block;
+    opacity: 1;
     animation:
         ipscan-char-in .28s cubic-bezier(.22,.61,.36,1) backwards,
         ipscan-ip-wave 1.5s ease-in-out infinite;
@@ -1499,6 +1520,7 @@ html.ip-pending::before {
 .ipscan-row-char {
     display: inline-block;
     white-space: pre;
+    opacity: 1;
     animation: ipscan-char-in .3s cubic-bezier(.22,.61,.36,1) backwards;
     animation-delay: calc(var(--i) * .018s);
 }
@@ -1866,7 +1888,7 @@ html.ipgate-locked body {
     .ipgate-reset { font-size: 9px; padding: 6px 10px; margin-left: 8px; }
     .ipgate-ua { font-size: 9px; }
     .ipscan-hex { display: none; }
-    .ipscan-radar { width: 104px; height: 104px; margin-bottom: 20px; }
+    .ipscan-radar--bg { width: 86vmin; height: 86vmin; opacity: .26; }
     .ipscan-title { font-size: 12px; letter-spacing: .2em; }
     .ipscan-timer { font-size: 15px; }
     .ipscan-stepname { font-size: 7px; letter-spacing: .18em; }
