@@ -26,9 +26,17 @@
         '2601:c4:c002:c10:789d:7f1d:7852:5873'
     ];
 
-    // How long the scan animation runs before showing a verdict, even if the
-    // IP lookup came back sooner. Drop this if the wait gets old.
-    var MIN_SCAN_MS = 1900;
+    // How long the scan runs before showing a verdict, even if the IP lookup
+    // came back sooner. The result is cached (see below) so this only plays
+    // once an hour, not on every page load.
+    var MIN_SCAN_MS = 30000;
+
+    // Verdict cache. Once a scan completes, the result is stored and reused
+    // for an hour, so normal browsing doesn't re-run the 10 second sequence.
+    // Note: if the visitor's network changes inside that hour, they keep the
+    // cached verdict until it expires.
+    var CACHE_KEY = 'artivicolab_ipgate_v1';
+    var CACHE_TTL_MS = 60 * 60 * 1000;
 
     var RANKS = [
         'Trespasser',
@@ -41,12 +49,39 @@
         'Guest List: Not Found'
     ];
 
+    // Shown one at a time under the log, cycling as the wait drags on.
+    var NOTES = [
+        'This will only take a few seconds',
+        'Please be patient',
+        'Almost there',
+        'Just a moment longer',
+        'Hang tight',
+        'Nearly finished',
+        'Any second now',
+        'Thank you for your patience'
+    ];
+
     var SCAN_LINES = [
         'ESTABLISHING UPLINK',
+        'NEGOTIATING HANDSHAKE',
+        'EXCHANGING KEYS',
         'READING NETWORK SIGNATURE',
         'RESOLVING ORIGIN NODE',
+        'TRACING ROUTE',
+        'GEOLOCATING ENDPOINT',
+        'PROFILING USER AGENT',
         'CROSS-REFERENCING REGISTRY',
-        'VALIDATING CREDENTIALS'
+        'QUERYING THREAT DATABASE',
+        'ANALYSING PACKET HEADERS',
+        'CHECKING ACCESS CONTROL LIST',
+        'RUNNING HEURISTICS',
+        'RECALIBRATING SENSORS',
+        'CONSULTING THE ARCHIVE',
+        'DOUBLE CHECKING',
+        'TRIPLE CHECKING',
+        'VALIDATING CREDENTIALS',
+        'COMPILING REPORT',
+        'FINALIZING'
     ];
 
     var html = document.documentElement;
@@ -110,6 +145,34 @@
         document.head.appendChild(link);
     }
 
+    /* ─── Verdict cache ──────────────────────────────────── */
+
+    function readCache() {
+        try {
+            var raw = localStorage.getItem(CACHE_KEY);
+            if (!raw) return null;
+            var c = JSON.parse(raw);
+            if (!c || typeof c.at !== 'number') return null;
+            if (Date.now() - c.at > CACHE_TTL_MS) {
+                localStorage.removeItem(CACHE_KEY);
+                return null;
+            }
+            return c;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function writeCache(allowed, ip) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                allowed: !!allowed,
+                ip: ip || null,
+                at: Date.now()
+            }));
+        } catch (e) { /* private mode, fine */ }
+    }
+
     /* ─── Scan sequence ──────────────────────────────────── */
 
     function buildLoader() {
@@ -128,15 +191,20 @@
                     '<span class="ipscan-cross ipscan-cross-v"></span>' +
                 '</div>' +
                 '<p class="ipscan-title">VERIFYING IP<span class="ipscan-dots"></span></p>' +
+                '<p class="ipscan-timer" id="ipscan-timer">T-30.0s</p>' +
+                '<p class="ipscan-iplabel">ORIGIN SIGNATURE</p>' +
+                '<p class="ipscan-ip" id="ipscan-ip"><span class="ipscan-ip-wait">SCANNING</span></p>' +
                 '<div class="ipscan-log" id="ipscan-log"></div>' +
                 '<div class="ipscan-bar"><div class="ipscan-bar-fill" id="ipscan-fill"></div></div>' +
                 '<p class="ipscan-pct" id="ipscan-pct">0%</p>' +
+                '<p class="ipscan-note" id="ipscan-note">' + esc(NOTES[0]) + '</p>' +
                 '<p class="ipscan-verdict" id="ipscan-verdict"></p>' +
             '</div>';
         html.appendChild(loader);
 
         // Terminal lines type in one after another.
         var log = loader.querySelector('#ipscan-log');
+        var step = (MIN_SCAN_MS - 900) / SCAN_LINES.length;
         SCAN_LINES.forEach(function (text, i) {
             setTimeout(function () {
                 if (!log.isConnected) return;
@@ -144,8 +212,32 @@
                 row.innerHTML = '<span class="ipscan-caret">&gt;</span> ' + esc(text) +
                                 '<span class="ipscan-ok">OK</span>';
                 log.appendChild(row);
-            }, 160 + i * 230);
+                log.scrollTop = log.scrollHeight;
+            }, 200 + i * step);
         });
+
+        // Reassurance, rotating and increasingly optimistic.
+        var note = loader.querySelector('#ipscan-note');
+        var noteIdx = 0;
+        var noteTick = setInterval(function () {
+            if (!note.isConnected) { clearInterval(noteTick); return; }
+            noteIdx = (noteIdx + 1) % NOTES.length;
+            note.style.opacity = '0';
+            setTimeout(function () {
+                if (!note.isConnected) return;
+                note.textContent = NOTES[noteIdx];
+                note.style.opacity = '';
+            }, 260);
+        }, MIN_SCAN_MS / NOTES.length);
+
+        // Countdown readout.
+        var timer = loader.querySelector('#ipscan-timer');
+        var timerTick = setInterval(function () {
+            if (!timer.isConnected) { clearInterval(timerTick); return; }
+            var left = Math.max(0, MIN_SCAN_MS - (Date.now() - startedAt));
+            timer.textContent = 'T-' + (left / 1000).toFixed(1) + 's';
+            if (left <= 0) clearInterval(timerTick);
+        }, 100);
 
         // Progress bar creeps toward 100 across the scan window.
         var fill = loader.querySelector('#ipscan-fill');
@@ -164,6 +256,26 @@
             if (!hex.isConnected) { clearInterval(hexTick); return; }
             hex.textContent = hexRow() + '\n' + hex.textContent.split('\n').slice(0, 26).join('\n');
         }, 70);
+    }
+
+    // Drop the address in one character at a time, then let the whole string
+    // ripple continuously.
+    function revealIp(ip) {
+        var host = loader && loader.querySelector('#ipscan-ip');
+        if (!host) return;
+        host.innerHTML = '';
+
+        var chars = String(ip || 'UNKNOWN').split('');
+        chars.forEach(function (ch, i) {
+            setTimeout(function () {
+                if (!host.isConnected) return;
+                var span = document.createElement('span');
+                span.className = 'ipscan-ip-char';
+                span.style.setProperty('--i', i);
+                span.textContent = ch;
+                host.appendChild(span);
+            }, i * 55);
+        });
     }
 
     function removeLoader() {
@@ -192,6 +304,9 @@
         setTimeout(function () {
             removeLoader();
             html.classList.remove('ip-pending');
+            // Cached only once the sequence has actually finished. Anyone who
+            // leaves mid-scan gets a fresh check next time.
+            writeCache(true, ip);
         }, 620);
     }
 
@@ -207,11 +322,19 @@
             removeLoader();
             showBlockScreen(ip);
             html.classList.remove('ip-pending');
+            // Cached only once the sequence has actually finished. Anyone who
+            // leaves mid-scan gets a fresh check next time.
+            writeCache(false, ip);
         }, 700);
     }
 
     function showBlockScreen(ip) {
         loadPixelFont();
+
+        // Neutralise the site's own body padding/background and stop the page
+        // behind the block screen from scrolling. Without this, mobile shows a
+        // strip of the real site below the overlay and the page scrolls.
+        html.classList.add('ipgate-locked');
 
         var rank = RANKS[Math.floor(Math.random() * RANKS.length)];
         var d = new Date();
@@ -267,20 +390,39 @@
 
     /* ─── Go ─────────────────────────────────────────────── */
 
+    var cached = readCache();
+    if (cached) {
+        // Verdict from the last hour: apply it instantly, no scan.
+        done = true;
+        if (cached.allowed) {
+            html.classList.remove('ip-pending');
+        } else if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () {
+                showBlockScreen(cached.ip);
+                html.classList.remove('ip-pending');
+            });
+        } else {
+            showBlockScreen(cached.ip);
+            html.classList.remove('ip-pending');
+        }
+        return;
+    }
+
     buildLoader();
 
     fetch('https://api64.ipify.org?format=json')
         .then(function (r) { return r.json(); })
         .then(function (data) {
             var ip = data && data.ip;
+            revealIp(ip);
             if (ip && ALLOWED_IPS.indexOf(ip) !== -1) {
                 settle(grant, ip);
             } else {
                 settle(deny, ip);
             }
         })
-        .catch(function () { settle(deny, null); });
+        .catch(function () { revealIp(null); settle(deny, null); });
 
     // Never leave the page hidden forever if the lookup hangs.
-    setTimeout(function () { settle(deny, null); }, 6000);
+    setTimeout(function () { settle(deny, null); }, MIN_SCAN_MS + 5000);
 })();

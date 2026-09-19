@@ -1288,7 +1288,8 @@ html.ip-pending::before {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background:
         radial-gradient(ellipse at 50% 50%, rgba(53,240,255,.09), transparent 60%),
         #050810;
@@ -1357,9 +1358,56 @@ html.ip-pending::before {
     0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
 }
 
+.ipscan-timer {
+    font-size: 26px;
+    letter-spacing: .1em;
+    color: #B6FF3D;
+    text-shadow: 0 0 18px rgba(182,255,61,.55);
+    margin-bottom: 18px;
+    font-variant-numeric: tabular-nums;
+}
+
+.ipscan-iplabel {
+    font-size: 9px;
+    letter-spacing: .3em;
+    color: rgba(127,233,245,.55);
+    margin-bottom: 8px;
+}
+
+.ipscan-ip {
+    font-size: 15px;
+    letter-spacing: .06em;
+    color: #35F0FF;
+    text-shadow: 0 0 16px rgba(53,240,255,.6);
+    margin-bottom: 20px;
+    min-height: 22px;
+    word-break: break-all;
+    line-height: 1.5;
+}
+.ipscan-ip-wait { opacity: .35; letter-spacing: .3em; font-size: 11px; }
+
+/* Each character drops in, then the whole string keeps rippling. */
+.ipscan-ip-char {
+    display: inline-block;
+    animation:
+        ipscan-char-in .28s cubic-bezier(.22,.61,.36,1) backwards,
+        ipscan-ip-wave 1.5s ease-in-out infinite;
+    animation-delay: 0s, calc(var(--i) * .07s);
+}
+@keyframes ipscan-char-in {
+    from { opacity: 0; transform: translateY(-10px) scale(1.5); filter: blur(3px); }
+    to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes ipscan-ip-wave {
+    0%, 100% { transform: translateY(0);    color: #35F0FF; }
+    50%      { transform: translateY(-7px); color: #B6FF3D; }
+}
+
 .ipscan-log {
     text-align: left; font-size: 11px; line-height: 2;
-    min-height: 110px; margin-bottom: 18px;
+    height: 132px; overflow: hidden; margin-bottom: 18px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 100%);
 }
 .ipscan-log p { animation: ipscan-in .22s ease-out; display: flex; gap: 8px; }
 .ipscan-caret { color: #B6FF3D; }
@@ -1376,6 +1424,15 @@ html.ip-pending::before {
     transition: width .12s linear;
 }
 .ipscan-pct { font-size: 11px; letter-spacing: .2em; margin-top: 10px; color: #B6FF3D; }
+
+.ipscan-note {
+    margin-top: 16px;
+    font-size: 12px;
+    letter-spacing: .06em;
+    color: rgba(127,233,245,.75);
+    transition: opacity .26s ease;
+    min-height: 16px;
+}
 
 .ipscan-verdict {
     margin-top: 20px; font-size: 16px; letter-spacing: .24em; min-height: 22px;
@@ -1399,28 +1456,39 @@ html.ip-pending::before {
 
 @media (prefers-reduced-motion: reduce) {
     .ipscan-grid, .ipscan-sweep, .ipscan-dots::after, .ipscan-log p,
-    .ipscan-granted, .ipscan-refused, .ipscan-flash, .ipscan-reject { animation: none; }
+    .ipscan-granted, .ipscan-refused, .ipscan-flash, .ipscan-reject,
+    .ipscan-ip-char { animation: none; }
+}
+
+/* The site's own body keeps its padding and cream background otherwise,
+   which leaves a scrollable strip under the block screen on phones. */
+html.ipgate-locked,
+html.ipgate-locked body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #0B0B16;
 }
 
 .ipgate-arcade {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 20px;
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     background:
         radial-gradient(ellipse at 50% 0%, rgba(53,240,255,.10), transparent 55%),
         radial-gradient(ellipse at 50% 100%, rgba(255,61,127,.12), transparent 55%),
         #0B0B16;
     color: #EAF2FF;
     font-family: 'Press Start 2P', ui-monospace, Menlo, monospace;
-    overflow: hidden;
 }
 
 /* CRT scanlines */
 .ipgate-scan {
-    position: absolute;
+    position: fixed;
     inset: 0;
     pointer-events: none;
     background:
@@ -1428,7 +1496,20 @@ html.ip-pending::before {
         radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.6) 100%);
 }
 
-.ipgate-inner { position: relative; text-align: center; max-width: 620px; width: 100%; }
+.ipgate-inner {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.ipgate-inner > * { max-width: 100%; }
 
 .ipgate-over {
     font-size: 11px;
@@ -1501,7 +1582,7 @@ html.ip-pending::before {
 }
 .ipgate-card p { font-size: 8px; line-height: 2.4; display: flex; gap: 10px; }
 .ipgate-card p span { flex: 0 0 96px; color: #6B7599; letter-spacing: .1em; }
-.ipgate-card p b { font-weight: 400; color: #EAF2FF; word-break: break-all; }
+.ipgate-card p b { font-weight: 400; color: #EAF2FF; overflow-wrap: anywhere; min-width: 0; }
 
 /* Fake progress bar, permanently stuck */
 .ipgate-bar-wrap { margin-bottom: 26px; }
@@ -1537,11 +1618,32 @@ html.ip-pending::before {
     font-size: 10px;
     line-height: 1.7;
     color: rgba(234,242,255,.28);
-    word-break: break-word;
+    max-width: 460px;
+    overflow-wrap: anywhere;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .ipgate-over, .ipgate-denied, .ipgate-ach, .ipgate-start, .ipgate-bar-fill { animation: none; }
+}
+@media (max-width: 600px) {
+    .ipgate-inner { padding: 28px 16px; }
+    .ipgate-denied { font-size: 17px; }
+    .ipgate-card { min-width: 0; width: 100%; padding: 14px; }
+    .ipgate-start { line-height: 2; }
+    .ipgate-card p { font-size: 7px; line-height: 2.2; gap: 8px; }
+    .ipgate-card p span { flex-basis: 76px; }
+    .ipgate-ach { padding: 10px 12px; gap: 10px; }
+    .ipgate-ach-name { font-size: 9px; }
+    .ipgate-start { font-size: 8px; }
+    .ipgate-ua { font-size: 9px; }
+    .ipscan-hex { display: none; }
+    .ipscan-radar { width: 104px; height: 104px; margin-bottom: 20px; }
+    .ipscan-title { font-size: 12px; letter-spacing: .2em; }
+    .ipscan-log { font-size: 10px; min-height: 96px; }
+    .ipscan-timer { font-size: 20px; }
+    .ipscan-ip { font-size: 12px; }
+    .ipscan-log { height: 108px; font-size: 9px; }
+    .ipscan-note { font-size: 11px; }
 }
 /* IP-GATE:END */
 
