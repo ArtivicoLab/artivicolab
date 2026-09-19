@@ -1527,7 +1527,7 @@ html.ip-pending::before {
 
 /* Museum placard for the specimen currently being examined. */
 .ipscan-specimen {
-    max-width: 340px;
+    max-width: 380px;
     margin: 0 auto 14px;
     padding: 12px 16px 13px;
     border: 1px solid rgba(182,255,61,.3);
@@ -1535,8 +1535,8 @@ html.ip-pending::before {
 }
 
 .ipscan-specimen-kicker {
-    font-size: 7px;
-    letter-spacing: .34em;
+    font-size: 10px;
+    letter-spacing: .3em;
     color: rgba(182,255,61,.55);
     margin-bottom: 7px;
 }
@@ -1544,7 +1544,7 @@ html.ip-pending::before {
 .ipscan-specimen-name {
     font-family: 'Playfair Display', Georgia, serif;
     font-style: italic;
-    font-size: 25px;
+    font-size: 31px;
     line-height: 1.1;
     color: #B6FF3D;
     text-shadow: 0 0 18px rgba(182,255,61,.4);
@@ -1552,8 +1552,8 @@ html.ip-pending::before {
 }
 
 .ipscan-specimen-sub {
-    font-size: 9px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.65;
     letter-spacing: .06em;
     color: rgba(127,233,245,.72);
 }
@@ -1709,14 +1709,14 @@ html.ip-pending::before {
 }
 
 .ipscan-specimen-org {
-    font-size: 7px;
-    letter-spacing: .24em;
+    font-size: 10px;
+    letter-spacing: .2em;
     color: rgba(182,255,61,.6);
     margin-bottom: 6px;
 }
 
 .ipscan-specimen-curator {
-    font-size: 11px;
+    font-size: 15px;
     letter-spacing: .05em;
     color: rgba(127,233,245,.9);
     margin-bottom: 6px;
@@ -1729,8 +1729,8 @@ html.ip-pending::before {
 }
 
 .ipscan-specimen-acc {
-    font-size: 8px;
-    letter-spacing: .18em;
+    font-size: 11px;
+    letter-spacing: .14em;
     color: rgba(127,233,245,.45);
     font-variant-numeric: tabular-nums;
 }
@@ -2056,9 +2056,12 @@ html.ipgate-locked body {
     .ipscan-row-key { min-width: 0; flex-basis: 84px; font-size: 7px; letter-spacing: .14em; }
     .ipscan-row-val { font-size: 12px; }
     .ipscan-specimen { max-width: 100%; padding: 11px 13px; }
-    .ipscan-specimen-name { font-size: 21px; }
-    .ipscan-specimen-sub { font-size: 8px; }
-    .ipscan-specimen-curator { font-size: 10px; }
+    .ipscan-specimen-name { font-size: 26px; }
+    .ipscan-specimen-sub { font-size: 12px; }
+    .ipscan-specimen-curator { font-size: 13px; }
+    .ipscan-specimen-kicker { font-size: 9px; }
+    .ipscan-specimen-org { font-size: 9px; }
+    .ipscan-specimen-acc { font-size: 10px; }
     .ipscan-specimen-rule { margin: 10px auto; }
     .ipscan-fineprint { font-size: 4.5px; max-width: 100%; }
 }
@@ -2448,9 +2451,8 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
     --runway-bloom: #C8860D;
 }
 
-@media (min-width: 1180px) {
-    body::before,
-    body::after {
+body::before,
+body::after {
         content: '';
         position: fixed;
         top: 0;
@@ -2489,11 +2491,28 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
         -webkit-mask-repeat: repeat-y;
         mask-repeat: repeat-y;
 
-        animation: runway-sequence 6s linear infinite;
+        animation: runway-sequence 7s cubic-bezier(.55, .06, .68, .19) infinite;
     }
 
-    body::before { left: 22px; }
-    body::after  { right: 22px; }
+body::before { left: 22px; }
+body::after  { right: 22px; }
+
+/* Narrow screens have no gutter to speak of, so the rails move to the very
+   edge and the lamps shrink to match. */
+@media (max-width: 1179px) {
+    body::before,
+    body::after {
+        width: 7px;
+        background-size: 100% 26vh, 100% 100%;
+        -webkit-mask-image: radial-gradient(circle at 50% 50%,
+            #000 0, #000 1.1px, rgba(0, 0, 0, .5) 1.9px, rgba(0, 0, 0, 0) 3.8px);
+        mask-image: radial-gradient(circle at 50% 50%,
+            #000 0, #000 1.1px, rgba(0, 0, 0, .5) 1.9px, rgba(0, 0, 0, 0) 3.8px);
+        -webkit-mask-size: 100% 30px;
+        mask-size: 100% 30px;
+    }
+    body::before { left: 4px; }
+    body::after  { right: 4px; }
 }
 
 @keyframes runway-sequence {
@@ -2506,4 +2525,82 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
     body::before,
     body::after { animation: none; background-image: none, linear-gradient(to bottom,
         var(--runway-green) 0 13%, var(--runway-amber) 26% 74%, var(--runway-red) 87% 100%); }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────
+   THE DEPARTURE
+   Every so often something actually uses the runway. A plan view
+   airliner, drawn faint enough to read as a watermark, rolls up the
+   page between the two rows of edge lights, accelerating the way a
+   real takeoff roll does, then rotates and climbs away while growing
+   toward the viewer.
+
+   It runs once a minute. Any more often and it stops being a moment
+   and starts being a distraction behind someone's reading.
+
+   Hangs off main::before, so again no page markup. Sits at z-index -1,
+   behind every word on the page and above the paper texture.
+   ─────────────────────────────────────────────────────────────────── */
+
+main::before {
+        content: '';
+        position: fixed;
+        left: 50%;
+        top: 0;
+        width: 300px;
+        height: 360px;
+        margin-left: -150px;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0;
+
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><path d='M100,8 C106,8 110,26 111,52 C111,70 111,84 112,96 L190,146 L190,162 L112,136 C112,164 110,188 107,204 L128,222 L128,232 L100,224 L72,232 L72,222 L93,204 C90,188 88,164 88,136 L10,162 L10,146 L88,96 C89,84 89,70 89,52 C90,26 94,8 100,8 Z' fill='%231A1816'/></svg>");
+
+        animation: departure 45s cubic-bezier(.4, 0, .9, .35) infinite;
+    }
+
+/* On a phone the text runs nearly edge to edge, so the aircraft comes down
+   in size and weight to stay clear of the reading. */
+@media (max-width: 1179px) {
+    main::before {
+        width: 200px;
+        height: 240px;
+        margin-left: -100px;
+        animation-name: departure-sm;
+    }
+}
+
+@keyframes departure {
+    /* holding short */
+    0%   { transform: translateY(108vh) scale(.5) rotate(0deg); opacity: 0; }
+    2%   { transform: translateY(104vh) scale(.5) rotate(0deg); opacity: .13; }
+    /* the roll, barely moving at first */
+    9%   { transform: translateY(86vh)  scale(.53) rotate(0deg); opacity: .14; }
+    16%  { transform: translateY(58vh)  scale(.58) rotate(0deg); opacity: .14; }
+    /* rotate, and the climb out */
+    22%  { transform: translateY(26vh)  scale(.7)  rotate(-1.5deg); opacity: .13; }
+    27%  { transform: translateY(-14vh) scale(.9)  rotate(-3deg);   opacity: .1; }
+    33%  { transform: translateY(-80vh) scale(1.3) rotate(-4.5deg); opacity: 0; }
+    /* gone. the runway sits empty until the next one. */
+    100% { transform: translateY(-80vh) scale(1.3) rotate(-4.5deg); opacity: 0; }
+}
+
+/* Same flight, lighter touch, because phone text has nowhere to hide. */
+@keyframes departure-sm {
+    0%   { transform: translateY(108vh) scale(.5) rotate(0deg); opacity: 0; }
+    2%   { transform: translateY(104vh) scale(.5) rotate(0deg); opacity: .08; }
+    9%   { transform: translateY(86vh)  scale(.53) rotate(0deg); opacity: .09; }
+    16%  { transform: translateY(58vh)  scale(.58) rotate(0deg); opacity: .09; }
+    22%  { transform: translateY(26vh)  scale(.7)  rotate(-1.5deg); opacity: .085; }
+    27%  { transform: translateY(-14vh) scale(.9)  rotate(-3deg);   opacity: .06; }
+    33%  { transform: translateY(-80vh) scale(1.3) rotate(-4.5deg); opacity: 0; }
+    100% { transform: translateY(-80vh) scale(1.3) rotate(-4.5deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    main::before { display: none; }
 }

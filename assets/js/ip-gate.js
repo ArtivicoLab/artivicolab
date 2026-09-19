@@ -493,8 +493,11 @@
         else                              race = 'subsp. sedentarius, two hands, one chair';
 
         function paint() {
-            var where = geo.city ? geo.city + ', ' + (geo.region || 'parts unknown') : 'habitat pending';
-            sub.textContent = race + '. Observed ' + where + '.';
+            // The habitat clause only appears once the lookup lands. Saying
+            // "observed habitat pending" just reads as broken.
+            sub.textContent = geo.city
+                ? race + '. Observed ' + geo.city + ', ' + (geo.region || 'parts unknown') + '.'
+                : race + '.';
         }
         paint();
         specimenPaint = paint;   // geo lookup calls this again once it lands

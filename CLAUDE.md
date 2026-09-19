@@ -26,8 +26,27 @@ Two things worth keeping:
   genuine photosensitivity risk. There is a reduced-motion rule that stops
   the sequence and leaves the lamps steady. Do not speed this up.
 
-Shown only at 1180px and wider, where the gutters exist. Measured clear of
-the 1100px container at every width above that.
+Runs at every width. Wide screens get 12px rails inset 22px into the
+gutter; below 1180px they slim to 7px hard against the edge with smaller,
+tighter lamps, measured clear of the text at 360px and up.
+
+## The departure
+
+Under a `THE DEPARTURE` banner in the same file. Every 45 seconds a plan
+view airliner, drawn as an ink silhouette, rolls up the page between the
+two rails, accelerating the way a real takeoff roll does, then rotates and
+climbs away growing toward the viewer as it fades. It hangs off
+`main::before`, which every page has, so again no markup. It sits at
+z-index -1, behind every word and above the paper texture, at around 13%
+opacity on desktop and 9% on phones where text has nowhere to hide.
+
+**Verifying animation in this repo:** headless screenshots capture CSS
+animations at their first frame, so anything that starts transparent looks
+broken in a screenshot even when it is perfect in a browser. Chasing that
+wasted a while. Sample `getComputedStyle` at several timestamps instead,
+which does advance. The departure was confirmed that way: it covers 102,
+167, 269 and 414 pixels in successive three second intervals, which is the
+acceleration curve, not a constant glide.
 
 ## ⚠️ Temporary: client-side IP gate, remove by 2026-09-20
 
