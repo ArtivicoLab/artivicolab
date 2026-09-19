@@ -1593,6 +1593,24 @@ html.ip-pending::before {
     margin-bottom: 14px;
 }
 
+.ipgate-word-tiles {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+.ipgate-word-tiles span {
+    display: inline-block;
+    min-width: 26px;
+    padding: 7px 4px;
+    border: 2px solid rgba(255,211,77,.7);
+    background: rgba(255,211,77,.1);
+    color: #FFD34D;
+    font-size: 13px;
+    letter-spacing: 0;
+}
+
 .ipgate-word-input {
     display: block;
     width: 100%;
@@ -1603,7 +1621,9 @@ html.ip-pending::before {
     background: rgba(5,8,16,.8);
     color: #35F0FF;
     font-family: inherit;
-    font-size: 13px;
+    /* Never below 16px. Safari on iOS zooms the page in on focus for
+       anything smaller, and it does not zoom back out afterwards. */
+    font-size: 16px;
     letter-spacing: .24em;
     text-align: center;
     text-transform: lowercase;
@@ -2004,7 +2024,20 @@ html.ipgate-locked body {
     .ipgate-word { max-width: 100%; padding: 15px 13px 13px; }
     .ipgate-word-label { font-size: 10px; }
     .ipgate-word-hint { font-size: 7px; }
-    .ipgate-word-input { font-size: 12px; padding: 11px 8px; }
+    .ipgate-word-input { font-size: 16px; padding: 11px 8px; }
+    .ipgate-word-tiles span { min-width: 22px; padding: 6px 3px; font-size: 12px; }
+
+    /* Out of lives on a phone: drop the trophy case so the prompt, the
+       tiles and the keyboard all share one screen without scrolling. */
+    .ipgate-arcade.is-word .ipgate-ach,
+    .ipgate-arcade.is-word .ipgate-card,
+    .ipgate-arcade.is-word .ipgate-bar-wrap,
+    .ipgate-arcade.is-word .ipgate-coin,
+    .ipgate-arcade.is-word .ipgate-ua { display: none; }
+    .ipgate-arcade.is-word .ipgate-inner { padding: 20px 16px; }
+    .ipgate-arcade.is-word .ipgate-over { margin-bottom: 6px; }
+    .ipgate-arcade.is-word .ipgate-denied { font-size: 15px; margin-bottom: 14px; }
+    .ipgate-arcade.is-word .ipgate-curator { margin-top: 14px; }
     .ipgate-word-go { font-size: 10px; }
     .ipgate-pass { top: 8px; right: 8px; padding: 6px 10px; gap: 7px; }
     .ipgate-pass-clock { font-size: 13px; }
@@ -2029,6 +2062,27 @@ html.ipgate-locked body {
     .ipscan-specimen-rule { margin: 10px auto; }
     .ipscan-fineprint { font-size: 4.5px; max-width: 100%; }
 }
+/* Short phones cannot hold the whole arcade cabinet. Drop the decorations
+   that carry no information so the card and the button still fit unscrolled. */
+@media (max-width: 600px) and (max-height: 760px) {
+    .ipgate-inner { padding: 18px 14px; }
+    .ipgate-ua,
+    .ipgate-coin { display: none; }
+    .ipgate-ach { padding: 8px 10px; gap: 8px; }
+    .ipgate-card { padding: 11px; }
+    .ipgate-card p { line-height: 1.9; }
+    .ipgate-denied { font-size: 15px; }
+    .ipgate-bar-wrap { margin: 12px 0; }
+    .ipgate-curator { margin-top: 12px; }
+}
+
+/* Very short phones, an SE sized screen. The fake firewall bar is the last
+   pure decoration left, so it goes before anything that says something. */
+@media (max-width: 600px) and (max-height: 620px) {
+    .ipgate-bar-wrap { display: none; }
+    .ipgate-over { margin-bottom: 4px; }
+}
+
 /* IP-GATE:END */
 
 html.gate-open, body.gate-open { overflow: hidden; height: 100%; }

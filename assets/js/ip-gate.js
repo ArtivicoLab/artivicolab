@@ -646,6 +646,22 @@
         }, 700);
     }
 
+    // Nobody can guess a word they were never shown, so the letters go up
+    // scrambled and they unscramble them.
+    function scramble(word) {
+        var letters = word.toUpperCase().split('');
+        var out, guard = 0;
+        do {
+            for (var i = letters.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var t = letters[i]; letters[i] = letters[j]; letters[j] = t;
+            }
+            out = letters.join('');
+            guard++;
+        } while (out === word.toUpperCase() && guard < 20);
+        return out;
+    }
+
     function showBlockScreen(ip, spendLife) {
         loadPixelFont();
 
@@ -666,7 +682,7 @@
         var time = pad(d.getHours(), 2) + ':' + pad(d.getMinutes(), 2) + ':' + pad(d.getSeconds(), 2);
 
         document.body.innerHTML =
-            '<div class="ipgate-arcade">' +
+            '<div class="ipgate-arcade' + (outOfLives ? ' is-word' : '') + '">' +
                 '<div class="ipgate-scan" aria-hidden="true"></div>' +
                 '<div class="ipgate-inner">' +
 
@@ -701,7 +717,12 @@
                     (outOfLives
                         ? '<form class="ipgate-word" id="ipgate-word">' +
                               '<p class="ipgate-word-label">&#9733; CONTINUE? &#9733;</p>' +
-                              '<p class="ipgate-word-hint">THIS DOOR RESPONDS TO MANNERS.<br>SAY THE MAGIC WORD.</p>' +
+                              '<p class="ipgate-word-hint">THIS DOOR RESPONDS TO MANNERS.<br>UNSCRAMBLE THE WORD.</p>' +
+                              '<p class="ipgate-word-tiles">' +
+                                  scramble(MAGIC_WORD).split('').map(function (ch) {
+                                      return '<span>' + esc(ch) + '</span>';
+                                  }).join('') +
+                              '</p>' +
                               '<input class="ipgate-word-input" id="ipgate-word-input" type="text" ' +
                                   'autocomplete="off" autocorrect="off" spellcheck="false" ' +
                                   'maxlength="16" placeholder="TYPE IT" aria-label="The magic word">' +

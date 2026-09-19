@@ -73,12 +73,29 @@ A denied visitor gets three lives, drawn as hearts on the player card.
 Each fresh denial spends one. Loads served from the one hour verdict
 cache do not spend one, or ordinary browsing would drain them.
 
-With the lives gone the screen becomes a continue prompt asking for the
-magic word. A correct answer, case and trailing punctuation forgiven,
-writes a five minute guest pass, resets the lives to three and reloads
-into the real site. A countdown badge sits top right and turns red under
+With the lives gone the screen becomes a continue prompt. Nobody can guess
+a word they were never shown, so the letters go up scrambled on tiles and
+the visitor unscrambles them. The scramble is reshuffled per load and
+never shows the answer in order. A correct answer, case and surrounding
+punctuation forgiven, writes a five minute guest pass, resets the lives to
+three and reloads into the real site. A countdown badge sits top right and turns red under
 the final minute. On expiry it clears the pass and reloads, which puts
 the visitor back on the block screen to start the grind again.
+
+### Mobile constraints, learned the hard way
+
+Two things that are easy to break again:
+
+- The word input must never be set below 16px. Safari on iOS zooms the
+  page in when a focused input is smaller, and it does not zoom back out
+  afterwards, which strands the visitor zoomed in on a granted page.
+- The block screen has to fit without scrolling, and the arcade cabinet is
+  too tall for short phones. Two height based media queries trim it: under
+  760px tall the user agent string and the insert coin line go, and under
+  620px tall the fake firewall bar goes too. The continue screen drops the
+  trophy case entirely on phones so the prompt, the tiles and the keyboard
+  share one screen. Measured as fitting at 390x844, 360x640 and 320x568,
+  in both the denial and the continue states.
 
 ### localStorage keys
 
