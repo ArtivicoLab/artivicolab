@@ -234,9 +234,23 @@
                 '<p class="ipscan-iplabel">ORIGIN SIGNATURE</p>' +
                 '<p class="ipscan-ip" id="ipscan-ip"><span class="ipscan-ip-wait">SCANNING</span></p>' +
                 '<div class="ipscan-dossier" id="ipscan-dossier"></div>' +
-                '<p class="ipscan-fineprint">For entertainment only. Everything above is read ' +
-                'live from your own browser and shown back to you. Nothing is recorded, ' +
-                'stored, or shared.</p>' +
+                '<div class="ipscan-specimen">' +
+                    '<p class="ipscan-specimen-kicker">SPECIMEN CLASSIFICATION</p>' +
+                    '<p class="ipscan-specimen-name" id="ipscan-species">Homo staticus</p>' +
+                    '<p class="ipscan-specimen-sub" id="ipscan-species-sub"></p>' +
+                    '<p class="ipscan-specimen-note">Collected live. Released unharmed.</p>' +
+                '</div>' +
+                // Deliberately microscopic, in the finest tradition of fine print.
+                '<p class="ipscan-fineprint">NOTICE: The foregoing readout is provided for ' +
+                'entertainment and demonstrative purposes only and constitutes neither ' +
+                'surveillance nor data collection. All values displayed are read live from ' +
+                'your own browser at render time, held in volatile memory for the duration ' +
+                'of this animation, and discarded when this overlay closes. Nothing is ' +
+                'recorded, stored, sold, or retained by ArtivicoLab. Approximate location ' +
+                'and network provider are resolved by a third party address lookup and are ' +
+                'accurate to the city at best, frequently not even that. No cookies are set ' +
+                'by this notice. Your browser volunteered every one of these details without ' +
+                'being asked, which is in fact the entire point being made here.</p>' +
                 '<div class="ipscan-log" id="ipscan-log"></div>' +
                 '<div class="ipscan-bar"><div class="ipscan-bar-fill" id="ipscan-fill"></div></div>' +
                 '<p class="ipscan-pct" id="ipscan-pct">0%</p>' +
@@ -351,7 +365,29 @@
                 delete pendingGeoRows[key];
             }
         });
+        if (specimenPaint) specimenPaint();
     }
+
+    // A taxonomy joke, keyed off whatever the visitor actually turned up on.
+    function classifySpecimen() {
+        var sub = loader && loader.querySelector('#ipscan-species-sub');
+        if (!sub) return;
+
+        var d = deviceInfo();
+        var race;
+        if (/Mobile/.test(d.device))      race = 'subsp. pollicaris, the thumb scroller';
+        else if (/Tablet/.test(d.device)) race = 'subsp. reclinatus, scrolls lying down';
+        else                              race = 'subsp. sedentarius, two hands, one chair';
+
+        function paint() {
+            var where = geo.city ? geo.city + ', ' + (geo.region || 'parts unknown') : 'habitat pending';
+            sub.textContent = race + '. Observed ' + where + '.';
+        }
+        paint();
+        specimenPaint = paint;   // geo lookup calls this again once it lands
+    }
+
+    var specimenPaint = null;
 
     function startDossier() {
         var host = loader && loader.querySelector('#ipscan-dossier');
@@ -588,6 +624,7 @@
     }
 
     buildLoader();
+    classifySpecimen();
     startDossier();
 
     // Geo lookup purely for the readout. The allow/deny decision never
