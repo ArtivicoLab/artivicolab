@@ -783,12 +783,50 @@
 
     // A visible countdown while the pass is live. When it runs out the page
     // reloads, which drops the visitor back onto the block screen.
+    // Line the badge up with the site name, without covering the menu button
+    // or the nav links. Vertical placement uses the header's height rather
+    // than its live position, so scrolling cannot throw it off screen.
+    function placePassBadge(badge) {
+        var header = document.querySelector('.header');
+        var cont = document.querySelector('.header .container');
+        if (!header || !cont) return;   // leave the stylesheet default in place
+
+        var bw = badge.offsetWidth;
+        var bh = badge.offsetHeight;
+        var hh = header.offsetHeight;
+        var contRect = cont.getBoundingClientRect();
+
+        var right = Math.max(8, Math.round(window.innerWidth - contRect.right));
+        var left = window.innerWidth - right - bw;
+        var top = Math.round((hh - bh) / 2);
+
+        // Anything in the header the visitor needs to click or read.
+        var blockers = ['.header .hamburger', '.header .nav-menu', '.header .logo'];
+        for (var i = 0; i < blockers.length; i++) {
+            var el = document.querySelector(blockers[i]);
+            if (!el) continue;
+            var r = el.getBoundingClientRect();
+            if (!r.width || !r.height) continue;            // hidden at this width
+            if (r.right > left - 10 && r.left < left + bw + 10) {
+                // No clear space on the header line, so sit just below it.
+                top = hh + 8;
+                break;
+            }
+        }
+
+        badge.style.top = Math.max(6, top) + 'px';
+        badge.style.right = right + 'px';
+    }
+
     function showPassTimer(until) {
         var badge = document.createElement('div');
         badge.className = 'ipgate-pass';
         badge.innerHTML = '<span class="ipgate-pass-label">GUEST PASS</span>' +
                           '<span class="ipgate-pass-clock" id="ipgate-pass-clock">5:00</span>';
         document.body.appendChild(badge);
+
+        placePassBadge(badge);
+        window.addEventListener('resize', function () { placePassBadge(badge); });
 
         var clock = badge.querySelector('#ipgate-pass-clock');
         var tick = setInterval(function () {

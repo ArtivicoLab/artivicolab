@@ -89,6 +89,11 @@ Two things that are easy to break again:
 - The word input must never be set below 16px. Safari on iOS zooms the
   page in when a focused input is smaller, and it does not zoom back out
   afterwards, which strands the visitor zoomed in on a granted page.
+- The guest pass badge is positioned by script, not by fixed CSS offsets.
+  It measures the header and drops below it whenever it would cover the
+  hamburger, the nav links or the logo. A fixed top right corner covered
+  the menu button outright on phones. Keep the measuring, or the menu
+  becomes unreachable for anyone holding a pass.
 - The block screen has to fit without scrolling, and the arcade cabinet is
   too tall for short phones. Two height based media queries trim it: under
   760px tall the user agent string and the insert coin line go, and under
