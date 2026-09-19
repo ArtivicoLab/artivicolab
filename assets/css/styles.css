@@ -1279,6 +1279,129 @@ html.ip-pending::before {
     background-color: #0B0B16;
 }
 
+/* ─── Verification scan overlay ──────────────────────────── */
+.ipscan {
+    position: fixed;
+    inset: 0;
+    z-index: 100001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(53,240,255,.09), transparent 60%),
+        #050810;
+    color: #7FE9F5;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    transition: opacity .4s ease, transform .4s ease;
+}
+.ipscan-out { opacity: 0; transform: scale(1.04); }
+
+.ipscan-grid {
+    position: absolute; inset: 0; pointer-events: none; opacity: .35;
+    background-image:
+        linear-gradient(rgba(53,240,255,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53,240,255,.10) 1px, transparent 1px);
+    background-size: 44px 44px;
+    animation: ipscan-drift 8s linear infinite;
+}
+@keyframes ipscan-drift { to { background-position: 44px 44px; } }
+
+.ipscan-scan {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px),
+        radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.7) 100%);
+}
+
+.ipscan-hex {
+    position: absolute; top: 0; right: 14px; pointer-events: none;
+    font-size: 10px; line-height: 1.5; white-space: pre;
+    color: rgba(53,240,255,.16);
+}
+
+.ipscan-inner { position: relative; text-align: center; width: 100%; max-width: 440px; }
+
+/* Radar */
+.ipscan-radar {
+    position: relative; width: 132px; height: 132px; margin: 0 auto 26px;
+    border-radius: 50%; border: 2px solid rgba(53,240,255,.4);
+    box-shadow: 0 0 24px rgba(53,240,255,.25), inset 0 0 24px rgba(53,240,255,.12);
+}
+.ipscan-ring {
+    position: absolute; inset: 18px; border-radius: 50%;
+    border: 1px solid rgba(53,240,255,.28);
+}
+.ipscan-ring2 { inset: 40px; }
+.ipscan-sweep {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(53,240,255,.55), rgba(53,240,255,0) 70deg);
+    animation: ipscan-spin 1.5s linear infinite;
+}
+@keyframes ipscan-spin { to { transform: rotate(360deg); } }
+.ipscan-cross {
+    position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+    background: rgba(53,240,255,.25);
+}
+.ipscan-cross-v { left: 50%; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
+
+.ipscan-title {
+    font-size: 14px; letter-spacing: .28em; color: #35F0FF;
+    text-shadow: 0 0 14px rgba(53,240,255,.6); margin-bottom: 20px;
+}
+.ipscan-dots::after {
+    content: ''; animation: ipscan-dots 1.2s steps(4) infinite;
+}
+@keyframes ipscan-dots {
+    0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
+}
+
+.ipscan-log {
+    text-align: left; font-size: 11px; line-height: 2;
+    min-height: 110px; margin-bottom: 18px;
+}
+.ipscan-log p { animation: ipscan-in .22s ease-out; display: flex; gap: 8px; }
+.ipscan-caret { color: #B6FF3D; }
+.ipscan-ok { margin-left: auto; color: #B6FF3D; opacity: .9; }
+@keyframes ipscan-in { from { opacity: 0; transform: translateX(-8px); } }
+
+.ipscan-bar {
+    height: 8px; border: 1px solid rgba(53,240,255,.5); background: rgba(53,240,255,.06);
+}
+.ipscan-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #35F0FF, #B6FF3D);
+    box-shadow: 0 0 14px rgba(53,240,255,.7);
+    transition: width .12s linear;
+}
+.ipscan-pct { font-size: 11px; letter-spacing: .2em; margin-top: 10px; color: #B6FF3D; }
+
+.ipscan-verdict {
+    margin-top: 20px; font-size: 16px; letter-spacing: .24em; min-height: 22px;
+}
+.ipscan-granted { color: #B6FF3D; text-shadow: 0 0 20px rgba(182,255,61,.8); animation: ipscan-pop .35s ease-out; }
+.ipscan-refused { color: #FF3D7F; text-shadow: 0 0 20px rgba(255,61,127,.8); animation: ipscan-pop .35s ease-out; }
+@keyframes ipscan-pop { from { transform: scale(.82); opacity: 0; } }
+
+.ipscan-flash { animation: ipscan-flash .45s ease-out; }
+@keyframes ipscan-flash {
+    0% { background-color: #050810; }
+    35% { background-color: #16301a; }
+    100% { background-color: #050810; }
+}
+.ipscan-reject { animation: ipscan-shake .4s ease-out; }
+@keyframes ipscan-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-9px); } 40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); } 80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ipscan-grid, .ipscan-sweep, .ipscan-dots::after, .ipscan-log p,
+    .ipscan-granted, .ipscan-refused, .ipscan-flash, .ipscan-reject { animation: none; }
+}
+
 .ipgate-arcade {
     position: relative;
     min-height: 100vh;
