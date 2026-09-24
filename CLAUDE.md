@@ -60,7 +60,13 @@ scan: the address revealed character by character, a live readout of what
 their own browser volunteers, a rough location from a public lookup, and a
 specimen plate that classifies them as *Homo staticus* and credits the
 curator. It ends on a card saying access was never in question, offering
-the arcade refusal screen as the other ending if they want to see it.
+the arcade refusal as the other ending if they want to see it.
+
+Both endings play the full sequence. The refusal is worth nothing without
+the build up in front of it, so asking for it replays the scan and lands
+on ACCESS DENIED rather than cutting straight to the arcade. The retry
+button on that screen replays it too, which is what makes spending the
+three lives feel like something.
 
 ### History, so nobody repeats it
 

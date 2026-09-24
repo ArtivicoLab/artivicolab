@@ -603,7 +603,7 @@
                 'a whole interaction, start to finish, out of flat files.</p>' +
                 '<div class="ipdemo-outro-actions">' +
                     '<button type="button" class="ipdemo-btn ipdemo-btn--primary" id="ipdemo-enter">Back to the site</button>' +
-                    '<button type="button" class="ipdemo-btn" id="ipdemo-refused">Show me the refusal</button>' +
+                    '<button type="button" class="ipdemo-btn" id="ipdemo-refused">Run it again, refuse me</button>' +
                 '</div>' +
                 '<p class="ipdemo-outro-note">The refusal screen is a demo too. It cannot keep you out.</p>' +
             '</div>';
@@ -614,7 +614,7 @@
         wrap.querySelector('#ipdemo-enter').addEventListener('click', closeOverlay);
         wrap.querySelector('#ipdemo-refused').addEventListener('click', function () {
             closeOverlay();
-            showBlockScreen(ip, true);
+            startDemo(MODE_REFUSED);
         });
         wrap.addEventListener('click', function (ev) { if (ev.target === wrap) closeOverlay(); });
     }
@@ -718,8 +718,7 @@
 
                     '<div class="ipgate-card">' +
                         '<p class="ipgate-card-title">PLAYER CARD</p>' +
-                        '<p><span>PLAYER ID</span><b id="ipgate-player-id">' +
-                            esc(ip || 'READING...') + '</b></p>' +
+                        '<p><span>PLAYER ID</span><b>' + esc(ip || 'UNKNOWN') + '</b></p>' +
                         '<p><span>LOADOUT</span><b>' + esc(browserInfo()) + '</b></p>' +
                         '<p><span>RANK</span><b>' + esc(rank) + '</b></p>' +
                         '<p><span>SCORE</span><b>000000</b></p>' +
@@ -897,15 +896,9 @@
         startedAt = Date.now();
         lives = START_LIVES;
 
-        if (mode === MODE_REFUSED) {
-            // Skip the theatre, this is the ending they asked to see.
-            showBlockScreen(null, true);
-            lookupIp(function (ip) {
-                var id = document.getElementById('ipgate-player-id');
-                if (id) id.textContent = ip || 'UNKNOWN';
-            });
-            return;
-        }
+        // Both endings play the full sequence. The refusal is worth nothing
+        // without the build up in front of it.
+        var ending = (mode === MODE_REFUSED) ? deny : grant;
 
         buildLoader();
         lockScroll(true);
@@ -915,11 +908,11 @@
 
         lookupIp(function (ip) {
             revealIp(ip);
-            settle(grant, ip);            // the welcome ending is the only automatic one
+            settle(ending, ip);
         });
 
         // If the lookup hangs, the demo still finishes rather than sitting there.
-        setTimeout(function () { settle(grant, null); }, MIN_SCAN_MS + 5000);
+        setTimeout(function () { settle(ending, null); }, MIN_SCAN_MS + 5000);
     }
 
     function lookupIp(fn) {
