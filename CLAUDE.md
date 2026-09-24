@@ -48,140 +48,78 @@ which does advance. The departure was confirmed that way: it covers 102,
 167, 269 and 414 pixels in successive three second intervals, which is the
 acceleration curve, not a constant glide.
 
-## ⚠️ Temporary: client-side IP gate, remove by 2026-09-20
+## Visitor Scan, the demo in the footer
 
-Added 2026-09-18 at the user's request, to visually hide the site from
-everyone except two specific IP addresses.
+`assets/js/ip-gate.js`, wired into every page inside `<!-- IP-GATE:START -->`
+and `<!-- IP-GATE:END -->` markers, with its styles in the matching block in
+`styles.css`.
 
-**This is not real access control, and nothing in it ever became real
-access control.** The site is static, hosted on GitHub Pages, with no
-server or edge layer able to check a visitor before serving files. The
-gate only hides content in browsers that run `assets/js/ip-gate.js`.
-Anything that does not execute JavaScript still gets the real page: curl,
-bots, search engines, a reader with JS disabled, or plain view-source.
+**Nothing on this site is gated, and this file gates nothing.** It is a
+showpiece. A visitor presses VISITOR SCAN in the footer and gets a staged
+scan: the address revealed character by character, a live readout of what
+their own browser volunteers, a rough location from a public lookup, and a
+specimen plate that classifies them as *Homo staticus* and credits the
+curator. It ends on a card saying access was never in question, offering
+the arcade refusal screen as the other ending if they want to see it.
 
-Two specific bypasses are worth knowing, because both are one line of
-work for a visitor:
+### History, so nobody repeats it
 
-- The verdict cache is trusted exactly as found. Setting
-  `artivicolab_ipgate_v1` to `{"allowed":true,"at":<now>}` in the console
-  grants entry with no VPN and no scan.
-- The magic word on the block screen is `please`, sitting in the source
-  where anyone can read it.
+This started on 2026-09-18 as a genuine attempt to show the site only to
+two IP addresses. It never worked as access control and never could: a
+static host serves the file before anything can check who is asking, so
+the markup was always one view-source away. Worse, it was left switched on
+past its removal date, and for several days every real visitor to
+artivicolab.com met GAME OVER instead of the homepage. On 2026-09-24 it
+was turned into what it was always good at, which is a demo.
 
-Do not describe this gate to anyone as protection. It is a stage set.
+If you ever want real access control, see the last section. Do not revive
+the allowlist.
 
-### Where it lives
+### Rules that keep it safe
 
-Everything the gate adds is in one of exactly two places. This is what
-makes removal safe, so keep any future gate work inside these lines.
+- **It never runs on its own.** No auto-start, no cover over the page, no
+  delay before the site is readable. The only triggers are the footer
+  button and `?scan=1`, or `?scan=refused` for the arcade ending.
+- **Every screen is an overlay over an untouched page, and every screen
+  has an exit.** The refusal screen carries a plain EXIT DEMO button, and
+  Escape closes anything this file opens. An earlier version replaced
+  `document.body.innerHTML`, which is fine for a gate that never intends
+  to let you back in and useless for a demo. Do not go back to that.
+- **Nothing is written to storage.** The lives and the guest pass live in
+  memory for one run. There is no verdict worth remembering when there is
+  no verdict.
+- **Nothing is recorded or sent.** The device readout is read live in the
+  tab. Two public lookups happen, `api64.ipify.org` for the address and
+  `ipwho.is` for the rough location, and both are display only.
 
-- `assets/js/ip-gate.js`, the whole thing: allowlist, address lookup,
-  scan sequence, block screen, arcade loop, guest pass. The removal
-  script deletes this file outright.
-- Marker blocks, stripped by the removal script:
-  - every `*.html` page, two lines wrapped in `<!-- IP-GATE:START -->`
-    and `<!-- IP-GATE:END -->`, just after the charset meta tag.
-  - `assets/css/styles.css`, one block wrapped in `/* IP-GATE:START */`
-    and `/* IP-GATE:END */`, holding the pre-paint cover, the scan
-    overlay, the dossier, the specimen plate, the block screen, the
-    magic word prompt and the guest pass badge.
+### The arcade ending
 
-The rescan button in the footer is injected at runtime next to
-`#beatsBtn`, so it leaves with the script. No page markup references it.
-
-### What the visitor sees
-
-The scan runs for 30 seconds as three timed steps, one on screen at a
-time, with a large radar watermark behind all of them. Step one acquires
-the address, step two sweeps the device, step three classifies the
-visitor as *Homo staticus* on a specimen plate credited to Gradi Kayamba
-as curator. A fixed header carries the step name and countdown, a fixed
-footer carries the status line, progress bar and note.
-
-The device readout is all values the browser volunteers. None of it is
-stored or transmitted by the site, and the fine print on step three says
-so.
-
-### Outbound requests
-
-Two third party calls, both from the visitor's browser:
-
-- `api64.ipify.org`, returns the address. The allow or deny decision
-  rests on this alone.
-- `ipwho.is`, returns city, region, country, provider and coordinates for
-  the readout only. Display only by design, so a slow or failed lookup
-  leaves those rows unresolved and changes no decision.
-
-### The arcade loop on the block screen
-
-A denied visitor gets three lives, drawn as hearts on the player card.
-Each fresh denial spends one. Loads served from the one hour verdict
-cache do not spend one, or ordinary browsing would drain them.
-
-With the lives gone the screen becomes a continue prompt. Nobody can guess
-a word they were never shown, so the letters go up scrambled on tiles and
-the visitor unscrambles them. The scramble is reshuffled per load and
-never shows the answer in order. A correct answer, case and surrounding
-punctuation forgiven, writes a five minute guest pass, resets the lives to
-three and reloads into the real site. A countdown badge sits top right and turns red under
-the final minute. On expiry it clears the pass and reloads, which puts
-the visitor back on the block screen to start the grind again.
+Three lives, spent one per refusal. With them gone the screen asks for a
+magic word, shown as scrambled letter tiles because nobody can guess a word
+they were never given. The word is `please`. Getting it right grants a five
+minute guest pass with a countdown badge, which expires quietly. It is a
+continue screen, not a login.
 
 ### Mobile constraints, learned the hard way
 
-Two things that are easy to break again:
+- The word input must never drop below 16px. Safari on iOS zooms the page
+  in on a focused smaller input and does not zoom back out.
+- The refusal screen is tall. Two height based tiers trim decoration under
+  760px and under 620px, and the continue screen drops the trophy case on
+  phones.
+- The guest pass badge is positioned by script, not fixed offsets. It
+  measures the header and drops below it rather than covering the menu
+  button, which it did at phone width before.
 
-- The word input must never be set below 16px. Safari on iOS zooms the
-  page in when a focused input is smaller, and it does not zoom back out
-  afterwards, which strands the visitor zoomed in on a granted page.
-- The guest pass badge is positioned by script, not by fixed CSS offsets.
-  It measures the header and drops below it whenever it would cover the
-  hamburger, the nav links or the logo. A fixed top right corner covered
-  the menu button outright on phones. Keep the measuring, or the menu
-  becomes unreachable for anyone holding a pass.
-- The block screen has to fit without scrolling, and the arcade cabinet is
-  too tall for short phones. Two height based media queries trim it: under
-  760px tall the user agent string and the insert coin line go, and under
-  620px tall the fake firewall bar goes too. The continue screen drops the
-  trophy case entirely on phones so the prompt, the tiles and the keyboard
-  share one screen. Measured as fitting at 390x844, 360x640 and 320x568,
-  in both the denial and the continue states.
-
-### localStorage keys
-
-- `artivicolab_ipgate_v1`, the cached allow or deny verdict, one hour.
-- `artivicolab_ipgate_lives_v1`, lives remaining.
-- `artivicolab_ipgate_pass_v1`, guest pass expiry.
-
-Removing the gate leaves these behind in visitors' browsers, where
-nothing reads them and they cost a few bytes. Harmless, not worth a
-migration.
-
-### To remove it
+### Removing it
 
 ```sh
 sh scripts/remove-ip-gate.sh
 ```
 
-This strips the marked blocks from every HTML page and from styles.css,
-and deletes `assets/js/ip-gate.js`. Review with `git diff` before
-committing.
-
-Removing the gate removes all of it at once. The scan, the dossier, the
-specimen plate, the denied screen, the lives, the magic word and the
-guest pass are one feature with one off switch, not separate pieces to
-unpick.
-
-Verified on 2026-09-19 against a throwaway copy of the repo. After
-running the script, no reference to the gate, the scan, the block screen
-or the arcade loop survives in any page, in styles.css, or anywhere else,
-and the site renders normally with the entry notice and canvas design
-untouched.
-
-**If nobody has removed it by 2026-09-20**, whoever picks this up next
-should run the script above, commit, and push. The gate was only ever
-meant to be temporary.
+Strips the marked blocks from every page and from `styles.css` and deletes
+the script. It is one feature with one off switch. Everything it adds lives
+either inside the markers or inside that file, so keep any new work there.
 
 ### If real access control is wanted later
 

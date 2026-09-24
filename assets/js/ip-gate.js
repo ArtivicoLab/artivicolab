@@ -1,35 +1,32 @@
 /**
- * Client-side IP gate, arcade edition, with a sci-fi verification sequence.
+ * ArtivicoLab, Visitor Scan.
  *
- * NOT real access control: this only hides page content in browsers that
- * execute this script. The underlying HTML/CSS/JS is still publicly
- * fetchable by anything that doesn't run JavaScript, curl, bots, search
- * engines, view-source. Real enforcement requires a server or edge layer
- * (e.g. Cloudflare) in front of the site, which this host does not have.
+ * A demo, not a gate. Nothing on this site is ever blocked by this file.
+ * It is here so a visitor can see the kind of interaction the lab builds:
+ * a live device readout, a staged scan sequence, and an arcade refusal
+ * screen with its own continue loop, all running in the browser with no
+ * server behind it.
  *
- * Fails closed: if the visitor's IP can't be verified (lookup blocked,
- * offline, timed out), the page is blocked rather than shown.
+ * It never runs on its own. The visitor launches it from the footer
+ * button, or with ?scan=1 in the URL, and every screen it opens has a way
+ * out that restores the page untouched.
+ *
+ * Earlier this file was a real attempt at an IP allowlist. It was never
+ * access control, because a static host cannot check anything before it
+ * serves the file, and it is not pretending to be one now.
  */
 (function () {
     'use strict';
 
-    // Edit this list to change who gets in. Everyone not listed here gets
-    // the block screen.
-    //
-    // Both entries below are the owner's home connection as of 2026-09-18,
-    // IPv4 and IPv6. Note the IPv6 address can rotate on its own with many
-    // ISPs, which would lock the owner out with no warning. If that happens,
-    // get the current address from https://api64.ipify.org and update it
-    // here, or run scripts/remove-ip-gate.sh to strip the gate entirely.
-    var ALLOWED_IPS = [
-        '76.122.79.245',
-        '2601:c4:c002:c10:789d:7f1d:7852:5873'
-    ];
+    // Which ending the demo plays. Nothing about the visitor decides
+    // this, they pick it themselves.
+    var MODE_WELCOME = 'welcome';
+    var MODE_REFUSED = 'refused';
 
     // How long the scan runs before showing a verdict, even if the IP lookup
     // came back sooner. The result is cached (see below) so this only plays
     // once an hour, not on every page load.
-    var MIN_SCAN_MS = 30000;
+    var MIN_SCAN_MS = 22000;
 
     // Arcade loop for blocked visitors. Three denials burn the three lives,
     // and the fourth screen asks for the magic word instead. Getting it right
@@ -48,12 +45,6 @@
         'YOU ARE OVERTHINKING A DOOR.'
     ];
 
-    // Verdict cache. Once a scan completes, the result is stored and reused
-    // for an hour, so normal browsing doesn't re-run the 10 second sequence.
-    // Note: if the visitor's network changes inside that hour, they keep the
-    // cached verdict until it expires.
-    var CACHE_KEY = 'artivicolab_ipgate_v1';
-    var CACHE_TTL_MS = 60 * 60 * 1000;
 
     var RANKS = [
         'Trespasser',
@@ -201,64 +192,36 @@
         document.head.appendChild(link);
     }
 
-    /* ─── Verdict cache ──────────────────────────────────── */
+    /* ─── Demo state ─────────────────────────────────────── */
 
-    function readLives() {
-        try {
-            var v = parseInt(localStorage.getItem(LIVES_KEY), 10);
-            return isNaN(v) ? START_LIVES : Math.max(0, v);
-        } catch (e) { return START_LIVES; }
-    }
-    function writeLives(n) {
-        try { localStorage.setItem(LIVES_KEY, String(Math.max(0, n))); } catch (e) { /* ignore */ }
-    }
+    // All of this lives in memory for the length of one demo run. Nothing
+    // is written to storage, because nothing here has to survive a reload:
+    // the site is never gated, so there is no verdict worth remembering.
 
-    function readPass() {
-        try {
-            var raw = localStorage.getItem(PASS_KEY);
-            if (!raw) return null;
-            var pass = JSON.parse(raw);
-            if (!pass || typeof pass.until !== 'number') return null;
-            if (Date.now() >= pass.until) { localStorage.removeItem(PASS_KEY); return null; }
-            return pass;
-        } catch (e) { return null; }
-    }
+    var lives = START_LIVES;
+    var passUntil = 0;
+    var passBadge = null;
+
+    function readLives() { return lives; }
+    function writeLives(n) { lives = Math.max(0, n); }
+
     function grantPass() {
-        try {
-            localStorage.setItem(PASS_KEY, JSON.stringify({ until: Date.now() + PASS_MS }));
-        } catch (e) { /* ignore */ }
-        writeLives(START_LIVES);   // the loop resets, so it has to be earned again
-        location.reload();
+        passUntil = Date.now() + PASS_MS;
+        writeLives(START_LIVES);       // the loop resets, so it is earned again
+        closeOverlay();                // out of the arcade, back to the site
+        showPassTimer(passUntil);
     }
+
     function endPass() {
-        try { localStorage.removeItem(PASS_KEY); } catch (e) { /* ignore */ }
-        location.reload();
-    }
-
-    function readCache() {
-        try {
-            var raw = localStorage.getItem(CACHE_KEY);
-            if (!raw) return null;
-            var c = JSON.parse(raw);
-            if (!c || typeof c.at !== 'number') return null;
-            if (Date.now() - c.at > CACHE_TTL_MS) {
-                localStorage.removeItem(CACHE_KEY);
-                return null;
-            }
-            return c;
-        } catch (e) {
-            return null;
+        passUntil = 0;
+        if (passBadge && passBadge.parentNode) {
+            passBadge.classList.add('is-out');
+            var el = passBadge;
+            passBadge = null;
+            setTimeout(function () {
+                if (el.parentNode) el.parentNode.removeChild(el);
+            }, 700);
         }
-    }
-
-    function writeCache(allowed, ip) {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify({
-                allowed: !!allowed,
-                ip: ip || null,
-                at: Date.now()
-            }));
-        } catch (e) { /* private mode, fine */ }
     }
 
     /* ─── Scan sequence ──────────────────────────────────── */
@@ -266,8 +229,8 @@
     // The scan runs as three short steps instead of one tall wall of
     // readouts. Only one step is on screen at a time, which is what keeps
     // the whole thing inside a phone without scrolling.
-    var STEP_2_AT = 9000;
-    var STEP_3_AT = 22000;
+    var STEP_2_AT = 6600;
+    var STEP_3_AT = 16000;
 
     var STEP_NAMES = [
         'STEP 1 OF 3 &middot; ACQUIRING SIGNAL',
@@ -569,12 +532,11 @@
         setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 420);
     }
 
-    /* ─── Rescan button ──────────────────────────────────── */
+    /* ─── Launch button ──────────────────────────────────── */
 
-    // Sits next to the footer play button. Clears the cached verdict so the
-    // scan runs again on reload, which is the only way to re-trigger it
-    // before the one hour expiry.
-    function injectResetButton() {
+    // The only way in. Sits next to the footer play button and says plainly
+    // what it is, so nobody clicks it expecting a security check.
+    function injectLaunchButton() {
         function place() {
             if (document.getElementById('ipgate-reset')) return;
             var beats = document.getElementById('beatsBtn');
@@ -585,12 +547,9 @@
             btn.id = 'ipgate-reset';
             btn.type = 'button';
             btn.className = 'ipgate-reset';
-            btn.title = 'Clear the saved verification and run the IP scan again';
-            btn.innerHTML = '<span aria-hidden="true">&#8635;</span> RESCAN IP';
-            btn.addEventListener('click', function () {
-                try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
-                location.reload();
-            });
+            btn.title = 'Run the visitor scan demo. Nothing on this site is gated.';
+            btn.innerHTML = '<span aria-hidden="true">&#9673;</span> VISITOR SCAN';
+            btn.addEventListener('click', function () { startDemo(MODE_WELCOME); });
 
             if (beats && beats.parentNode) {
                 beats.parentNode.insertBefore(btn, beats.nextSibling);
@@ -623,12 +582,41 @@
 
         setTimeout(function () {
             removeLoader();
-            html.classList.remove('ip-pending');
-            // Cached only once the sequence has actually finished. Anyone who
-            // leaves mid-scan gets a fresh check next time.
-            writeCache(true, ip);
-            injectResetButton();
+            showOutro(ip);
         }, 620);
+    }
+
+    // What the visitor sees when the welcome ending finishes: a plain
+    // statement of what just happened, and the choice to see the other
+    // ending rather than being handed it.
+    function showOutro(ip) {
+        var wrap = document.createElement('div');
+        wrap.className = 'ipdemo-outro';
+        wrap.innerHTML =
+            '<div class="ipdemo-outro-card">' +
+                '<p class="ipdemo-outro-kicker">SCAN COMPLETE</p>' +
+                '<h2 class="ipdemo-outro-title">Access granted.<br>It always was.</h2>' +
+                '<p class="ipdemo-outro-body">Nothing on this site is gated. That sequence read ' +
+                'your browser out loud, looked up roughly where your connection sits, and ' +
+                'ran entirely in this tab. No server, no account, no record kept.</p>' +
+                '<p class="ipdemo-outro-body">This is the sort of thing the lab builds: ' +
+                'a whole interaction, start to finish, out of flat files.</p>' +
+                '<div class="ipdemo-outro-actions">' +
+                    '<button type="button" class="ipdemo-btn ipdemo-btn--primary" id="ipdemo-enter">Back to the site</button>' +
+                    '<button type="button" class="ipdemo-btn" id="ipdemo-refused">Show me the refusal</button>' +
+                '</div>' +
+                '<p class="ipdemo-outro-note">The refusal screen is a demo too. It cannot keep you out.</p>' +
+            '</div>';
+        document.body.appendChild(wrap);
+        lockScroll(true);
+        overlay = wrap;
+
+        wrap.querySelector('#ipdemo-enter').addEventListener('click', closeOverlay);
+        wrap.querySelector('#ipdemo-refused').addEventListener('click', function () {
+            closeOverlay();
+            showBlockScreen(ip, true);
+        });
+        wrap.addEventListener('click', function (ev) { if (ev.target === wrap) closeOverlay(); });
     }
 
     function deny(ip) {
@@ -642,10 +630,6 @@
         setTimeout(function () {
             removeLoader();
             showBlockScreen(ip, true);
-            html.classList.remove('ip-pending');
-            // Cached only once the sequence has actually finished. Anyone who
-            // leaves mid-scan gets a fresh check next time.
-            writeCache(false, ip);
         }, 700);
     }
 
@@ -665,13 +649,43 @@
         return out;
     }
 
+    /* ─── Overlays ───────────────────────────────────────── */
+
+    // Every demo screen is an overlay on top of the untouched page. The old
+    // version replaced document.body.innerHTML, which is fine for a gate
+    // that never intends to let you back, and useless for a demo.
+
+    var overlay = null;
+
+    function lockScroll(on) {
+        html.classList.toggle('ipdemo-locked', !!on);
+    }
+
+    function closeOverlay() {
+        if (!overlay) return;
+        var el = overlay;
+        overlay = null;
+        el.classList.add('is-leaving');
+        lockScroll(false);
+        setTimeout(function () {
+            if (el.parentNode) el.parentNode.removeChild(el);
+        }, 320);
+    }
+
+    // Escape always works, on every screen this file opens.
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape') {
+            if (overlay) closeOverlay();
+            else if (loader) { done = true; removeLoader(); lockScroll(false); }
+        }
+    });
+
     function showBlockScreen(ip, spendLife) {
         loadPixelFont();
 
         // Neutralise the site's own body padding/background and stop the page
         // behind the block screen from scrolling. Without this, mobile shows a
         // strip of the real site below the overlay and the page scrolls.
-        html.classList.add('ipgate-locked');
 
         var lives = readLives();
         if (spendLife && lives > 0) {
@@ -684,7 +698,9 @@
         var d = new Date();
         var time = pad(d.getHours(), 2) + ':' + pad(d.getMinutes(), 2) + ':' + pad(d.getSeconds(), 2);
 
-        document.body.innerHTML =
+        var host = document.createElement('div');
+        host.className = 'ipdemo-overlay';
+        host.innerHTML =
             '<div class="ipgate-arcade' + (outOfLives ? ' is-word' : '') + '">' +
                 '<div class="ipgate-scan" aria-hidden="true"></div>' +
                 '<div class="ipgate-inner">' +
@@ -702,7 +718,8 @@
 
                     '<div class="ipgate-card">' +
                         '<p class="ipgate-card-title">PLAYER CARD</p>' +
-                        '<p><span>PLAYER ID</span><b>' + esc(ip || 'UNKNOWN') + '</b></p>' +
+                        '<p><span>PLAYER ID</span><b id="ipgate-player-id">' +
+                            esc(ip || 'READING...') + '</b></p>' +
                         '<p><span>LOADOUT</span><b>' + esc(browserInfo()) + '</b></p>' +
                         '<p><span>RANK</span><b>' + esc(rank) + '</b></p>' +
                         '<p><span>SCORE</span><b>000000</b></p>' +
@@ -739,15 +756,23 @@
                     '<p class="ipgate-curator">ARTIVICOLAB &middot; ATLANTA<br>' +
                     'GAME BY <b>GRADI KAYAMBA</b></p>' +
                     '<p class="ipgate-ua">' + esc(navigator.userAgent) + '</p>' +
+                    '<button type="button" class="ipgate-exit" id="ipgate-exit">' +
+                        'EXIT DEMO &middot; NOTHING IS ACTUALLY BLOCKED</button>' +
 
                 '</div>' +
             '</div>';
+        document.body.appendChild(host);
+        lockScroll(true);
+        overlay = host;
+
+        var exit = document.getElementById('ipgate-exit');
+        if (exit) exit.addEventListener('click', closeOverlay);
 
         var retry = document.getElementById('ipgate-retry');
         if (retry) {
             retry.addEventListener('click', function () {
-                try { localStorage.removeItem(CACHE_KEY); } catch (e) { /* ignore */ }
-                location.reload();
+                closeOverlay();
+                startDemo(MODE_REFUSED);
             });
         }
 
@@ -827,6 +852,7 @@
         badge.innerHTML = '<span class="ipgate-pass-label">GUEST PASS</span>' +
                           '<span class="ipgate-pass-clock" id="ipgate-pass-clock">5:00</span>';
         document.body.appendChild(badge);
+        passBadge = badge;
 
         placePassBadge(badge);
         window.addEventListener('resize', function () { placePassBadge(badge); });
@@ -837,8 +863,7 @@
             if (left <= 0) {
                 clearInterval(tick);
                 clock.textContent = '0:00';
-                badge.classList.add('is-out');
-                setTimeout(endPass, 700);
+                endPass();
                 return;
             }
             var total = Math.ceil(left / 1000);
@@ -863,68 +888,74 @@
         } else { fn(); }
     }
 
-    var pass = readPass();
-    if (pass) {
-        // Earned by saying the magic word. Runs out on its own.
-        done = true;
-        html.classList.remove('ip-pending');
-        onReady(function () { showPassTimer(pass.until); });
-        return;
-    }
+    // Runs only when asked. `mode` decides the ending, and the visitor
+    // chooses it: the footer button plays the welcome, the outro offers the
+    // refusal, and ?scan=refused links straight to it.
+    function startDemo(mode) {
+        if (loader || overlay) return;        // one screen at a time
+        done = false;
+        startedAt = Date.now();
+        lives = START_LIVES;
 
-    var cached = readCache();
-    if (cached) {
-        // Verdict from the last hour: apply it instantly, no scan.
-        done = true;
-        if (cached.allowed) {
-            html.classList.remove('ip-pending');
-            injectResetButton();
-        } else if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () {
-                showBlockScreen(cached.ip, false);
-                html.classList.remove('ip-pending');
+        if (mode === MODE_REFUSED) {
+            // Skip the theatre, this is the ending they asked to see.
+            showBlockScreen(null, true);
+            lookupIp(function (ip) {
+                var id = document.getElementById('ipgate-player-id');
+                if (id) id.textContent = ip || 'UNKNOWN';
             });
-        } else {
-            showBlockScreen(cached.ip, false);
-            html.classList.remove('ip-pending');
+            return;
         }
-        return;
+
+        buildLoader();
+        lockScroll(true);
+        classifySpecimen();
+        startDossier();
+        lookupGeo();
+
+        lookupIp(function (ip) {
+            revealIp(ip);
+            settle(grant, ip);            // the welcome ending is the only automatic one
+        });
+
+        // If the lookup hangs, the demo still finishes rather than sitting there.
+        setTimeout(function () { settle(grant, null); }, MIN_SCAN_MS + 5000);
     }
 
-    buildLoader();
-    classifySpecimen();
-    startDossier();
+    function lookupIp(fn) {
+        fetch('https://api64.ipify.org?format=json')
+            .then(function (r) { return r.json(); })
+            .then(function (data) { fn(data && data.ip); })
+            .catch(function () { fn(null); });
+    }
 
-    // Geo lookup purely for the readout. The allow/deny decision never
-    // depends on it, so a failure here just leaves those rows unresolved.
-    fetch('https://ipwho.is/')
-        .then(function (r) { return r.json(); })
-        .then(function (g) {
-            if (!g || g.success === false) return;
-            geo.city    = g.city || 'unknown';
-            geo.region  = g.region || 'unknown';
-            geo.country = g.country || 'unknown';   // no emoji: the per-char reveal splits surrogate pairs
-            geo.isp     = (g.connection && (g.connection.isp || g.connection.org)) || 'unknown';
-            geo.coords  = (g.latitude != null && g.longitude != null)
-                ? Number(g.latitude).toFixed(3) + ', ' + Number(g.longitude).toFixed(3)
-                : 'unknown';
-            applyGeo();
-        })
-        .catch(function () { /* readout only, ignore */ });
+    // Readout only. Nothing here decides anything, so a failure just leaves
+    // those rows unresolved.
+    function lookupGeo() {
+        fetch('https://ipwho.is/')
+            .then(function (r) { return r.json(); })
+            .then(function (g) {
+                if (!g || g.success === false) return;
+                geo.city    = g.city || 'unknown';
+                geo.region  = g.region || 'unknown';
+                geo.country = g.country || 'unknown';
+                geo.isp     = (g.connection && (g.connection.isp || g.connection.org)) || 'unknown';
+                geo.coords  = (g.latitude != null && g.longitude != null)
+                    ? Number(g.latitude).toFixed(3) + ', ' + Number(g.longitude).toFixed(3)
+                    : 'unknown';
+                applyGeo();
+            })
+            .catch(function () { /* readout only, ignore */ });
+    }
 
-    fetch('https://api64.ipify.org?format=json')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            var ip = data && data.ip;
-            revealIp(ip);
-            if (ip && ALLOWED_IPS.indexOf(ip) !== -1) {
-                settle(grant, ip);
-            } else {
-                settle(deny, ip);
-            }
-        })
-        .catch(function () { revealIp(null); settle(deny, null); });
+    // The page is never covered and never gated. All this does on load is
+    // offer the button.
+    html.classList.remove('ip-pending');
+    injectLaunchButton();
 
-    // Never leave the page hidden forever if the lookup hangs.
-    setTimeout(function () { settle(deny, null); }, MIN_SCAN_MS + 5000);
+    onReady(function () {
+        var want = (new URLSearchParams(location.search)).get('scan');
+        if (want === 'refused') startDemo(MODE_REFUSED);
+        else if (want) startDemo(MODE_WELCOME);
+    });
 })();

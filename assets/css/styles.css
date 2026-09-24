@@ -1271,13 +1271,7 @@ html.gate-pending::before {
 /* ─── Client-side IP gate, arcade block screen ───────────── */
 /* Pre-paint cover, set inline before first render, removed by ip-gate.js
    once the visitor's IP has been checked. Sits above everything else. */
-html.ip-pending::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    background-color: #0B0B16;
-}
+
 
 /* ─── Verification scan overlay ──────────────────────────── */
 .ipscan {
@@ -1797,15 +1791,126 @@ html.ip-pending::before {
     .ipscan-ip-char, .ipscan-row, .ipscan-row-char { animation: none; }
 }
 
-/* The site's own body keeps its padding and cream background otherwise,
-   which leaves a scrollable strip under the block screen on phones. */
-html.ipgate-locked,
-html.ipgate-locked body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    background: #0B0B16;
+/* While a demo screen is open the page behind it must not scroll, but it
+   keeps its own layout and colour, because the visitor is going back to it. */
+html.ipdemo-locked,
+html.ipdemo-locked body { overflow: hidden; }
+
+.ipdemo-overlay,
+.ipdemo-outro {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    animation: ipdemo-in .32s ease-out;
+}
+.ipdemo-overlay.is-leaving,
+.ipdemo-outro.is-leaving { opacity: 0; transition: opacity .3s ease; }
+
+@keyframes ipdemo-in { from { opacity: 0; } }
+
+/* Way out of the refusal screen. Deliberately plain and unmissable. */
+.ipgate-exit {
+    display: block;
+    margin: 26px auto 0;
+    padding: 13px 18px;
+    max-width: 100%;
+    border: 2px solid rgba(234,242,255,.5);
+    background: transparent;
+    color: rgba(234,242,255,.85);
+    font-family: inherit;
+    font-size: 8px;
+    line-height: 1.8;
+    letter-spacing: .16em;
+    cursor: pointer;
+}
+.ipgate-exit:hover,
+.ipgate-exit:focus-visible {
+    border-color: #B6FF3D;
+    color: #B6FF3D;
+    outline: none;
+}
+
+/* The closing card, written on paper rather than in the arcade, because
+   this is the lab talking, not the game. */
+.ipdemo-outro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(11, 11, 22, .82);
+    overflow-y: auto;
+}
+
+.ipdemo-outro-card {
+    width: 100%;
+    max-width: 520px;
+    padding: 34px 34px 28px;
+    background: var(--paper-card);
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+    box-shadow: 0 30px 70px rgba(0,0,0,.45);
+}
+
+.ipdemo-outro-kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .3em;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+}
+
+.ipdemo-outro-title {
+    font-family: var(--font-display);
+    font-size: 38px;
+    line-height: 1.08;
+    margin-bottom: 18px;
+}
+
+.ipdemo-outro-body {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+}
+
+.ipdemo-outro-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 22px 0 14px;
+}
+
+.ipdemo-btn {
+    flex: 1 1 auto;
+    padding: 13px 18px;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: .06em;
+    cursor: pointer;
+    transition: background-color .2s var(--ease), color .2s var(--ease);
+}
+.ipdemo-btn:hover,
+.ipdemo-btn:focus-visible { background: var(--ink); color: var(--paper-card); outline: none; }
+
+.ipdemo-btn--primary { background: var(--accent); border-color: var(--accent); color: #FFF; }
+.ipdemo-btn--primary:hover,
+.ipdemo-btn--primary:focus-visible { background: var(--accent-deep); border-color: var(--accent-deep); color: #FFF; }
+
+.ipdemo-outro-note {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-faint);
+}
+
+@media (max-width: 600px) {
+    .ipdemo-outro-card { padding: 24px 20px 20px; }
+    .ipdemo-outro-title { font-size: 28px; }
+    .ipdemo-outro-body { font-size: 14px; }
+    .ipdemo-outro-actions { flex-direction: column; }
 }
 
 .ipgate-arcade {
