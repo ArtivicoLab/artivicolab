@@ -1095,7 +1095,6 @@ body.frame-full-open .footer { display: none; }
 }
 
 .footer .sep { margin: 0 6px; color: var(--ink-faint); }
-.site-stamp { color: var(--ink-faint); white-space: nowrap; }
 
 /* Footer watermark wave */
 .footer { position: fixed; overflow: hidden; }
@@ -2271,7 +2270,6 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
     color: var(--ink-faint);
 }
 
-.gate-stamp { margin-top: 4px; color: var(--accent); }
 .gate-link { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; pointer-events: auto; }
 
 .gate-btn { display: inline-flex; align-items: center; gap: 10px; }

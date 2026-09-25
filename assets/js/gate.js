@@ -46,7 +46,6 @@
                     '<span class="gate-hint">click here</span>' +
                 '</div>' +
                 '<p class="gate-fine">Shown once. Clicking means you read it. This site uses Google Analytics for visit counts, see <a href="privacy.html?peek=1" class="gate-link" target="_blank" rel="noopener">Privacy</a>.</p>' +
-                '<p class="gate-fine gate-stamp">Site updated &middot; September 24, 2026 · 12:56 PM MDT</p>' +
             '</div>';
         return overlay;
     }
