@@ -85,8 +85,9 @@ logDrum, brass, flute, pluck, voice, pad, riser) at beat offsets inside bar `b`:
   rest at each full stop, bar count derived from the text. Change the
   text and the loop reshapes itself. 17 bars.
 - **Rally II**, 94 BPM, the same chant sequence, big and clean: one
-  gliding 808, one brass hit per pong, the Anthem whistle and nothing
-  else per ping, wall snare, hats, fanfare into the loop. Two passes, 34
+  gliding 808, one brass hit per pong, the same brass an octave up per
+  ping (a whistle there was "annoying as hell" on speakers), wall snare,
+  hats, fanfare into the loop. Two passes, 34
   bars, `gain: 1.3`, no bed. Two earlier versions were cut down by Gradi:
   the first stacked djembe, dundun, choir, shakers and bells ("too busy
   for a car"); the second kept a whistle melody with vibrato over the

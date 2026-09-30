@@ -1150,7 +1150,7 @@
         {
             id: 'rally2', name: 'Rally II', bpm: 94, bars: RALLY_BARS * 2, swing: 0.04, bed: null, gain: 1.3,
             style: 'Rap, big and clean',
-            blurb: 'The chant again, built to play loud in a car: a few big things and nothing in between. One 808 that glides under the pongs, a brass hit on each pong, the Anthem whistle on each ping, a snare like a wall, and hats. No melody over it, no effects. Just the beat and the chant, twice through.',
+            blurb: 'The chant again, built to play loud in a car: a few big things and nothing in between. One 808 that glides under the pongs, a low horn on each pong and the same horn an octave up on each ping, a snare like a wall, and hats. No melody over it, no effects. Just the beat and the chant, twice through.',
             bar: function (bar) {
                 var cb = bar % RALLY_BARS;
                 var ch = RALLY_CHORDS[Math.floor(cb / 4) % 4];
@@ -1167,8 +1167,9 @@
                         pongs.push(off);
                         brass(ch.low, off, 0.42, 0.22, 2400);
                     } else {
-                        // Same whistle as Anthem's bing: around 1.7 kHz, held just over the eighth
-                        flute(ch.ping * 1.5, off, 0.55, 0.2);
+                        // Ping is the same horn an octave up, short and bright. A whistle
+                        // here was too piercing on speakers.
+                        brass(ch.low.map(function (f) { return f * 2; }), off, 0.3, 0.16, 3400);
                     }
                 }
                 // One 808: root on the one and the and-of-two, a glide into the third pong
