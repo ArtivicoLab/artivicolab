@@ -48,6 +48,110 @@ which does advance. The departure was confirmed that way: it covers 102,
 167, 269 and 414 pixels in successive three second intervals, which is the
 acceleration curve, not a constant glide.
 
+## Sounds, the footer beat and sounds.html
+
+`assets/js/beats.js` is the whole thing: a Web Audio synth with no samples,
+no libraries and nothing fetched. The footer play button on every page and
+the list on `sounds.html` both drive it. Styles are under the `Sounds page`
+banner in `styles.css`.
+
+Ten loops live in the `TRACKS` table, each a `bar(b)` function that calls
+the shared instruments (kick, snare, clap, hat, shaker, rim, tone, sawBass,
+logDrum, brass, flute, pluck, voice, pad, riser) at beat offsets inside bar `b`:
+
+- **Crackle**, 84 BPM, lo-fi boom-bap with the vinyl crackle bed. This is
+  the original footer beat, unchanged.
+- **Stride**, 126 BPM, deep house. Four on the floor, claps, offbeat bass,
+  sidechain-style pumping pad.
+- **Sprint**, 148 BPM, log drum afro-tech. Broken kick, sixteenth shakers,
+  clave, amapiano log drum bass.
+- **Parade**, 132 BPM, major key brass fanfare with a flute lead. The
+  intro is a solo trumpet call over a snare roll, then stabs on every chord.
+- **Rumba**, 138 BPM, Congolese sebene. Two plucked guitars in sixteenths
+  (mi-solo arpeggio plus a lead riff), cowbell, skipping sine bass, a crowd
+  shout on the turnaround, a two-bar kick drop at bar 8.
+- **Bounce**, 104 BPM, Afrobeats. Log drum hook, swung shakers, late claps,
+  whistle line, crowd "oh" every second bar.
+- **Anthem**, 92 BPM, rap beat whose hook is a chant asked for as
+  "bong bong bong, bong bing bong": bong is a low brass hit with an 808
+  under it, bing a whistle. Whistle answer on beat four, fanfare on the
+  turnaround, 16 bars with no intro. The site default.
+- **Anthem II**, 96 BPM, the same chant over a West African ensemble:
+  dundun under every bong, djembe in sixteenths, talking drum between the
+  calls. 32 bars in four sections that each add weight. Carries
+  `gain: 1.3`, the per-track master gain added for it.
+- **Rally**, 94 BPM, a chant dictated word for word ("pong pong ping
+  pong...") parsed from `RALLY_TEXT` at load: one syllable per eighth, a
+  rest at each full stop, bar count derived from the text. Change the
+  text and the loop reshapes itself. 17 bars.
+- **Rally II**, 94 BPM, the same chant sequence, big and clean: one
+  gliding 808, one brass hit per pong, the Anthem whistle and nothing
+  else per ping, wall snare, hats, fanfare into the loop. Two passes, 34
+  bars, `gain: 1.3`, no bed. Two earlier versions were cut down by Gradi:
+  the first stacked djembe, dundun, choir, shakers and bells ("too busy
+  for a car"); the second kept a whistle melody with vibrato over the
+  chant, a low whistle harmony and an airhorn, which read as "alien" and
+  "cemetery". No melody over the chant, no effects. Keep it sparse.
+  `airhorn` and `impact` stay in the instrument set, unused by any track.
+
+Rumba and Bounce were asked for as short-video music (2026-09-30), so
+they are 16 bars with no intro: the hook lands on beat one. The other
+four keep the intro / full / breakdown shape.
+
+The first four are 32 bars: four-bar intro, twenty-four full, four-bar breakdown
+with a riser, so the loop point lands as a drop. Whichever track was chosen
+last is remembered in `localStorage` under `artivicolab.track` and the
+footer plays that one on every page. A visitor with no choice stored
+gets `DEFAULT_TRACK`, which is Anthem (Gradi's pick, 2026-09-30). The `--beat` custom property on
+`<html>` is set from the track's tempo, so the mascot bop and the play
+button pulse follow whatever is playing.
+
+**Studio, unlisted.** `studio.html` is for the lab, not visitors: noindex,
+not linked from any page, not in the sitemap. It exposes the mix
+generator in `beats.js`: `makeMix(n, seed)` builds a 16-bar loop from a
+seeded choice of drum style, bass, chord voice, lead, key, mode, tempo,
+bass pattern and a two-bar pentatonic hook. `getMixes()` walks seeds
+upward until 100 mixes have distinct instrument line-ups and is only
+called on the studio page, so public pages never pay for it. Mix numbers
+are stable: the same number gives the same mix on any machine. A mix
+chosen there becomes the footer track like any other (`mix-37` in
+localStorage) and downloads the same way. Instruments added for it:
+marimba (also kalimba), organ, conga, bell, djembe, dundun, talking drum.
+
+**Footer picker.** The script wraps the footer play button in a
+`.beats-wrap` and injects a `.beats-menu` listing every track, plus a
+small chevron. It opens on hover with a mouse, on a 420 ms press with a
+finger (the click that follows a long press is swallowed so it does not
+also toggle play), from the chevron, and from the arrow keys when the play
+button has focus. Escape or clicking outside closes it. When testing
+touch over the DevTools protocol, use `Input.synthesizeTapGesture` for a
+tap: a raw touchStart/touchEnd pair is held for two seconds by Chrome and
+reads as a long press.
+
+**Output chain.** Every instrument feeds a compressor (threshold -16 dB,
+4:1), then the per-track gain, then a brick-wall limiter (threshold -2 dB,
+20:1, 1 ms attack) added on 2026-09-30 when Rally II at `gain: 1.45`
+clipped the WAV. The limiter only bites above -2 dB, so the quiet tracks
+are untouched. Both the live chain and the offline render use it.
+
+**Download** renders the same bar functions into an `OfflineAudioContext`
+(engine state is swapped onto it for the synchronous scheduling pass, then
+swapped back), packs the result as 16-bit mono 44.1 kHz WAV in the tab, and
+hands the browser a blob. No server. Files are 4 to 8 MB. `stop()` captures
+its own router `<audio>` before the delayed pause, so switching tracks
+mid-play does not silence the new one.
+
+**Verifying audio in this repo:** headless Chrome can render every track
+offline. The scratch harness used on 2026-09-30 drove Chrome over the
+DevTools protocol, rendered each track through the download path, and
+checked duration, RMS, peak and per-bar loudness. Crackle 91.6 s, Stride
+61.2 s, Sprint 52.1 s, Parade 58.4 s, peaks under 0.6, no dead bars. Do that rather than
+listening by proxy through a screenshot.
+
+To add a loop: append to `TRACKS` with a dictionary-word id, then add a
+matching `<li data-track="id">` card on `sounds.html`. Nothing else needs
+wiring.
+
 ## Visitor Scan, the demo in the footer
 
 `assets/js/ip-gate.js`, wired into every page inside `<!-- IP-GATE:START -->`

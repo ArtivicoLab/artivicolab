@@ -7,38 +7,35 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-WMW68GE9TM');
     </script>
-    
+
     <meta charset="UTF-8">
     <!-- IP-GATE:START Visitor Scan demo, launched by the visitor. See CLAUDE.md -->
     <script src="assets/js/ip-gate.js?v=20260930-1425"></script>
     <!-- IP-GATE:END -->
     <script>try{if(localStorage.getItem('artivicolab_gate_ack_v1')!=='1'){document.documentElement.classList.add('gate-pending');setTimeout(function(){document.documentElement.classList.remove('gate-pending')},6000)}}catch(e){}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Preview a website template from ArtivicoLab's collection, with metadata and a live in-page demo.">
-    <meta name="keywords" content="website templates, static web apps, web design, Gradi Kayamba, ArtivicoLab, portfolio">
+    <meta name="description" content="Lab-only generator: a hundred seeded instrumental mixes for picking the next sound.">
     <meta name="author" content="Gradi Kayamba">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="noindex, nofollow">
     <meta property="og:site_name" content="ArtivicoLab">
-    <meta property="og:title" content="Template preview, ArtivicoLab">
-    <meta property="og:description" content="Preview a website template from ArtivicoLab's collection.">
+    <meta property="og:title" content="Studio, ArtivicoLab">
+    <meta property="og:description" content="Original loops synthesized in the browser, downloadable as WAV.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://artivicolab.com/showcase.html">
+    <meta property="og:url" content="https://artivicolab.com/studio.html">
     <meta property="og:image" content="https://artivicolab.com/assets/images/mascot.jpg">
     <meta property="og:locale" content="en_US">
-    <title>Template preview, ArtivicoLab</title>
-    <link rel="canonical" href="https://artivicolab.com/showcase.html">
+    <title>Studio, ArtivicoLab</title>
+    <link rel="canonical" href="https://artivicolab.com/studio.html">
     <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="assets/images/logo.svg">
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/styles.css?v=20260930-1425">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="showcase-page">
+<body>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
         <defs>
             <filter id="ink-jitter" x="-2%" y="-10%" width="104%" height="120%">
@@ -65,42 +62,43 @@
                     <span></span>
                 </div>
                 <div class="nav-menu" id="nav-menu">
-                    <a href="index.html" class="ink-link">← Back to gallery</a>
-                    <a href="https://neonfluencer.artivicolab.com/" class="ink-link" target="_blank">Neon Fluencer</a>
-                    <a href="https://offer.artivicolab.com" class="ink-link ink-link--warm" target="_blank">Special Offer</a>
+                    <a href="index.html" class="ink-link">Home</a>
+                    <a href="contact.html" class="ink-link">Contact</a>
                 </div>
             </nav>
         </div>
     </header>
 
-    <main class="container">
-        <section class="showcase-details" id="showcase-details">
-            <!-- Website details will be dynamically inserted here via JavaScript -->
+    <main class="container legal">
+        <section class="legal-section studio">
+            <p class="eyebrow">§ studio · unlisted</p>
+            <h1 class="legal-heading">Studio.</h1>
+            <p class="legal-updated">A hundred generated mixes, for the lab only</p>
+
+            <p class="lede">Not linked from anywhere and marked noindex. A generator builds one hundred loops from the synth's instruments: a drum style, a bass, a chord voice, a lead, a key, a tempo and a two-bar hook, all from a fixed seed. No two share a line-up, and Mix 37 is always the same Mix 37. Use it to find the next sound worth finishing by hand. Any mix can be played in the footer and downloaded as WAV.</p>
+
+            <ol class="sound-list">
+                <li class="sound-card sound-card--mix" data-track="mix-1" data-mix-card>
+                    <button class="sound-play" type="button" data-track-play aria-label="Play mix" aria-pressed="false"><span>&#9658;</span></button>
+                    <div class="sound-head"><h2 class="sound-name" data-mix-name>Mix 1</h2><span class="sound-meta" data-mix-meta></span></div>
+                    <p class="sound-blurb" data-mix-blurb></p>
+                    <div class="mix-controls">
+                        <button class="mix-btn" type="button" data-mix-prev aria-label="Previous mix">&larr;</button>
+                        <label class="mix-jump">Mix <input type="number" min="1" max="100" inputmode="numeric" value="1" data-mix-jump aria-label="Mix number, 1 to 100"> of 100</label>
+                        <button class="mix-btn" type="button" data-mix-next aria-label="Next mix">&rarr;</button>
+                        <button class="mix-btn mix-btn--shuffle" type="button" data-mix-random>Shuffle</button>
+                    </div>
+                    <button class="sound-dl" type="button" data-track-download>Download WAV</button>
+                </li>
+            </ol>
+
+            <h2>All hundred</h2>
+            <p>Every line-up, in order. Play any row, or download it.</p>
+            <ol class="mix-table" id="mixTable"></ol>
+
+            <p class="signature">ArtivicoLab</p>
         </section>
     </main>
-
-    <section class="frame-section" id="frame-section">
-        <div class="frame-bar">
-            <div class="frame-bar-left">
-                <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-                <span class="frame-name" id="frame-name">Template preview</span>
-            </div>
-            <div class="frame-bar-right">
-                <a id="frame-open" class="ink-link" href="#" target="_blank" rel="noopener">Open live site</a>
-                <button type="button" class="frame-btn" id="frame-expand" aria-pressed="false">Expand</button>
-            </div>
-        </div>
-        <div class="frame-viewport" id="iframe-wrapper">
-            <iframe
-                id="website-frame"
-                title="Website Showcase"
-                class="website-frame"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-top-navigation"
-                referrerpolicy="no-referrer"
-                loading="lazy">
-            </iframe>
-        </div>
-    </section>
 
     <footer class="footer">
         <div class="beats-prog" aria-hidden="true"><div id="beatsProg"></div></div>
@@ -123,11 +121,24 @@
         </div>
     </footer>
 
-    <script src="assets/js/data.js?v=20260930-1425"></script>
-    <script src="assets/js/protection.js?v=20260930-1425"></script>
     <script src="assets/js/script.js?v=20260930-1425"></script>
     <script src="assets/js/hamburger.js?v=20260930-1425"></script>
     <script src="assets/js/gate.js?v=20260930-1425"></script>
     <script src="assets/js/beats.js?v=20260930-1425"></script>
+    <script>
+    (function () {
+        var list = document.getElementById('mixTable'), B = window.ArtivicoBeats;
+        if (!list || !B) return;
+        var html = '';
+        B.mixes().forEach(function (m) {
+            html += '<li class="mix-row" data-track="' + m.id + '">' +
+                '<button class="mix-row-play" type="button" data-track-play aria-label="Play ' + m.name + '" aria-pressed="false"><span>&#9658;</span></button>' +
+                '<span class="mix-row-num">' + m.id.slice(4) + '</span>' +
+                '<span class="mix-row-text"><strong>' + m.bpm + ' BPM · ' + m.style.split(' · ')[0] + '</strong> ' + m.blurb.replace(/\. [^.]*$/, '.') + '</span>' +
+                '<button class="mix-row-dl" type="button" data-track-download>WAV</button></li>';
+        });
+        list.innerHTML = html;
+    })();
+    </script>
 </body>
 </html>

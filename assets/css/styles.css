@@ -287,8 +287,8 @@ html.sound-playing .intro-mascot {
     transition: none;
     transform-origin: 50% 50%;
     animation:
-        mascot-wave 1.43s ease-in-out infinite,
-        mascot-recolor 4.29s steps(1) infinite;
+        mascot-wave calc(var(--beat, 0.714s) * 2) ease-in-out infinite,
+        mascot-recolor calc(var(--beat, 0.714s) * 6) steps(1) infinite;
 }
 
 @keyframes mascot-wave {
@@ -1198,6 +1198,193 @@ html.sound-playing .footer-beat span { opacity: 0.32; }
 html.sound-playing .footer-soundwave { opacity: 0.5; }
 html.sound-playing .fw-word { opacity: 0.1; }
 .footer-beat span, .footer-soundwave, .fw-word { transition: opacity 0.6s var(--ease); }
+
+/* Footer sound picker: hover, long-press, or the chevron opens it */
+.beats-wrap { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
+.beats-chevron {
+    width: 18px; height: 34px;
+    margin-left: -4px; margin-right: 6px;
+    border: 0; background: transparent; padding: 0;
+    color: var(--ink-soft); font-size: 12px; line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.beats-chevron:hover, .beats-wrap.is-open .beats-chevron { color: var(--ink); }
+.beats-wrap.is-open .beats-chevron { transform: rotate(180deg); }
+.beats-menu {
+    position: absolute;
+    left: 0; bottom: calc(100% + 12px);
+    min-width: 230px;
+    padding: 8px;
+    background: var(--paper-card);
+    border: 1.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    z-index: 6;
+    display: none;
+}
+.beats-wrap.is-open .beats-menu { display: block; }
+.beats-menu::after {
+    content: ""; position: absolute; left: 12px; bottom: -8px;
+    width: 12px; height: 12px;
+    background: var(--paper-card);
+    border-right: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink);
+    transform: rotate(45deg);
+}
+.beats-menu-title {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 4px 8px 6px;
+}
+.beats-menu [data-track-pick] {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+    width: 100%; text-align: left;
+    padding: 7px 10px 7px 22px;
+    border: 0; background: transparent; cursor: pointer;
+    color: var(--ink);
+    position: relative;
+}
+.beats-menu [data-track-pick]::before {
+    content: ""; position: absolute; left: 8px; top: 13px;
+    width: 7px; height: 7px; border-radius: 50%;
+    border: 1.5px solid var(--ink-faint);
+}
+.beats-menu [data-track-pick].is-current::before { background: var(--ink); border-color: var(--ink); }
+.beats-menu [data-track-pick].is-playing::before { background: var(--accent); border-color: var(--accent); }
+.beats-menu [data-track-pick]:hover, .beats-menu [data-track-pick]:focus-visible { background: rgba(26, 24, 22, 0.07); outline: none; }
+.beats-menu-name { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1.1; }
+.beats-menu-meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+.beats-menu-more { display: block; margin: 6px 8px 2px; font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { .beats-chevron { transition: none; } }
+
+/* ─── Sounds page (sounds.html) ──────────────────────────── */
+.sound-list { list-style: none; padding: 0; margin: var(--sp-lg) 0 0; max-width: 68ch; }
+.sound-card {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    grid-template-areas: "play head dl" "play body dl";
+    column-gap: var(--sp-md);
+    row-gap: 6px;
+    align-items: center;
+    padding: var(--sp-md) 0;
+    border-top: 1.5px solid var(--rule-strong);
+}
+.sound-card:last-child { border-bottom: 1.5px solid var(--rule-strong); }
+.sound-play {
+    grid-area: play;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.sound-play:hover { background-color: var(--ink); color: var(--paper); }
+.sound-card.is-playing .sound-play { background-color: var(--accent); border-color: var(--accent); color: var(--paper); }
+.sound-card.is-playing .sound-play { animation: sound-pulse calc(var(--beat, 0.714s) * 2) ease-in-out infinite; }
+@keyframes sound-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+.sound-head { grid-area: head; display: flex; align-items: baseline; gap: var(--sp-sm); flex-wrap: wrap; }
+.sound-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+.sound-meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+}
+.sound-card.is-current .sound-meta::after { content: " · in the footer"; color: var(--accent); }
+.sound-blurb { grid-area: body; color: var(--ink-soft); font-size: var(--fs-md); line-height: 1.6; margin: 0; }
+.sound-dl {
+    grid-area: dl;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    padding: 8px 16px;
+    background-color: var(--ink);
+    color: var(--paper);
+    border: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s var(--ease);
+}
+.sound-dl:hover { background-color: var(--accent); }
+.sound-dl:disabled { background-color: var(--ink-faint); cursor: progress; }
+.sound-card--mix { grid-template-areas: "play head dl" "play body dl" "play ctl dl"; }
+.mix-controls { grid-area: ctl; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.mix-btn {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    padding: 6px 12px;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.mix-btn:hover { background-color: var(--ink); color: var(--paper); }
+.mix-btn--shuffle { text-transform: uppercase; letter-spacing: 0.1em; }
+.mix-jump { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; }
+.mix-jump input {
+    width: 4.2em;
+    font: inherit; font-size: 16px;
+    padding: 4px 6px;
+    border: 1.5px solid var(--rule-strong);
+    background: var(--paper-card);
+    color: var(--ink);
+    text-align: center;
+}
+.mix-jump input:focus { outline: none; border-color: var(--ink); }
+@media (max-width: 600px) {
+    .sound-card { grid-template-columns: 52px 1fr; grid-template-areas: "play head" "body body" "dl dl"; }
+    .sound-card--mix { grid-template-areas: "play head" "body body" "ctl ctl" "dl dl"; }
+    .sound-dl { justify-self: start; margin-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .sound-card.is-playing .sound-play { animation: none; } }
+
+/* Studio page (unlisted): the hundred-row mix table */
+.mix-table { list-style: none; padding: 0; margin: var(--sp-md) 0 var(--sp-lg); max-width: 68ch; }
+.mix-row {
+    display: grid;
+    grid-template-columns: 34px 3ch 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+}
+.mix-row:last-child { border-bottom: 1px solid var(--rule); }
+.mix-row-play {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1.5px solid var(--ink); background: transparent; color: var(--ink);
+    font-size: 11px; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.mix-row-play:hover { background: var(--ink); color: var(--paper); }
+.mix-row.is-playing .mix-row-play { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.mix-row.is-current .mix-row-num { color: var(--accent); }
+.mix-row-num { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--ink-faint); text-align: right; }
+.mix-row-text { font-size: var(--fs-sm); color: var(--ink-soft); line-height: 1.45; }
+.mix-row-text strong { color: var(--ink); font-weight: 600; }
+.mix-row-dl {
+    font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em;
+    padding: 5px 9px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer;
+}
+.mix-row-dl:hover { background: var(--ink); color: var(--paper); }
+.mix-row-dl:disabled { color: var(--ink-faint); border-color: var(--ink-faint); cursor: progress; }
+@media (max-width: 600px) {
+    .mix-row { grid-template-columns: 34px 3ch 1fr; grid-template-areas: "play num text" "dl dl dl"; }
+    .mix-row-dl { grid-area: dl; justify-self: start; }
+}
 
 /* Footer beat: equalizer bars + soundwave line, faint like the text */
 .footer-beat {
@@ -2504,6 +2691,20 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
     }
 
     .hamburger { display: flex; }
+
+    /* Once the menu collapses to the hamburger, the wordmark sits in the
+       middle of the header. It is taken out of the flow and centred on
+       the container so the mark itself is centred, with the logo image
+       left and the hamburger right where they were. */
+    .header .container { position: relative; }
+
+    .logo-mark {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+    }
 
     .nav-menu {
         display: none;
