@@ -1148,9 +1148,9 @@
             }
         },
         {
-            id: 'rally2', name: 'Rally II', bpm: 94, bars: RALLY_BARS * 2, swing: 0.04, bed: null, gain: 1.3,
+            id: 'rally2', name: 'Rally II', bpm: 94, bars: RALLY_BARS * 2, swing: 0.04, bed: null, gain: 1.4,
             style: 'Rap, big and clean',
-            blurb: 'The chant again, built to play loud in a car: a few big things and nothing in between. One 808 that glides under the pongs, a low horn on each pong and the same horn an octave up on each ping, a snare like a wall, and hats. No melody over it, no effects. Just the beat and the chant, twice through.',
+            blurb: 'The chant again, built to play loud in a car: a few big things and nothing in between. One 808 that glides under the pongs, a low horn on each pong and the same horn an octave up on each ping, a boom on every pong, a snare like a wall, and hats. No melody over it, no effects. Just the beat and the chant, twice through.',
             bar: function (bar) {
                 var cb = bar % RALLY_BARS;
                 var ch = RALLY_CHORDS[Math.floor(cb / 4) % 4];
@@ -1166,6 +1166,9 @@
                     if (syl === 0) {
                         pongs.push(off);
                         brass(ch.low, off, 0.42, 0.22, 2400);
+                        // Every pong is a boom: a short 808 on the root and a dundun under it
+                        kick(off, 0.8, { hi: ch.root * 2.2, lo: ch.root, bend: 0.04, dur: 0.55, click: true });
+                        dundun(off, 0.55, true);
                     } else {
                         // Ping is the same horn an octave up, short and bright. A whistle
                         // here was too piercing on speakers.
@@ -1173,14 +1176,15 @@
                     }
                 }
                 // One 808: root on the one and the and-of-two, a glide into the third pong
-                kick(0, 0.74, { hi: ch.root * 2.4, lo: ch.root, bend: 0.04, dur: 1.3 });
-                kick(2.5 + SWING, 0.62, { hi: ch.root * 2.4, lo: ch.root, bend: 0.04, dur: 1.0 });
-                if (pongs.length > 2 && pongs[2] > 0.6 && pongs[2] < 2.4) kick(pongs[2], 0.5, { hi: ch.root * 1.5, lo: ch.root, bend: 0.25, dur: 0.8 });
+                kick(0, 0.9, { hi: ch.root * 2.4, lo: ch.root, bend: 0.04, dur: 1.3 });
+                kick(2.5 + SWING, 0.8, { hi: ch.root * 2.4, lo: ch.root, bend: 0.04, dur: 1.0 });
+                if (pongs.length > 2 && pongs[2] > 0.6 && pongs[2] < 2.4) kick(pongs[2], 0.6, { hi: ch.root * 1.5, lo: ch.root, bend: 0.25, dur: 0.8 });
 
                 // Kit: punch kick on top of the 808, wall snare, straight hats with one roll
-                kick(0, 0.55, K); kick(2.5 + SWING, 0.45, K);
-                snare(1, 0.62); clap(1, 0.36);
-                snare(3, 0.64); clap(3, 0.38);
+                kick(0, 0.8, K); kick(2.5 + SWING, 0.7, K);
+                dundun(0, 0.7, true); dundun(2.5 + SWING, 0.6, true);
+                snare(1, 0.75); clap(1, 0.42); dundun(1, 0.4, false);
+                snare(3, 0.78); clap(3, 0.44); dundun(3, 0.42, false);
                 for (e = 0; e < 8; e++) hat(e * 0.5 + (e % 2 ? SWING : 0), e % 2 ? 0.07 : 0.12, false);
                 if (cb % 4 === 3) for (e = 0; e < 6; e++) hat(3 + e / 6, 0.06 + e * 0.012, false);
                 hat(2.5 + SWING, 0.1, true);
