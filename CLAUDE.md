@@ -172,13 +172,20 @@ Three files, in this order on every page, and the order matters:
 **Sound is mandatory and the clock proves it.** The timer does not count
 wall-clock seconds. Every 200ms it asks `ArtivicoBeats.isPlaying()` and
 `ArtivicoBeats.level()`, and only adds the elapsed time if real signal is
-coming out of the output. Pause the footer player, block autoplay, or
+coming out of the output (level above 0.001; true silence reads 0.000,
+Parade's quietest beats read about 0.005). Pause the footer player, block autoplay, or
 switch tabs in a way that suspends the audio clock and the countdown stops
 dead, the bar greys out, and a red "Turn the sound on" button appears.
 There is no path to the site that does not go through hearing Parade twice.
 `level()` is an AnalyserNode tapped off the limiter in `beats.js`, added
 for exactly this. Hardware volume at zero is not detectable from
 JavaScript by anyone, so that is the one hole and it cannot be closed.
+
+**The listening room opens on the winning tap itself**, underneath the
+puzzle card while it fades, so sound and card arrive together. Before
+that there was about a second of music with nothing on screen, which
+Gradi reported as the music "playing out on nowhere". The puzzle leaves
+the scroll lock alone when it sees the gate is already up.
 
 **Audio has to start inside a user gesture** or iOS refuses. That is why
 `puzzle.js` takes an `onWin` callback and fires it synchronously inside

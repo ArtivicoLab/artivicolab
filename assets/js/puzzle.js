@@ -149,8 +149,12 @@
                 overlay.classList.add('is-out');
                 html.classList.remove('puzzle-open');
                 body.classList.remove('puzzle-open');
-                body.style.top = '';
-                window.scrollTo(0, scrollY);
+                // If the listening room already took over the screen, it owns
+                // the scroll lock now; do not pull the page out from under it.
+                if (!document.querySelector('.gate')) {
+                    body.style.top = '';
+                    window.scrollTo(0, scrollY);
+                }
                 document.removeEventListener('focusin', trap);
                 setTimeout(function () {
                     overlay.remove();

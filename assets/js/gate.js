@@ -234,7 +234,7 @@
             if (!B || !B.isPlaying || !B.level) { reason = 'off'; return false; }
             if (B.muted && B.muted()) { reason = 'off'; return false; }
             if (!B.isPlaying()) { reason = 'off'; return false; }
-            if (B.level() <= 0.003) { reason = 'off'; return false; }
+            if (B.level() <= 0.001) { reason = 'off'; return false; }
             reason = '';
             return true;
         }
@@ -285,9 +285,15 @@
 
     /* ── Orchestration ── */
 
+    // On the winning tap the music starts (inside the gesture, for iOS)
+    // and the listening room opens in the same instant, underneath the
+    // puzzle card while that fades out. Sound and card arrive together;
+    // before this there was a second of music with nothing on screen.
+    // open() ignores a second call, so the onDone path is harmless, and
+    // it is what the mercy rule uses, since there is no winning tap then.
     function runFlow() {
         var P = window.ArtivicoPuzzle;
-        if (P && P.open) P.open(open, primeAudio);
+        if (P && P.open) P.open(open, function () { primeAudio(); open(); });
         else open();
     }
 
