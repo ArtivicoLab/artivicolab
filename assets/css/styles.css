@@ -2449,6 +2449,82 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 .gate-btn:hover, .gate-btn:focus-visible { color: var(--accent); outline: 0; }
 .gate-btn:hover { filter: url(#ink-jitter); }
 
+.gate-body p { margin-bottom: var(--sp-sm); }
+.gate-body p:last-child { margin-bottom: 0; }
+
+/* The listening room: Parade must actually be heard, twice, before the
+   doors open. The clock in gate.js only moves while sound is coming out,
+   so this block has a loud silent state on purpose. */
+.gate-listen {
+    margin: var(--sp-md) 0 var(--sp-sm);
+    padding: var(--sp-sm) 0 0;
+    border-top: 1.5px solid var(--rule-strong);
+}
+.gate-listen-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+}
+.gate-listen-label strong { color: var(--ink); font-weight: 600; }
+.gate-silent .gate-listen-label { color: var(--accent); }
+
+.gate-listen-bar {
+    height: 10px;
+    border: 1.5px solid var(--ink);
+    background-color: var(--paper-card);
+    overflow: hidden;
+}
+.gate-listen-fill {
+    height: 100%;
+    width: 0;
+    background-color: var(--accent-cool);
+    transition: width 0.2s linear;
+}
+.gate-silent .gate-listen-fill { background-color: var(--ink-faint); }
+
+.gate-listen-time {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-top: 8px;
+}
+.gate-listen-clock {
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+}
+.gate-silent .gate-listen-clock { color: var(--accent); }
+
+.gate-listen-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    margin-top: 6px;
+}
+.gate-silent .gate-listen-note { color: var(--accent); }
+
+.gate-sound {
+    margin-top: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    padding: 8px 18px;
+    background-color: var(--accent);
+    color: var(--paper);
+    border: 0;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease);
+}
+.gate-sound:hover, .gate-sound:focus-visible { background-color: var(--ink); outline: 0; }
+.gate-sound[hidden] { display: none; }
+
 .gate-fine {
     margin-top: var(--sp-sm);
     font-family: var(--font-mono);

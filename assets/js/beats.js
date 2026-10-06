@@ -25,11 +25,15 @@
 
     // Engine state. ctx/comp/barBase/BEAT/SWING are swapped out while a
     // download renders offline, so instruments must read them at call time.
-    var ctx = null, master = null, comp = null, playing = false, ticker = null;
+    var ctx = null, master = null, comp = null, playing = false, starting = false;
+    // The one and only running chain (`live` is taken: it is the note-time
+    // guard the instruments use). start() kills whatever is here before
+    // it builds, stop() kills it, and nothing else ever holds a reference,
+    // so two loops cannot sound at once in one page by construction.
+    var run = null;
     var sessionStart = 0, startTime = 0, nextBarTime = 0, curBar = 0, barBase = 0;
     var BEAT = 0, SWING = 0, BARS = 0, DUR = 0;
-    var snareBuf = null, hatBuf = null, bedSrc = null;
-    var routerAudio = null, streamDest = null;
+    var snareBuf = null, hatBuf = null;
     var current = null, rendering = false, shownMix = null;
     var DEFAULT_TRACK = 'anthem'; // what a first-time visitor gets in the footer
 
@@ -1431,70 +1435,127 @@
         return { master: m, comp: cp, out: lim };
     }
 
+    /* ── Cross-tab lock. Two tabs of this site each have their own player;
+       whichever starts last wins and the others stop. BroadcastChannel where
+       it exists, the storage event everywhere, both cheap. ── */
+    var TAB = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    var bc = null;
+    try {
+        bc = new BroadcastChannel('artivicolab-beats');
+        bc.onmessage = function (ev) {
+            if (ev.data && ev.data.type === 'start' && ev.data.tab !== TAB && (playing || starting)) stop(false);
+        };
+    } catch (e) { bc = null; }
+    window.addEventListener('storage', function (ev) {
+        if (ev.key === 'artivicolab.beats.owner' && ev.newValue && ev.newValue !== TAB && (playing || starting)) stop(false);
+    });
+    function claim() {
+        try { if (bc) bc.postMessage({ type: 'start', tab: TAB }); } catch (e) { /* ignore */ }
+        try { localStorage.setItem('artivicolab.beats.owner', TAB); } catch (e) { /* ignore */ }
+    }
+
+    // Tear down the live chain: fade it, then cut it off the graph entirely
+    // so nothing it already scheduled can be heard, and release its router.
+    function kill(auto) {
+        var L = run; run = null;
+        playing = false;
+        if (!L) return;
+        clearInterval(L.ticker);
+        var fade = auto ? 0.8 : 0.4;
+        try {
+            var now = ctx.currentTime;
+            L.master.gain.cancelScheduledValues(now);
+            L.master.gain.setValueAtTime(L.master.gain.value, now);
+            L.master.gain.linearRampToValueAtTime(0, now + fade);
+        } catch (e) { /* ignore */ }
+        if (L.bed) { try { L.bed.stop(ctx.currentTime + fade + 0.1); } catch (e) { /* ignore */ } }
+        setTimeout(function () {
+            try { L.out.disconnect(); } catch (e) { /* ignore */ }
+            try { L.master.disconnect(); } catch (e) { /* ignore */ }
+            try { L.comp.disconnect(); } catch (e) { /* ignore */ }
+            if (L.router) { try { L.router.pause(); L.router.srcObject = null; } catch (e) { /* ignore */ } }
+        }, fade * 1000 + 200);
+    }
+
+    // `starting` closes the window between the first await and `playing`
+    // going true, so a second caller cannot get through while the first is
+    // still waiting on the audio clock. And start() kills any chain that
+    // somehow exists before building, so even a caller that slipped past
+    // every guard would replace the loop, never double it.
     async function start() {
-        if (playing) return true;
-        var c = getCtx();
-        try { await c.resume(); } catch (e) { /* ignore */ }
-        if (c.state !== 'running' || playing) return false;
-        try { localStorage.setItem('artivicolab.beats', 'on'); } catch (e) { /* ignore */ }
+        if (playing || starting) return playing;
+        starting = true;
+        try {
+            var c = getCtx();
+            try { await c.resume(); } catch (e) { /* ignore */ }
+            if (c.state !== 'running' || playing) return false;
+            try { localStorage.setItem('artivicolab.beats', 'on'); } catch (e) { /* ignore */ }
 
-        var chain = buildChain(c);
-        master = chain.master; comp = chain.comp;
-        var out = chain.out;
+            kill(false);
 
-        // Route through exactly one destination (MediaStream on iOS so the silent switch is ignored).
-        var routed = false;
-        if (typeof c.createMediaStreamDestination === 'function') {
+            var chain = buildChain(c);
+            var L = { master: chain.master, comp: chain.comp, out: chain.out, analyser: null, streamDest: null, router: null, bed: null, ticker: null };
+            master = L.master; comp = L.comp;
+
+            // A tap on the output so callers can tell real sound from silence.
+            // The entry gate uses it: its clock only moves while this reads
+            // above zero, so a paused or blocked tab earns no credit.
             try {
-                streamDest = c.createMediaStreamDestination();
-                out.connect(streamDest);
-                routerAudio = new Audio();
-                routerAudio.playsInline = true;
-                routerAudio.setAttribute('playsinline', '');
-                routerAudio.srcObject = streamDest.stream;
-                await routerAudio.play();
-                routed = true;
-            } catch (e) {
-                try { out.disconnect(streamDest); } catch (e2) { /* ignore */ }
-                streamDest = null; routerAudio = null;
+                L.analyser = c.createAnalyser();
+                L.analyser.fftSize = 512;
+                L.out.connect(L.analyser);
+            } catch (e) { L.analyser = null; }
+
+            // Route through exactly one destination (MediaStream on iOS so the silent switch is ignored).
+            var routed = false;
+            if (typeof c.createMediaStreamDestination === 'function') {
+                try {
+                    L.streamDest = c.createMediaStreamDestination();
+                    L.out.connect(L.streamDest);
+                    L.router = new Audio();
+                    L.router.playsInline = true;
+                    L.router.setAttribute('playsinline', '');
+                    L.router.srcObject = L.streamDest.stream;
+                    await L.router.play();
+                    routed = true;
+                } catch (e) {
+                    try { L.out.disconnect(L.streamDest); } catch (e2) { /* ignore */ }
+                    if (L.router) { try { L.router.srcObject = null; } catch (e3) { /* ignore */ } }
+                    L.streamDest = null; L.router = null;
+                }
             }
-        }
-        if (!routed) out.connect(c.destination);
+            if (!routed) L.out.connect(c.destination);
 
-        snareBuf = noise(0.03); hatBuf = noise(0.006);
-        if (current.bed && BEDS[current.bed]) { bedSrc = BEDS[current.bed](); bedSrc.start(); }
+            // Something stopped us while the router was spinning up. Respect it.
+            if (run !== null) { try { L.out.disconnect(); } catch (e) { /* ignore */ } return false; }
 
-        startTime = c.currentTime + 0.3;
-        nextBarTime = startTime; curBar = 0;
-        pump();
+            snareBuf = noise(0.03); hatBuf = noise(0.006);
+            if (current.bed && BEDS[current.bed]) { L.bed = BEDS[current.bed](); L.bed.start(); }
 
-        sessionStart = c.currentTime;
-        playing = true;
-        setUI();
-        ticker = setInterval(function () {
-            if (ctx.currentTime - sessionStart >= LOOP_SECONDS) { stop(true); return; }
+            startTime = c.currentTime + 0.3;
+            nextBarTime = startTime; curBar = 0;
+            run = L;
             pump();
-            if (prog) {
-                var pos = ctx.currentTime - startTime;
-                if (pos >= 0) prog.style.width = ((pos % DUR) / DUR * 100).toFixed(1) + '%';
-            }
-        }, TICK_MS);
-        return true;
+
+            sessionStart = c.currentTime;
+            playing = true;
+            claim();
+            setUI();
+            L.ticker = setInterval(function () {
+                if (run !== L) { clearInterval(L.ticker); return; }
+                if (ctx.currentTime - sessionStart >= LOOP_SECONDS) { stop(true); return; }
+                pump();
+                if (prog) {
+                    var pos = ctx.currentTime - startTime;
+                    if (pos >= 0) prog.style.width = ((pos % DUR) / DUR * 100).toFixed(1) + '%';
+                }
+            }, TICK_MS);
+            return true;
+        } finally { starting = false; }
     }
 
     function stop(auto) {
-        clearInterval(ticker);
-        playing = false;
-        if (master) {
-            try {
-                var now = ctx.currentTime;
-                master.gain.cancelScheduledValues(now);
-                master.gain.setValueAtTime(master.gain.value, now);
-                master.gain.linearRampToValueAtTime(0, now + (auto ? 0.8 : 0.4));
-            } catch (e) { /* ignore */ }
-        }
-        if (bedSrc) { try { bedSrc.stop(ctx.currentTime + 1); } catch (e) { /* ignore */ } bedSrc = null; }
-        if (routerAudio) { var ra = routerAudio; routerAudio = null; setTimeout(function () { try { ra.pause(); } catch (e) { /* ignore */ } }, 900); }
+        kill(auto);
         setUI();
         if (prog) setTimeout(function () { prog.style.width = '0%'; }, auto ? 1200 : 400);
     }
@@ -1511,6 +1572,18 @@
         loadTrack(t);
         setUI();
         return Promise.resolve(false);
+    }
+
+    // The one call other scripts should use to make a track play. Everything
+    // up to the first await runs synchronously, so when this is invoked from
+    // inside a tap the audio clock is created and resumed inside the gesture,
+    // which is what iOS requires. Never pair choose() and start() by hand.
+    function play(id) {
+        var t = trackById(id);
+        if ((playing || starting) && current === t) return Promise.resolve(true);
+        if (playing || starting) return choose(id);
+        choose(id);
+        return start();
     }
 
     /* ── Download: render one full loop offline and pack it as a WAV. ── */
@@ -1729,6 +1802,29 @@
 
     setUI();
 
-    window.ArtivicoBeats = { tracks: TRACKS, mixes: getMixes, mix: mixByNumber, choose: choose, start: start, stop: function () { stop(false); }, download: download };
+    // level() is the output amplitude right now, 0 when silent. isPlaying()
+    // is true only while the audio clock is actually running.
+    function level() {
+        var an = run && run.analyser;
+        if (!an) return 0;
+        try {
+            var buf = new Uint8Array(an.fftSize);
+            an.getByteTimeDomainData(buf);
+            var sum = 0, i;
+            for (i = 0; i < buf.length; i++) { var v = (buf[i] - 128) / 128; sum += v * v; }
+            return Math.sqrt(sum / buf.length);
+        } catch (e) { return 0; }
+    }
+    function isPlaying() { return !!(playing && ctx && ctx.state === 'running'); }
+    // Only what the platform actually tells us. A browser never reports the
+    // speaker volume or a tab's mute state, so this catches the output
+    // element being silenced and nothing more.
+    function muted() {
+        var r = run && run.router;
+        if (!r) return false;
+        return !!(r.muted || r.volume === 0 || r.paused);
+    }
+
+    window.ArtivicoBeats = { tracks: TRACKS, mixes: getMixes, mix: mixByNumber, level: level, isPlaying: isPlaying, muted: muted, play: play, choose: choose, start: start, stop: function () { stop(false); }, download: download };
     // No autoplay by design: the beat starts only from a button.
 })();

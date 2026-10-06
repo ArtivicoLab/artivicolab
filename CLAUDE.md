@@ -153,46 +153,102 @@ To add a loop: append to `TRACKS` with a dictionary-word id, then add a
 matching `<li data-track="id">` card on `sounds.html`. Nothing else needs
 wiring.
 
-## The entry puzzle
+## The welcome: puzzle, then the listening room
 
-`assets/js/puzzle.js`, with styles under the `ENTRY PUZZLE` banner in
-`styles.css`. It stands on its own: its own overlay, its own class names,
-its own scroll lock, its own file. Delete the file and the one script tag
-that loads it and the site is exactly as it was.
+Three files, in this order on every page, and the order matters:
+`puzzle.js`, `gate.js`, `beats.js`.
 
-**It is the first thing a visitor sees.** Four runway lamps, coloured like
-the rails in the page gutters, flash a four-step sequence; the visitor taps
-it back. "Show me again" replays at no cost. When the visitor is through,
-the puzzle fades and hands over to the rights notice, which runs its
-lock-pop and ACCESS GRANTED exactly as before.
+1. **`assets/js/puzzle.js`** Four runway lamps flash a sequence, the
+   visitor taps it back. A component, not a decision maker: `open(onDone,
+   onWin)` and that is all. `gate.js` decides who sees it.
+2. **`assets/js/gate.js`** The listening room. Parade plays twice while
+   the lab's story is on screen and a clock counts down. At zero the lock
+   pops, ACCESS GRANTED, in you go.
+3. Access lasts **one hour**, stored as a timestamp in
+   `artivicolab_access_until`. When it lapses the whole welcome plays
+   again. The inline pre-paint script in every page reads the same key, so
+   change it in both places or returning visitors get a flash of the site.
 
-The handover is a small handshake, not a merge. `puzzle.js` loads *before*
-`gate.js` on every page and sets `window.ArtivicoPuzzle.pending`. `gate.js`
-sees that and waits via `onPass`. No puzzle on the page and the notice
-opens straight away, same as it always did. Keep the script order.
+**Sound is mandatory and the clock proves it.** The timer does not count
+wall-clock seconds. Every 200ms it asks `ArtivicoBeats.isPlaying()` and
+`ArtivicoBeats.level()`, and only adds the elapsed time if real signal is
+coming out of the output. Pause the footer player, block autoplay, or
+switch tabs in a way that suspends the audio clock and the countdown stops
+dead, the bar greys out, and a red "Turn the sound on" button appears.
+There is no path to the site that does not go through hearing Parade twice.
+`level()` is an AnalyserNode tapped off the limiter in `beats.js`, added
+for exactly this. Hardware volume at zero is not detectable from
+JavaScript by anyone, so that is the one hole and it cannot be closed.
 
-**The key was bumped to `artivicolab_gate_ack_v2`** on 2026-10-06. The
-first version of this shipped reusing `..._v1`, which meant every visitor
-who had already cleared the old notice, including Gradi, never saw the
-puzzle at all and reported being let straight in. The same key is read by
-the inline pre-paint script in every page, so bump it in both places or
-returning visitors get a flash of the site before the overlay lands.
-`gate.js` owns the key and sets it only after the notice, so solving the
-puzzle and leaving means you play again next time.
+**Audio has to start inside a user gesture** or iOS refuses. That is why
+`puzzle.js` takes an `onWin` callback and fires it synchronously inside
+the winning tap, still in the gesture, and why `gate.js` passes
+`primeAudio` into it. Do not move that call into a timeout.
 
-**THE MERCY RULE, DO NOT REMOVE IT.** Three misses and the status line
-reads "Three tries. In you go." and the visitor is let through. This site
-already locked real people out for days with the IP gate in September
-2026. A puzzle is a greeting, not a wall. The overlay is script-only and
-the page underneath is complete HTML, so the site stays readable and
-indexable whatever happens here.
+`primeAudio` saves the visitor's chosen footer track before switching to
+Parade and `restoreTrack` puts it back at grant time, so the welcome does
+not quietly overwrite their pick. It captures that track only on the
+first call, because the "Turn the sound on" button can prime again and
+would otherwise save Parade over their choice.
 
-Accessibility: the lamps are real buttons, Tab cycles lamps then replay,
-Escape is ignored by design, and a visually hidden live region names each
-lamp as it lights so the sequence can be played by ear.
-`ArtivicoPuzzle.sequence()` exposes the current sequence for the headless
-test; anyone who opens devtools to read it could just as easily set the
-localStorage key, so it hides nothing that was not already open.
+**The music stops when the overlay goes.** `dismiss()` calls
+`ArtivicoBeats.stop()`. Leaving it running meant Parade played on in the
+background while the visitor read the site.
+
+**The double-sound saga, and why it cannot come back.** Gradi heard the
+same loop twice, a beat apart, three times over on 2026-10-06. Each time
+a real cause was found and fixed, and the last fix changed the design so
+the class of bug is gone, not just the instances:
+
+- `beats.js` holds exactly one running chain in `live`. `start()` kills
+  whatever is in `live` before building, `stop()` kills it, and nothing
+  else holds a reference. `kill()` fades the chain, then disconnects
+  every node and releases the router `<audio>`, so notes it had already
+  scheduled cannot be heard. The `starting` flag closes the window
+  between `start()`'s first `await` and `playing` going true, and after
+  the router spins up `start()` checks `live` again and bails if a stop
+  landed meanwhile.
+- `ArtivicoBeats.play(id)` is the only call other scripts should make.
+  It does the choose-then-start dance correctly, synchronously up to the
+  first await so it works inside a tap on iOS. The gate used to pair
+  `choose()` and `start()` by hand, and `choose()` already restarts the
+  player when swapping tracks, which was cause number one.
+- A cross-tab lock: a `BroadcastChannel` plus the `storage` event on
+  `artivicolab.beats.owner`. Whichever tab starts last wins and every
+  other tab stops. Two tabs or windows of the site, each with its own
+  player, was the one cause no in-page fix could touch, and it is the
+  likely reason the report kept coming back after the in-page fixes.
+
+The test for all of it wraps `createDynamicsCompressor` to count chains
+built and chains still connected: after any sequence of `play()`,
+`start()`, footer clicks and a track swap, at most one chain may remain
+on the graph, and a single `stop()` must leave zero.
+
+**Footer "Replay the welcome"** (`[data-access-replay]`, next to the old
+`[data-gate-open]` link, both wired to the same thing) clears access and
+runs the whole flow on demand.
+
+**The mercy rule still applies to the puzzle only.** Three misses and the
+visitor goes through to the listening room. It does not apply to the
+listen, which is the point of it. The old IP gate locked real people out
+for days in September 2026; the puzzle is a greeting, but the listen is a
+deliberate toll and Gradi asked for it twice, explicitly, including
+"audio is required, no blocking nor muting".
+
+Know the cost: two minutes of forced audio before any content is a heavy
+toll on a public site, and a visitor who leaves during it counts against
+the page in search. The overlay is script-only and the page underneath is
+complete HTML, so crawlers still index everything.
+
+Do not claim anything about Gradi's education in this copy. An early
+draft said "no computer science degree, no bootcamp", which is untrue (he
+holds a degree from Georgia State) and he asked for degrees to stay out
+of it. "Self-taught" and "ten thousand hours" are the framing he wants.
+
+Accessibility: lamps are real buttons, Tab cycles them, Escape is ignored
+by design, a hidden live region names each lamp as it lights, and the
+listening room's note is a live region so a screen reader hears when the
+clock stops.
 
 ## Visitor Scan, the demo in the footer
 

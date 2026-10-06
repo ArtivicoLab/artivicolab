@@ -1,57 +1,38 @@
 /**
  * ArtivicoLab entry puzzle
  *
- * The first thing a visitor sees. Four runway lamps flash a sequence and
- * the visitor taps it back. It stands on its own: its own overlay, its own
- * styles under the ENTRY PUZZLE banner in styles.css, its own scroll lock.
- * Delete this file and the line that loads it and the site is exactly as
- * it was, with the rights notice first again.
+ * Four runway lamps flash a sequence and the visitor taps it back. It is a
+ * component, not a decision maker: it opens when gate.js asks it to and
+ * calls back when the visitor is through. gate.js owns the question of who
+ * needs to see it. Keep puzzle.js loading BEFORE gate.js on every page.
  *
- * Order on every page: puzzle.js, then gate.js. This file claims the
- * screen first and hands over to the rights notice when the visitor is
- * through, via window.ArtivicoPuzzle.onPass.
+ * Styles live under the ENTRY PUZZLE banner in styles.css. Delete this
+ * file, its styles and its script tag and the welcome goes straight to the
+ * notice, which is how it worked before 2026-10-06.
  *
  * THE MERCY RULE, DO NOT REMOVE IT. Three misses and the visitor is let
- * in regardless. This site already locked real people out once with the
- * IP gate in September 2026 (see CLAUDE.md). A puzzle is a greeting, not
- * a wall. The page underneath is complete HTML and this overlay is
- * script-only, so the site stays readable and indexable no matter what
- * happens here.
+ * through regardless. This site already locked real people out for days
+ * with the IP gate in September 2026 (see CLAUDE.md). A puzzle is a
+ * greeting, not a wall. The overlay is script-only and the page underneath
+ * is complete HTML, so the site stays readable and indexable whatever
+ * happens in here.
  */
 (function () {
     'use strict';
 
-    // Read only. gate.js owns this key and sets it after the notice, so a
-    // visitor who solves the puzzle and leaves gets to play again.
-    var KEY = 'artivicolab_gate_ack_v2';
     var LEN = 4, MISSES = 3, ON = 380, GAP = 230;
     var NAMES = ['green', 'amber', 'amber', 'red'];
-
-    function acked() {
-        try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; }
-    }
-
-    // The Privacy link inside the notice opens with ?peek=1 and must not
-    // hit a puzzle on the way.
-    if (/[?&]peek=1\b/.test(location.search) || acked()) return;
-
-    var passCbs = [];
-    window.ArtivicoPuzzle = {
-        pending: true,
-        onPass: function (cb) { if (typeof cb === 'function') passCbs.push(cb); },
-        sequence: function () { return seq.slice(); }
-    };
-
-    var seq = [], typed = [], misses = 0, showing = false, done = false, timers = [];
+    var active = null;
 
     function makeSeq() {
-        seq = [];
+        var seq = [];
         while (seq.length < LEN) {
             var n = Math.floor(Math.random() * 4);
             // No three of the same lamp in a row: hard to read, hard to repeat.
             if (seq.length >= 2 && seq[seq.length - 1] === n && seq[seq.length - 2] === n) continue;
             seq.push(n);
         }
+        return seq;
     }
 
     function build() {
@@ -76,7 +57,18 @@
         return overlay;
     }
 
-    function open() {
+    /**
+     * open(onDone, onWin)
+     *   onDone runs once the overlay is gone, however the visitor got through.
+     *   onWin runs inside the winning tap, still in the user gesture, which
+     *   is the only moment audio is allowed to start on iOS. gate.js uses it
+     *   to get the music going.
+     */
+    function open(onDone, onWin) {
+        if (document.querySelector('.puzzle')) return;
+
+        var seq = makeSeq(), typed = [], misses = 0;
+        var showing = false, done = false, timers = [];
         var overlay = build();
         var html = document.documentElement;
         var body = document.body;
@@ -86,6 +78,7 @@
         body.style.top = (-scrollY) + 'px';
         html.classList.add('puzzle-open');
         body.classList.add('puzzle-open');
+        active = { seq: seq };
 
         function stopScroll(e) { e.preventDefault(); }
         overlay.addEventListener('wheel', stopScroll, { passive: false });
@@ -161,9 +154,8 @@
                 document.removeEventListener('focusin', trap);
                 setTimeout(function () {
                     overlay.remove();
-                    window.ArtivicoPuzzle.pending = false;
-                    passCbs.forEach(function (cb) { cb(); });
-                    passCbs = [];
+                    active = null;
+                    if (typeof onDone === 'function') onDone();
                 }, 340);
             }, 900);
         }
@@ -183,7 +175,10 @@
             typed.push(i);
             var k = typed.length - 1;
             if (typed[k] !== seq[k]) { miss(); return; }
-            if (typed.length === seq.length) finish('That is the one.');
+            if (typed.length !== seq.length) return;
+            // Still inside the click. The only safe place to start audio.
+            if (typeof onWin === 'function') { try { onWin(); } catch (e) { /* never block the gate */ } }
+            finish('That is the one.');
         }
 
         lamps.forEach(function (l) {
@@ -199,10 +194,8 @@
         });
     }
 
-    makeSeq();
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', open);
-    } else {
-        open();
-    }
+    window.ArtivicoPuzzle = {
+        open: open,
+        sequence: function () { return active ? active.seq.slice() : null; }
+    };
 })();
