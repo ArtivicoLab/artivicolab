@@ -1,17 +1,12 @@
 /**
- * ArtivicoLab entry notice, with a puzzle
- * First visit only: shows a rights notice and a short puzzle. Four runway
- * lamps flash in an order; the visitor taps them back. Solve it and the
- * lock pops. Three misses and the lab lets you in anyway, because a gate
- * that can lock out a real person is the one mistake this site has
- * already made once (see CLAUDE.md). Remembered in localStorage so it
- * never repeats. The overlay is script-only: the page underneath is
- * complete HTML, so search engines index it as before.
+ * ArtivicoLab entry notice
+ * First visit only: shows a rights notice the visitor must acknowledge
+ * before using the site. Remembered in localStorage so it never repeats.
  */
 (function () {
     'use strict';
 
-    var KEY = 'artivicolab_gate_ack_v1';
+    var KEY = 'artivicolab_gate_ack_v2';
 
     function acked() {
         try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; }
@@ -34,27 +29,23 @@
                 '<p class="eyebrow">Notice &middot; before you enter</p>' +
                 '<h2 id="gate-title" class="gate-title">All rights reserved.</h2>' +
                 '<p id="gate-body" class="gate-body">Everything on this site is the original work of <strong>Gradi Kayamba</strong>, published under <strong>ArtivicoLab</strong> supervision. Gradi\'s imagination, brought to life. Look around, use the apps, fork the templates that say you can. Just don\'t pass any of it off as your own.</p>' +
-                '<div class="gate-puzzle" id="gate-puzzle">' +
-                    '<p class="gate-puzzle-ask">One small thing first. <strong>Watch the runway lamps, then tap them back in the same order.</strong></p>' +
-                    '<div class="gate-lamps" role="group" aria-label="Runway lamps">' +
-                        '<button type="button" class="gate-lamp" data-lamp="0" aria-label="Lamp 1, green"><span></span></button>' +
-                        '<button type="button" class="gate-lamp" data-lamp="1" aria-label="Lamp 2, amber"><span></span></button>' +
-                        '<button type="button" class="gate-lamp" data-lamp="2" aria-label="Lamp 3, amber"><span></span></button>' +
-                        '<button type="button" class="gate-lamp" data-lamp="3" aria-label="Lamp 4, red"><span></span></button>' +
-                    '</div>' +
-                    '<p class="gate-status" id="gate-status" aria-live="polite">Watch.</p>' +
-                    '<p class="gate-sr" id="gate-sr" aria-live="polite"></p>' +
-                    '<button type="button" class="gate-replay" id="gate-replay">Show me again</button>' +
-                '</div>' +
-                '<div class="gate-cta" hidden>' +
-                    '<button type="button" class="gate-btn" id="gate-btn" tabindex="-1" aria-hidden="true">' +
+                '<div class="gate-cta">' +
+                    '<button type="button" class="gate-btn" id="gate-btn">' +
                         '<svg class="gate-lock" viewBox="0 0 32 40" aria-hidden="true" focusable="false">' +
                             '<path class="gate-lock-shackle" d="M9,18 C8,7 11,3 16,3 C21,3 24,7 23,18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>' +
                             '<path class="gate-lock-body" d="M5,18 C12,17 20,17 27,18 C28,25 27,31 27,36 C20,37 12,37 5,36 C5,31 4,25 5,18 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>' +
+                            '<circle class="gate-lock-key" cx="16" cy="26" r="2.2" fill="currentColor"/>' +
+                            '<path class="gate-lock-key" d="M16,28 L16,32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
                         '</svg>' +
+                        '<span class="gate-btn-text">Understood, chef Gradi.</span>' +
                     '</button>' +
+                    '<svg class="gate-arrow" viewBox="0 0 120 60" aria-hidden="true" focusable="false">' +
+                        '<path d="M112,10 C95,8 70,14 48,30 C36,39 26,44 12,46" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+                        '<path d="M26,36 C20,41 16,44 11,46 C16,47 21,50 25,54" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+                    '</svg>' +
+                    '<span class="gate-hint">click here</span>' +
                 '</div>' +
-                '<p class="gate-fine">Shown once. Solving it means you read the notice. This site uses Google Analytics for visit counts, see <a href="privacy.html?peek=1" class="gate-link" target="_blank" rel="noopener">Privacy</a>.</p>' +
+                '<p class="gate-fine">Shown once. Clicking means you read it. This site uses Google Analytics for visit counts, see <a href="privacy.html?peek=1" class="gate-link" target="_blank" rel="noopener">Privacy</a>.</p>' +
             '</div>';
         return overlay;
     }
@@ -82,26 +73,14 @@
         overlay.addEventListener('touchmove', stopScroll, { passive: false });
 
         var btn = overlay.querySelector('#gate-btn');
-        var lamps = Array.prototype.slice.call(overlay.querySelectorAll('.gate-lamp'));
-        var status = overlay.querySelector('#gate-status');
-        var sr = overlay.querySelector('#gate-sr');
-        var replay = overlay.querySelector('#gate-replay');
-        var focusables = function () {
-            return Array.prototype.slice.call(overlay.querySelectorAll('.gate-lamp, .gate-replay, .gate-link')).filter(function (el) { return !el.disabled; });
-        };
 
-        // Keep focus inside the dialog. Escape does not dismiss; the puzzle does.
+        // Keep focus inside the dialog. Escape does not dismiss; the button does.
         overlay.addEventListener('keydown', function (e) {
-            if (e.key === 'Tab') {
-                var f = focusables(); if (!f.length) return;
-                var i = f.indexOf(document.activeElement);
-                e.preventDefault();
-                f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
-            }
+            if (e.key === 'Tab') { e.preventDefault(); btn.focus(); }
             if (e.key === 'Escape') { e.preventDefault(); }
         });
         document.addEventListener('focusin', function trap(e) {
-            if (!overlay.contains(e.target)) { var f = focusables(); if (f[0]) f[0].focus(); }
+            if (!overlay.contains(e.target)) btn.focus();
             overlay._trap = trap;
         });
 
@@ -115,11 +94,10 @@
             setTimeout(function () { overlay.remove(); }, 350);
         }
 
-        function unlock() {
+        btn.addEventListener('click', function () {
             if (btn.disabled) return;
             btn.disabled = true;
             remember();
-            overlay.querySelector('.gate-cta').hidden = false;
 
             var card = overlay.querySelector('.gate-card');
 
@@ -171,96 +149,13 @@
                 void count.offsetWidth;
                 count.classList.add('gate-count-pop');
             }, 1000);
-        }
-
-        /* ── The puzzle ── */
-        var LEN = 4, MISSES = 3;
-        var seq = [], typed = [], misses = 0, showing = false, solved = false, timers = [];
-        var names = ['green', 'amber', 'amber', 'red'];
-
-        function makeSeq() {
-            seq = [];
-            while (seq.length < LEN) {
-                var n = Math.floor(Math.random() * 4);
-                if (seq.length >= 2 && seq[seq.length - 1] === n && seq[seq.length - 2] === n) continue;
-                seq.push(n);
-            }
-        }
-        function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
-        function clearTimers() { timers.forEach(clearTimeout); timers = []; }
-        function light(i, ms) {
-            lamps[i].classList.add('is-lit');
-            later(function () { lamps[i].classList.remove('is-lit'); }, ms);
-        }
-        function say(text) { status.textContent = text; }
-
-        function show() {
-            if (solved) return;
-            clearTimers();
-            showing = true; typed = [];
-            overlay.classList.add('gate-showing');
-            lamps.forEach(function (l) { l.classList.remove('is-lit'); });
-            say('Watch.');
-            sr.textContent = '';
-            var ON = 380, GAP = 230;
-            seq.forEach(function (i, k) {
-                later(function () {
-                    light(i, ON);
-                    sr.textContent = 'Lamp ' + (i + 1) + ', ' + names[i];
-                }, 500 + k * (ON + GAP));
-            });
-            later(function () {
-                showing = false;
-                overlay.classList.remove('gate-showing');
-                say('Your turn.');
-                lamps[0].focus();
-            }, 500 + seq.length * (ON + GAP) + 200);
-        }
-
-        function miss() {
-            misses += 1;
-            overlay.classList.add('gate-miss');
-            later(function () { overlay.classList.remove('gate-miss'); }, 450);
-            if (misses >= MISSES) {
-                say('Three tries. The lab lets you in anyway.');
-                solved = true;
-                lamps.forEach(function (l) { l.disabled = true; });
-                replay.disabled = true;
-                later(unlock, 1100);
-                return;
-            }
-            say(misses === 1 ? 'Not quite. Once more.' : 'Close. Last try, then we let you in regardless.');
-            later(show, 900);
-        }
-
-        function press(i) {
-            if (showing || solved) return;
-            light(i, 180);
-            typed.push(i);
-            var k = typed.length - 1;
-            if (typed[k] !== seq[k]) { miss(); return; }
-            if (typed.length === seq.length) {
-                solved = true;
-                say('That is the one.');
-                lamps.forEach(function (l) { l.disabled = true; });
-                replay.disabled = true;
-                later(unlock, 500);
-            }
-        }
-
-        lamps.forEach(function (l) {
-            l.addEventListener('click', function () { press(parseInt(l.getAttribute('data-lamp'), 10)); });
         });
-        replay.addEventListener('click', function () { if (!showing && !solved) show(); });
-
-        makeSeq();
-        overlay._seq = seq;
 
         requestAnimationFrame(function () {
             overlay.classList.add('gate-in');
             // The overlay is painted now, so the pre-paint paper cover can go.
             html.classList.remove('gate-pending');
-            later(show, 700);
+            btn.focus();
         });
     }
 
@@ -271,7 +166,7 @@
         e.preventDefault();
         if (!document.querySelector('.gate')) open();
     });
-    window.ArtivicoGate = { open: open, sequence: function () { var g = document.querySelector('.gate'); return g && g._seq ? g._seq.slice() : null; } };
+    window.ArtivicoGate = { open: open };
 
     // ?peek=1 lets the Privacy link from inside the notice open without the notice
     // (the visitor hasn't acknowledged yet). Nothing is remembered.
@@ -281,9 +176,19 @@
     }
 
     if (acked()) return;
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', open);
-    } else {
-        open();
+
+    function start() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', open);
+        } else {
+            open();
+        }
     }
+
+    // puzzle.js loads first and claims the screen. The notice waits for it
+    // and opens the moment the visitor is through. No puzzle on the page,
+    // or one already passed, and the notice opens straight away as before.
+    var P = window.ArtivicoPuzzle;
+    if (P && P.pending) { P.onPass(start); return; }
+    start();
 })();

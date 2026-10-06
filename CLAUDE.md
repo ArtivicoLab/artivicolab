@@ -155,27 +155,44 @@ wiring.
 
 ## The entry puzzle
 
-`assets/js/gate.js`, with styles next to the other `.gate-` rules in
-`styles.css`. First visit only, remembered under `artivicolab_gate_ack_v1`.
-The rights notice is still there; below it, four runway lamps (green,
-amber, amber, red, like the rails in the gutters) flash a four-step
-sequence and the visitor taps it back. Solving it runs the same lock-pop
-and ACCESS GRANTED sequence the old "Understood, chef Gradi" button ran.
-"Show me again" replays the sequence at no cost.
+`assets/js/puzzle.js`, with styles under the `ENTRY PUZZLE` banner in
+`styles.css`. It stands on its own: its own overlay, its own class names,
+its own scroll lock, its own file. Delete the file and the one script tag
+that loads it and the site is exactly as it was.
 
-**The mercy rule, do not remove it.** Three misses and the status line
-says the lab lets you in anyway, then the lock pops. This exists because
-the IP gate below locked real visitors out for days in September 2026. A
-puzzle is a greeting, not a wall. If it ever fails for some reason
-(script error, no JS), the page underneath is complete HTML: the overlay
-is script-only, so the site is readable and indexable regardless.
+**It is the first thing a visitor sees.** Four runway lamps, coloured like
+the rails in the page gutters, flash a four-step sequence; the visitor taps
+it back. "Show me again" replays at no cost. When the visitor is through,
+the puzzle fades and hands over to the rights notice, which runs its
+lock-pop and ACCESS GRANTED exactly as before.
 
-Accessibility: the lamps are buttons, Tab cycles through lamps, replay
-and the privacy link, Escape is ignored by design, and a visually hidden
-live region names each lamp as it lights so a screen reader user can
-play. `ArtivicoGate.sequence()` returns the current sequence; it is there
-for the headless test, and anyone who opens devtools to read it could
-just as easily set the localStorage key, so it hides nothing.
+The handover is a small handshake, not a merge. `puzzle.js` loads *before*
+`gate.js` on every page and sets `window.ArtivicoPuzzle.pending`. `gate.js`
+sees that and waits via `onPass`. No puzzle on the page and the notice
+opens straight away, same as it always did. Keep the script order.
+
+**The key was bumped to `artivicolab_gate_ack_v2`** on 2026-10-06. The
+first version of this shipped reusing `..._v1`, which meant every visitor
+who had already cleared the old notice, including Gradi, never saw the
+puzzle at all and reported being let straight in. The same key is read by
+the inline pre-paint script in every page, so bump it in both places or
+returning visitors get a flash of the site before the overlay lands.
+`gate.js` owns the key and sets it only after the notice, so solving the
+puzzle and leaving means you play again next time.
+
+**THE MERCY RULE, DO NOT REMOVE IT.** Three misses and the status line
+reads "Three tries. In you go." and the visitor is let through. This site
+already locked real people out for days with the IP gate in September
+2026. A puzzle is a greeting, not a wall. The overlay is script-only and
+the page underneath is complete HTML, so the site stays readable and
+indexable whatever happens here.
+
+Accessibility: the lamps are real buttons, Tab cycles lamps then replay,
+Escape is ignored by design, and a visually hidden live region names each
+lamp as it lights so the sequence can be played by ear.
+`ArtivicoPuzzle.sequence()` exposes the current sequence for the headless
+test; anyone who opens devtools to read it could just as easily set the
+localStorage key, so it hides nothing that was not already open.
 
 ## Visitor Scan, the demo in the footer
 
