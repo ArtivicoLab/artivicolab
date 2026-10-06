@@ -153,6 +153,30 @@ To add a loop: append to `TRACKS` with a dictionary-word id, then add a
 matching `<li data-track="id">` card on `sounds.html`. Nothing else needs
 wiring.
 
+## The entry puzzle
+
+`assets/js/gate.js`, with styles next to the other `.gate-` rules in
+`styles.css`. First visit only, remembered under `artivicolab_gate_ack_v1`.
+The rights notice is still there; below it, four runway lamps (green,
+amber, amber, red, like the rails in the gutters) flash a four-step
+sequence and the visitor taps it back. Solving it runs the same lock-pop
+and ACCESS GRANTED sequence the old "Understood, chef Gradi" button ran.
+"Show me again" replays the sequence at no cost.
+
+**The mercy rule, do not remove it.** Three misses and the status line
+says the lab lets you in anyway, then the lock pops. This exists because
+the IP gate below locked real visitors out for days in September 2026. A
+puzzle is a greeting, not a wall. If it ever fails for some reason
+(script error, no JS), the page underneath is complete HTML: the overlay
+is script-only, so the site is readable and indexable regardless.
+
+Accessibility: the lamps are buttons, Tab cycles through lamps, replay
+and the privacy link, Escape is ignored by design, and a visually hidden
+live region names each lamp as it lights so a screen reader user can
+play. `ArtivicoGate.sequence()` returns the current sequence; it is there
+for the headless test, and anyone who opens devtools to read it could
+just as easily set the localStorage key, so it hides nothing.
+
 ## Visitor Scan, the demo in the footer
 
 `assets/js/ip-gate.js`, wired into every page inside `<!-- IP-GATE:START -->`

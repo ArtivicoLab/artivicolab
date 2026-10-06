@@ -2478,6 +2478,71 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
     color: var(--accent); transform: rotate(-6deg); white-space: nowrap;
 }
 @keyframes gate-nudge { from { transform: translateX(0); } to { transform: translateX(-8px); } }
+
+/* The entry puzzle: four runway lamps, coloured by aviation convention */
+.gate-puzzle { margin: var(--sp-md) 0 var(--sp-sm); }
+.gate-puzzle-ask {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--fs-md);
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin-bottom: var(--sp-sm);
+}
+.gate-puzzle-ask strong { color: var(--ink); font-style: normal; font-weight: 700; }
+.gate-lamps { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; }
+.gate-lamp {
+    --c: #2E8B57;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: var(--paper-card);
+    padding: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 0.12s var(--ease), box-shadow 0.12s var(--ease);
+}
+.gate-lamp[data-lamp="1"], .gate-lamp[data-lamp="2"] { --c: #D9A021; }
+.gate-lamp[data-lamp="3"] { --c: var(--accent); }
+.gate-lamp span {
+    display: block; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--c); opacity: 0.28;
+    transition: opacity 0.1s linear, transform 0.1s var(--ease), box-shadow 0.1s linear;
+}
+.gate-lamp.is-lit span { opacity: 1; transform: scale(1.45); box-shadow: 0 0 18px var(--c), 0 0 38px var(--c); }
+.gate-lamp:hover { transform: translateY(-1px); }
+.gate-lamp:focus-visible { outline: 0; box-shadow: 0 0 0 3px var(--paper), 0 0 0 4.5px var(--ink); }
+.gate-lamp:disabled { cursor: default; }
+.gate-showing .gate-lamp { cursor: wait; }
+.gate-showing .gate-lamp:hover { transform: none; }
+.gate-status {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    min-height: 1.4em;
+    margin-bottom: 6px;
+}
+.gate-miss .gate-status { color: var(--accent); }
+.gate-miss .gate-lamps { animation: gate-miss-shake 0.4s ease-in-out; }
+@keyframes gate-miss-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.gate-replay {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    background: transparent; border: 0; padding: 0;
+    text-decoration: underline; text-underline-offset: 3px;
+    cursor: pointer;
+}
+.gate-replay:hover, .gate-replay:focus-visible { color: var(--accent); outline: 0; }
+.gate-replay:disabled { opacity: 0; pointer-events: none; }
+.gate-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.gate-cta[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+    .gate-lamp, .gate-lamp span { transition: none; }
+    .gate-miss .gate-lamps { animation: none; }
+}
 .gate-unlocking .gate-arrow, .gate-unlocking .gate-hint { opacity: 0; }
 
 /* Big watermark lock behind the notice. On acknowledge it comes forward,
