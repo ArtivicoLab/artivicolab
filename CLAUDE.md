@@ -153,109 +153,45 @@ To add a loop: append to `TRACKS` with a dictionary-word id, then add a
 matching `<li data-track="id">` card on `sounds.html`. Nothing else needs
 wiring.
 
-## The welcome: puzzle, then the listening room
+## The rights notice, and the welcome gate that was removed
 
-Three files, in this order on every page, and the order matters:
-`puzzle.js`, `gate.js`, `beats.js`.
+`assets/js/gate.js` opens a rights notice card only from the footer
+"All rights reserved" link (`[data-gate-open]`). Nothing opens on its
+own, nothing covers the page before paint, nothing is required of a
+visitor. Its styles are the `.gate-` rules in `styles.css`.
 
-1. **`assets/js/puzzle.js`** Four runway lamps flash a sequence, the
-   visitor taps it back. A component, not a decision maker: `open(onDone,
-   onWin)` and that is all. `gate.js` decides who sees it.
-2. **`assets/js/gate.js`** The listening room. Parade plays twice while
-   the lab's story is on screen and a clock counts down. At zero the lock
-   pops, ACCESS GRANTED, in you go.
-3. Access lasts **one hour**, stored as a timestamp in
-   `artivicolab_access_until`. When it lapses the whole welcome plays
-   again. The inline pre-paint script in every page reads the same key, so
-   change it in both places or returning visitors get a flash of the site.
+From 2026-10-06 to 2026-10-10 the site had a welcome gate in front of
+every page: a lamp-sequence puzzle (`puzzle.js`), then a listening room
+where Parade had to be heard twice with a clock that only ran while
+sound was actually coming out, access good for an hour. Gradi asked for
+it, tested it, and on 2026-10-10 said "we are done with the test, let the
+site be accessible". It was removed in full: the puzzle file, the
+listening room, the access timestamp, the inline pre-paint cover script
+on every page, the footer replay link and all their styles. The history
+is in git (`ab639e1` through `dde56bb`) if it is ever wanted again.
 
-**Sound is mandatory and the clock proves it.** The timer does not count
-wall-clock seconds. Every 200ms it asks `ArtivicoBeats.isPlaying()` and
-`ArtivicoBeats.level()`, and only adds the elapsed time if real signal is
-coming out of the output (level above 0.001; true silence reads 0.000,
-Parade's quietest beats read about 0.005). Pause the footer player, block autoplay, or
-switch tabs in a way that suspends the audio clock and the countdown stops
-dead, the bar greys out, and a red "Turn the sound on" button appears.
-There is no path to the site that does not go through hearing Parade twice.
-`level()` is an AnalyserNode tapped off the limiter in `beats.js`, added
-for exactly this. Hardware volume at zero is not detectable from
-JavaScript by anyone, so that is the one hole and it cannot be closed.
+Two things from that work were kept on purpose, because they fixed real
+bugs in the player rather than belonging to the gate:
 
-**The listening room opens on the winning tap itself**, underneath the
-puzzle card while it fades, so sound and card arrive together. Before
-that there was about a second of music with nothing on screen, which
-Gradi reported as the music "playing out on nowhere". The puzzle leaves
-the scroll lock alone when it sees the gate is already up.
+- `beats.js` holds exactly one running chain (`run`); `start()` kills any
+  existing chain before building, a `starting` flag closes the race
+  between `start()`'s first await and `playing` going true, and
+  `ArtivicoBeats.play(id)` is the one call other scripts should make.
+  Pairing `choose()` and `start()` by hand produced the same loop twice.
+- A cross-tab lock (`BroadcastChannel` plus the `storage` event on
+  `artivicolab.beats.owner`): the tab that starts last wins, every other
+  tab stops. Two open tabs each running a player was a double-sound
+  report no in-page fix could touch.
+- `level()`, `isPlaying()` and `muted()` stay exported; harmless, and the
+  analyser tap costs nothing.
+- `touch-action: manipulation` on the play buttons and the notice, so a
+  fast second tap on a phone does not zoom the page.
 
-**Audio has to start inside a user gesture** or iOS refuses. That is why
-`puzzle.js` takes an `onWin` callback and fires it synchronously inside
-the winning tap, still in the gesture, and why `gate.js` passes
-`primeAudio` into it. Do not move that call into a timeout.
-
-`primeAudio` saves the visitor's chosen footer track before switching to
-Parade and `restoreTrack` puts it back at grant time, so the welcome does
-not quietly overwrite their pick. It captures that track only on the
-first call, because the "Turn the sound on" button can prime again and
-would otherwise save Parade over their choice.
-
-**The music stops when the overlay goes.** `dismiss()` calls
-`ArtivicoBeats.stop()`. Leaving it running meant Parade played on in the
-background while the visitor read the site.
-
-**The double-sound saga, and why it cannot come back.** Gradi heard the
-same loop twice, a beat apart, three times over on 2026-10-06. Each time
-a real cause was found and fixed, and the last fix changed the design so
-the class of bug is gone, not just the instances:
-
-- `beats.js` holds exactly one running chain in `live`. `start()` kills
-  whatever is in `live` before building, `stop()` kills it, and nothing
-  else holds a reference. `kill()` fades the chain, then disconnects
-  every node and releases the router `<audio>`, so notes it had already
-  scheduled cannot be heard. The `starting` flag closes the window
-  between `start()`'s first `await` and `playing` going true, and after
-  the router spins up `start()` checks `live` again and bails if a stop
-  landed meanwhile.
-- `ArtivicoBeats.play(id)` is the only call other scripts should make.
-  It does the choose-then-start dance correctly, synchronously up to the
-  first await so it works inside a tap on iOS. The gate used to pair
-  `choose()` and `start()` by hand, and `choose()` already restarts the
-  player when swapping tracks, which was cause number one.
-- A cross-tab lock: a `BroadcastChannel` plus the `storage` event on
-  `artivicolab.beats.owner`. Whichever tab starts last wins and every
-  other tab stops. Two tabs or windows of the site, each with its own
-  player, was the one cause no in-page fix could touch, and it is the
-  likely reason the report kept coming back after the in-page fixes.
-
-The test for all of it wraps `createDynamicsCompressor` to count chains
-built and chains still connected: after any sequence of `play()`,
-`start()`, footer clicks and a track swap, at most one chain may remain
-on the graph, and a single `stop()` must leave zero.
-
-**Footer "Replay the welcome"** (`[data-access-replay]`, next to the old
-`[data-gate-open]` link, both wired to the same thing) clears access and
-runs the whole flow on demand.
-
-**The mercy rule still applies to the puzzle only.** Three misses and the
-visitor goes through to the listening room. It does not apply to the
-listen, which is the point of it. The old IP gate locked real people out
-for days in September 2026; the puzzle is a greeting, but the listen is a
-deliberate toll and Gradi asked for it twice, explicitly, including
-"audio is required, no blocking nor muting".
-
-Know the cost: two minutes of forced audio before any content is a heavy
-toll on a public site, and a visitor who leaves during it counts against
-the page in search. The overlay is script-only and the page underneath is
-complete HTML, so crawlers still index everything.
-
-Do not claim anything about Gradi's education in this copy. An early
-draft said "no computer science degree, no bootcamp", which is untrue (he
-holds a degree from Georgia State) and he asked for degrees to stay out
-of it. "Self-taught" and "ten thousand hours" are the framing he wants.
-
-Accessibility: lamps are real buttons, Tab cycles them, Escape is ignored
-by design, a hidden live region names each lamp as it lights, and the
-listening room's note is a live region so a screen reader hears when the
-clock stops.
+Lessons that stand regardless: this site has now gated real visitors
+twice (the IP gate in September, the welcome in October) and both were
+taken down. Anything that must be passed before content is read costs
+traffic and search standing. If a greeting is wanted, make it something
+a visitor can ignore.
 
 ## Visitor Scan, the demo in the footer
 
