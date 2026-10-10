@@ -2556,6 +2556,20 @@ body.gate-open { position: fixed; left: 0; right: 0; width: 100%; }
 @keyframes gate-nudge { from { transform: translateX(0); } to { transform: translateX(-8px); } }
 
 /* ─── Entry puzzle (puzzle.js), stands alone ─────────────── */
+/* No double-tap zoom anywhere the welcome lives. Entering the lamp
+   sequence means tapping fast, and phones read a fast second tap as
+   "zoom in", after which a fixed overlay cannot be panned back out.
+   `manipulation` keeps pinch and pan, drops only the double-tap zoom. */
+html.puzzle-open, html.gate-open, body.puzzle-open, body.gate-open,
+.puzzle, .puzzle *, .gate, .gate *, .beats-btn, .beats-chevron, .beats-menu *, .sound-play, .mix-btn, .mix-row-play {
+    touch-action: manipulation;
+}
+.puzzle-lamp, .sound-play, .beats-btn, .mix-row-play, .gate-sound, .puzzle-replay {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 html.puzzle-open, body.puzzle-open { overflow: hidden; height: 100%; }
 body.puzzle-open { position: fixed; left: 0; right: 0; width: 100%; }
 
